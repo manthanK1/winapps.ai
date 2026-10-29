@@ -1,0 +1,31 @@
+---
+// Section heading as in the design: eyebrow + h2 on the left, an underlined
+// link on the right (optional). V1's two-tone title/accent is set in ink.
+import Icon from "./Icon.astro";
+import { href } from "../lib/url";
+
+interface Props {
+  id?: string;
+  eyebrow?: string;
+  title: string;
+  accent?: string;
+  intro?: string;
+  link?: { label: string; href: string };
+  center?: boolean;
+  /** Heading level; h2 by default. */
+  as?: "h2" | "h3";
+  class?: string;
+}
+const { id, eyebrow, title, accent, intro, link, center = false, as: H = "h2", class: className } = Astro.props;
+---
+<div class:list={["section-head", { "section-head--center": center }, className]}>
+  <div class="section-head__text veil">
+    {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+    <H id={id} class="h2">{title}{accent && <> {accent}</>}</H>
+    {intro && <p class="lead">{intro}</p>}
+    <slot />
+  </div>
+  {link && (
+    <a class="link-u veil" href={href(link.href)}>{link.label} <Icon name="arrow" size={16} /></a>
+  )}
+</div>

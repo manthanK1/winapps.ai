@@ -1,0 +1,31 @@
+---
+import { href } from "../lib/url";
+
+interface Props {
+  /** Trail after Home, e.g. [{ name: "Work", path: "/work/" }] */
+  items: { name: string; path: string }[];
+}
+const { items } = Astro.props;
+const trail = [{ name: "Home", path: "/" }, ...items];
+---
+<nav aria-label="Breadcrumb" class="crumbs">
+  <ol class="list-reset">
+    {trail.map((item, i) => (
+      <li>
+        {i > 0 && <span aria-hidden="true" class="crumbs__sep">/</span>}
+        {i === trail.length - 1
+          ? <span aria-current="page">{item.name}</span>
+          : <a href={href(item.path)}>{item.name}</a>}
+      </li>
+    ))}
+  </ol>
+</nav>
+
+<style>
+  .crumbs ol { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; font-size: 13px; color: var(--muted); }
+  .crumbs li { display: flex; align-items: center; gap: 8px; }
+  .crumbs a { display: inline-flex; align-items: center; min-height: 32px; color: var(--ink-2); text-decoration: underline; text-underline-offset: 3px; }
+  .crumbs a:hover { color: var(--primary); }
+  .crumbs [aria-current="page"] { color: var(--ink); max-width: 48ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .crumbs__sep { color: var(--rule-2); }
+</style>

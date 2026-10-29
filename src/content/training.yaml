@@ -1,0 +1,204 @@
+# Training courses, grouped into tracks. Tracks show in this order on the home
+# page, the header menu and /training/; courses keep the order listed.
+#
+# - id: used in links, e.g. /training/#flutter. Keep it unique and lower-case.
+# - logos: keys from src/lib/tech-logos.ts (the official logos).
+# - topics: the "What you'll learn" list on the course card.
+#
+# Duration, fees and batch dates are not listed yet: every course card asks
+# people to enquire on WhatsApp. Add them here once they're confirmed.
+
+- id: ai-data
+  name: AI & Data
+  order: 1
+  intro: From your first Python script to machine learning models in production.
+  logos: [python, tensorflow, pytorch, pandas]
+  courses:
+    - id: ai-ml
+      name: AI & Machine Learning
+      logos: [tensorflow, pytorch, scikitlearn]
+      summary: Build, train and deploy models, including apps built on large language models.
+      topics:
+        - The maths and data preparation you actually need
+        - Supervised and unsupervised learning with scikit-learn
+        - Deep learning with TensorFlow and PyTorch
+        - LLMs, prompting and retrieval-augmented generation (RAG)
+        - Serving a model behind an API
+    - id: python
+      name: Python Programming
+      logos: [python]
+      summary: The language behind AI, data and automation, from first principles to real projects.
+      topics:
+        - Syntax, data types and control flow
+        - Functions, modules and object-oriented programming
+        - Files, APIs and automation scripts
+        - Working with data in pandas
+        - A complete project, start to finish
+    - id: data-analytics
+      name: Data Analytics
+      logos: [pandas, mysql]
+      summary: Turn raw data into answers with SQL, Excel, Power BI and Python.
+      topics:
+        - SQL queries, joins and aggregations
+        - Cleaning and shaping data in Excel and pandas
+        - Dashboards in Power BI
+        - Statistics for everyday decisions
+        - A portfolio dashboard project
+
+- id: web
+  name: Web Development
+  order: 2
+  intro: Front end, back end and design for the web, in the stacks companies hire for.
+  logos: [react, nodejs, java, php, dotnetcore, figma]
+  courses:
+    - id: mern
+      name: MERN Stack
+      logos: [mongodb, express, react, nodejs]
+      summary: Full-stack JavaScript with MongoDB, Express, React and Node.js.
+      topics:
+        - Modern JavaScript and TypeScript basics
+        - React components, hooks and routing
+        - REST APIs with Node.js and Express
+        - Data modelling in MongoDB
+        - Authentication, deployment and a full-stack project
+    - id: java-full-stack
+      name: Java Full Stack
+      logos: [java, spring, react, mysql]
+      summary: Core Java, Spring Boot and React, the enterprise favourite.
+      topics:
+        - Core Java and object-oriented programming
+        - Collections, streams and exception handling
+        - REST APIs with Spring Boot
+        - JPA and Hibernate with MySQL
+        - A React front end, deployed end to end
+    - id: dotnet-core
+      name: .NET Core
+      logos: [dotnetcore, csharp]
+      summary: C# and ASP.NET Core for fast, secure web apps and APIs.
+      topics:
+        - C# fundamentals and object-oriented programming
+        - ASP.NET Core MVC and Web API
+        - Entity Framework Core with SQL Server
+        - Authentication and authorisation
+        - Testing and deploying to the cloud
+    - id: php
+      name: PHP & Laravel
+      logos: [php, laravel, mysql]
+      summary: Server-side web development with PHP, MySQL and Laravel.
+      topics:
+        - PHP syntax, forms and sessions
+        - MySQL and PDO
+        - Object-oriented PHP and MVC
+        - Laravel routing, Eloquent and Blade
+        - Building and hosting a live website
+    - id: web-design
+      name: Web Design (UI/UX)
+      logos: [figma, html5, css3]
+      summary: Design and build responsive websites that look good and are easy to use.
+      topics:
+        - UI and UX principles
+        - Wireframes and prototypes in Figma
+        - HTML5 and modern CSS (Flexbox, Grid)
+        - Responsive and accessible design
+        - From a Figma design to a live site
+
+- id: mobile-games
+  name: Mobile & Game Development
+  order: 3
+  intro: Apps for iPhone and Android, cross-platform apps with Flutter and .NET MAUI, and games with Unity.
+  logos: [apple, android, flutter, dotnet, unity]
+  courses:
+    - id: ios-android
+      name: iOS & Android
+      logos: [apple, android, swift, kotlin]
+      summary: Native apps with Swift for iPhone and Kotlin for Android.
+      topics:
+        - Swift and SwiftUI basics
+        - Kotlin and Jetpack Compose basics
+        - Navigation, storage and networking
+        - Notifications, camera and other device features
+        - Publishing to the App Store and Google Play
+    - id: flutter
+      name: Flutter
+      logos: [flutter, dart, firebase]
+      summary: One Dart codebase for iOS, Android and the web.
+      topics:
+        - Dart language essentials
+        - Widgets, layouts and theming
+        - State management with Provider, Riverpod or BLoC
+        - Firebase sign-in, database and notifications
+        - Releasing to both app stores
+    - id: dotnet-maui
+      name: .NET MAUI
+      logos: [dotnet, csharp]
+      summary: Cross-platform apps for Android, iOS, Windows and macOS in C#.
+      topics:
+        - C# and XAML basics
+        - The MVVM pattern
+        - Layouts, controls and navigation
+        - APIs, data and local storage
+        - Packaging for each platform
+    - id: unity
+      name: Unity Game Development
+      logos: [unity, csharp]
+      summary: 2D and 3D games in Unity with C#, for mobile and PC.
+      topics:
+        - The Unity editor, scenes and prefabs
+        - C# scripting for gameplay
+        - Physics, animation and game UI
+        - A 2D and a 3D game project
+        - Building for Android, iOS and PC
+
+- id: cloud-devops
+  name: Cloud & DevOps
+  order: 4
+  intro: Deploy, automate and run software on AWS, Microsoft Azure and Oracle Cloud.
+  logos: [aws, azure, oracle, docker, kubernetes]
+  courses:
+    - id: cloud
+      name: Cloud Development
+      logos: [aws, azure, oracle]
+      summary: Build and deploy applications on AWS, Microsoft Azure and Oracle Cloud.
+      topics:
+        - Cloud basics, from compute and storage to networking
+        - Core services on AWS, Azure and Oracle Cloud (OCI)
+        - Serverless functions and managed databases
+        - Security, access control and cost control
+        - Deploying a real application end to end
+    - id: aws-devops
+      name: AWS DevOps
+      logos: [aws, docker, kubernetes, jenkins]
+      summary: CI/CD, containers and infrastructure as code, on AWS.
+      topics:
+        - Linux, Git and shell scripting
+        - CI/CD pipelines with Jenkins and AWS CodePipeline
+        - Docker and Kubernetes
+        - Infrastructure as code with Terraform and CloudFormation
+        - Monitoring with CloudWatch
+
+- id: testing-marketing
+  name: Testing & Marketing
+  order: 5
+  intro: Careers right next to the code, in software testing and digital marketing.
+  logos: [selenium, postman, google, meta]
+  courses:
+    - id: qa-testing
+      name: QA & Software Testing
+      logos: [selenium, playwright, postman, jira]
+      summary: Manual and automation testing that catches bugs before users do.
+      topics:
+        - Testing fundamentals, test cases and bug reports
+        - Agile, Jira and the testing life cycle
+        - Test automation with Selenium and Playwright
+        - API testing with Postman
+        - Performance testing basics
+    - id: digital-marketing
+      name: Digital Marketing
+      logos: [google, meta, instagram]
+      summary: SEO, social media and paid ads that bring in traffic you can measure.
+      topics:
+        - SEO, from keywords to technical fixes
+        - Google Ads and Meta ads
+        - Social media marketing and content
+        - Email marketing
+        - Analytics and reporting

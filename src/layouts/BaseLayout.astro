@@ -1,0 +1,145 @@
+---
+// Every page: pre-rendered HTML with all content in the source, one <h1>,
+// canonical on the production domain, Open Graph/Twitter, and JSON-LD
+// (Organization + ProfessionalService, WebSite, WebPage, BreadcrumbList,
+// plus whatever the page passes in). The WebGL ribbon is decoration only and
+// loads after first paint.
+import "../styles/global.css";
+import headingFont from "../assets/fonts/inter-tight-600.woff2?url";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { SITE } from "../data/site";
+import { metaDescription, pageTitle } from "../lib/seo";
+import { absolute, href } from "../lib/url";
+import { breadcrumbs as breadcrumbSchema, organization, webPage, website, type WebPageType } from "../lib/schema";
+
+interface Props {
+  title: string;
+  description: string;
+  /** Breadcrumb trail after Home, e.g. [{ name: "Work", path: "/work/" }] */
+  breadcrumbs?: { name: string; path: string }[];
+  /** Page-specific JSON-LD (Service, Course, FAQPage, Article…). */
+  jsonLd?: object[];
+  /** schema.org type of this page's WebPage node. */
+  pageType?: WebPageType;
+  /** Skip the generic WebPage node (when jsonLd already carries one, e.g. ContactPage). */
+  noWebPage?: boolean;
+  ogType?: "website" | "article";
+  /** Article dates for og/article meta. */
+  published?: Date;
+  modified?: Date;
+  /** Clean Markdown version of this page, advertised to AI crawlers. */
+  markdownPath?: string;
+  noindex?: boolean;
+  /** "home": the full W intro. "inner": the calm curtain. "none": no canvas. */
+  ribbon?: "home" | "inner" | "none";
+}
+
+const {
+  title,
+  description,
+  breadcrumbs = [],
+  jsonLd = [],
+  pageType = "WebPage",
+  noWebPage = false,
+  ogType = "website",
+  published,
+  modified,
+  markdownPath,
+  noindex = false,
+  ribbon = "inner",
+} = Astro.props;
+
+const fullTitle = pageTitle(title);
+const metaDesc = metaDescription(description);
+const canonical = new URL(Astro.url.pathname, Astro.site).toString();
+const ogImage = absolute("/brand/og.png", Astro.site);
+const logoImage = absolute("/brand/icon-512.png", Astro.site);
+const trail = [{ name: "Home", path: "/" }, ...breadcrumbs];
+const path = Astro.url.pathname.slice(import.meta.env.BASE_URL.replace(/\/$/, "").length) || "/";
+
+const schemas: object[] = [
+  organization(Astro.site, logoImage, ogImage),
+  website(Astro.site),
+  ...(noWebPage ? [] : [webPage(Astro.site, { type: pageType, name: fullTitle, description: metaDesc, path, dateModified: modified })]),
+  breadcrumbSchema(Astro.site, trail),
+  ...jsonLd,
+];
+const plausibleDomain = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN;
+---
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={metaDesc} />
+    <link rel="canonical" href={canonical} />
+    {noindex ? <meta name="robots" content="noindex, follow" /> : <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />}
+    <meta name="theme-color" content="#FFFFFF" />
+    <meta name="author" content={SITE.legalName} />
+
+    <link rel="preload" href={headingFont} as="font" type="font/woff2" crossorigin />
+    <script is:inline>document.documentElement.classList.add("js");</script>
+
+    <link rel="icon" href={href("/favicon.ico")} sizes="32x32" />
+    <link rel="icon" type="image/png" sizes="32x32" href={href("/favicon-32.png")} />
+    <link rel="apple-touch-icon" href={href("/apple-touch-icon.png")} />
+    <link rel="manifest" href={href("/site.webmanifest")} />
+    <link rel="sitemap" type="application/xml" href={href("/sitemap-index.xml")} />
+    <link rel="alternate" type="text/plain" title="llms.txt" href={href("/llms.txt")} />
+    {markdownPath && <link rel="alternate" type="text/markdown" href={href(markdownPath)} />}
+
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={`${SITE.name}®`} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={metaDesc} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Winapps logo: senior engineers for software that has to work." />
+    <meta property="og:locale" content="en_GB" />
+    {published && <meta property="article:published_time" content={published.toISOString()} />}
+    {modified && <meta property="article:modified_time" content={modified.toISOString()} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={metaDesc} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content="Winapps logo: senior engineers for software that has to work." />
+
+    {schemas.map((s) => <script type="application/ld+json" set:html={JSON.stringify(s)} />)}
+
+    {plausibleDomain && <script is:inline defer data-domain={plausibleDomain} src="https://plausible.io/js/script.js" />}
+  </head>
+  <body>
+    <a href="#main" class="skip-link">Skip to content</a>
+    {ribbon !== "none" && <canvas class="ribbon-canvas" data-ribbon={ribbon} aria-hidden="true"></canvas>}
+    <Header />
+    <main id="main" class="site-main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+
+    <script>
+      // The ribbon is decoration: start it only once the page has painted and
+      // the main thread is idle, so it never delays the hero text. Any failure
+      // (no WebGL, old browser) simply leaves the page without it.
+      const canvas = document.querySelector<HTMLCanvasElement>("canvas[data-ribbon]");
+      if (canvas) {
+        const start = () =>
+          import("../scripts/ribbon")
+            .then(({ mountRibbon }) => {
+              const variant = canvas.dataset.ribbon === "home" ? "home" : "inner";
+              if (!mountRibbon(canvas, { variant, wordmark: document.getElementById("ribbon-word") })) canvas.remove();
+            })
+            .catch(() => canvas.remove());
+        const whenIdle = () =>
+          "requestIdleCallback" in window ? requestIdleCallback(start, { timeout: 1500 }) : setTimeout(start, 120);
+        if (document.readyState === "complete") whenIdle();
+        else addEventListener("load", whenIdle, { once: true });
+      }
+    </script>
+  </body>
+</html>

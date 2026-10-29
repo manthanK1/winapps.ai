@@ -1,0 +1,148 @@
+---
+// Footer in the design's language (1px ink rule, near-white panel, 13px
+// meta row) carrying all of V1's columns: Services, Training, Explore,
+// Company, Legal, Social, plus contact details.
+import Icon from "./Icon.astro";
+import { FOOTER, SITE, SOCIAL } from "../data/site";
+import { getServices, getTracks } from "../lib/content";
+import { href } from "../lib/url";
+
+const services = await getServices();
+const tracks = await getTracks();
+const year = new Date().getFullYear();
+---
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__grid">
+      <div class="site-footer__brand">
+        <a href={href("/")} class="site-footer__logo" aria-label={`${SITE.name} home`}>
+          <img src={href("/brand/winapps-logo-still.webp")} alt={SITE.name} width="257" height="287" loading="lazy" decoding="async" />
+        </a>
+        <p class="site-footer__legal">{SITE.legalName}</p>
+        <p class="site-footer__blurb">{FOOTER.blurb}</p>
+        <address class="site-footer__contact">
+          <a href={`mailto:${SITE.email}`}><Icon name="mail" size={18} />{SITE.email}</a>
+          <a href={SITE.phoneHref}><Icon name="phone" size={18} />{SITE.phone}</a>
+          <a href={SITE.whatsappHref} target="_blank" rel="noopener"><Icon name="whatsapp" size={18} />WhatsApp</a>
+        </address>
+      </div>
+
+      <nav class="site-footer__cols" aria-label="Footer">
+        <div>
+          <h2 class="site-footer__head">Services</h2>
+          <ul class="list-reset">
+            {services.map((s) => <li><a href={href(`/services/${s.id}/`)}>{s.data.title}</a></li>)}
+          </ul>
+        </div>
+        <div>
+          <h2 class="site-footer__head">Training</h2>
+          <ul class="list-reset">
+            {tracks.map((t) => <li><a href={href(`/training/#${t.id}`)}>{t.data.name}</a></li>)}
+            <li><a href={href("/training/")}>All courses</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="site-footer__head">Explore</h2>
+          <ul class="list-reset">
+            {FOOTER.explore.map((l) => <li><a href={href(l.href)}>{l.label}</a></li>)}
+          </ul>
+        </div>
+        <div>
+          <h2 class="site-footer__head">Company</h2>
+          <ul class="list-reset">
+            {FOOTER.company.map((l) => <li><a href={href(l.href)}>{l.label}</a></li>)}
+          </ul>
+          <h2 class="site-footer__head site-footer__head--gap">Legal</h2>
+          <ul class="list-reset">
+            {FOOTER.legal.map((l) => <li><a href={href(l.href)}>{l.label}</a></li>)}
+          </ul>
+        </div>
+        <div>
+          <h2 class="site-footer__head">Social</h2>
+          <ul class="list-reset">
+            {SOCIAL.map((s) => <li><a href={s.href} target="_blank" rel="noopener">{s.label}</a></li>)}
+          </ul>
+        </div>
+      </nav>
+    </div>
+
+    <div class="site-footer__bar">
+      <p>© {SITE.founded}–{year} {SITE.name}®. All rights reserved.</p>
+      <p>{SITE.legalName} · <a href={`mailto:${SITE.email}`}>{SITE.email}</a> · <a href={SITE.phoneHref}>{SITE.phone}</a></p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    position: relative;
+    z-index: 1;
+    margin-top: clamp(48px, 8vw, 120px);
+    border-top: 1px solid var(--ink);
+    background: var(--card);
+    color: var(--ink);
+  }
+  .site-footer__grid {
+    display: grid;
+    gap: 48px;
+    padding-block: clamp(48px, 6vw, 80px) 48px;
+  }
+  @media (min-width: 1100px) {
+    .site-footer__grid { grid-template-columns: minmax(260px, 1fr) 2.6fr; gap: 64px; }
+  }
+  .site-footer__logo { display: inline-flex; height: 64px; overflow: hidden; }
+  .site-footer__logo img { height: 72px; width: auto; max-width: none; }
+  .site-footer__legal { margin-top: 12px; font: 600 18px/1.25 var(--font-display); letter-spacing: -0.01em; }
+  .site-footer__blurb { margin-top: 10px; max-width: 34ch; font-size: 14px; color: var(--ink-2); }
+  .site-footer__contact { display: grid; justify-items: start; margin-top: 18px; }
+  .site-footer__contact a {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .site-footer__contact a:hover { text-decoration: underline; text-underline-offset: 4px; }
+  .site-footer__contact :global(svg) { color: var(--primary); }
+  .site-footer__cols {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 36px 24px;
+  }
+  @media (min-width: 720px) {
+    .site-footer__cols { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  }
+  .site-footer__head {
+    margin-bottom: 10px;
+    font: 600 12px/1.3 var(--font-body);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--primary);
+  }
+  .site-footer__head--gap { margin-top: 28px; }
+  .site-footer__cols a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-size: 14px;
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+  @media (min-width: 1100px) {
+    .site-footer__cols a { min-height: 36px; }
+  }
+  .site-footer__cols a:hover { color: var(--primary); text-decoration: underline; text-underline-offset: 4px; }
+  .site-footer__bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 24px;
+    padding: 20px 0 28px;
+    border-top: 1px solid var(--ink);
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+  .site-footer__bar a { color: inherit; }
+</style>

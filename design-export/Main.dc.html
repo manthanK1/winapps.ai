@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>WinApps – home</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Inter+Tight:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0F1416}a:hover{color:#134F53}
+.wa-links{display:flex}
+@media (max-width: 900px){.wa-links{display:none}}
+@media (max-width: 640px){.wa-label{display:none}}
+</style>
+</helmet>
+<div id="wa-root" ref="{{setRoot}}" onPointerMove="{{onMove}}" style="position: relative; width: 100%; background: #FFFFFF; color: #0F1416; font-family: Inter, system-ui, sans-serif; -webkit-font-smoothing: antialiased">
+<canvas id="wa-gl" ref="{{setCanvas}}" aria-hidden="true" style="position: fixed; left: 0; top: 0; width: 100%; height: 100vh; display: block; z-index: 0; pointer-events: none"></canvas>
+
+<!-- HERO -->
+<section id="top" ref="{{setHero}}" style="position: relative; z-index: 1; height: 100vh; min-height: 640px; overflow: hidden">
+<div id="wa-word" ref="{{setWord}}" aria-hidden="true" style="position: absolute; left: 0; top: 0; opacity: 0; font-family: 'Inter Tight', Inter, sans-serif; font-weight: 600; letter-spacing: 0.32em; color: #278990; white-space: nowrap; pointer-events: none">WINAPPS</div>
+
+<header style="position: absolute; left: 0; right: 0; top: 0; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 0 clamp(16px, 3vw, 40px); height: 76px; box-sizing: border-box; border-bottom: 1px solid #E3E6E7; background: rgba(255,255,255,0.86)">
+<a href="#top" aria-label="WinApps home" style="display: flex; align-items: flex-start; height: 76px; padding-top: 6px; box-sizing: border-box; text-decoration: none; overflow: hidden">
+<img src="./assets/a07cd29bac08d0c3a61b0dfb38badf92.gif" alt="WinApps" style="display: block; height: 82px; width: auto">
+</a>
+<nav class="wa-links" aria-label="Main" style="align-items: center; gap: 36px; font-size: 14px; font-weight: 500">
+<a href="#services" style="text-decoration: none; min-height: 44px; display: flex; align-items: center">Services</a>
+<a href="#work" style="text-decoration: none; min-height: 44px; display: flex; align-items: center">Work</a>
+<a href="#insights" style="text-decoration: none; min-height: 44px; display: flex; align-items: center">Insights</a>
+<a href="#careers" style="text-decoration: none; min-height: 44px; display: flex; align-items: center">Careers</a>
+<a href="#about" style="text-decoration: none; min-height: 44px; display: flex; align-items: center">About</a>
+</nav>
+<div style="display: flex; align-items: center; gap: 10px">
+<a href="https://wa.me/917015796830" target="_blank" rel="noopener" aria-label="Chat on WhatsApp" style="display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 14px; border: 1px solid #0F1416; border-radius: 0; color: #0F1416; text-decoration: none; font-size: 14px; font-weight: 600; box-sizing: border-box">
+<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="#1FAF38" d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.64.07-.3-.15-1.26-.46-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.08c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.23 1.36.2 1.87.12.57-.08 1.76-.72 2.01-1.42.25-.7.25-1.29.17-1.42-.07-.13-.27-.2-.57-.35zM12.04 21.5h-.01a9.45 9.45 0 0 1-4.82-1.32l-.35-.21-3.58.94.96-3.49-.23-.36a9.43 9.43 0 0 1-1.45-5.03c0-5.22 4.25-9.47 9.48-9.47 2.53 0 4.91.99 6.7 2.78a9.4 9.4 0 0 1 2.77 6.7c0 5.22-4.25 9.46-9.47 9.46zm8.06-17.53A11.33 11.33 0 0 0 12.04.63C5.76.63.65 5.74.65 12.02c0 2.01.52 3.97 1.52 5.69L.55 23.6l6.04-1.58a11.36 11.36 0 0 0 5.44 1.39h.01c6.28 0 11.39-5.11 11.39-11.39 0-3.04-1.18-5.9-3.33-8.05z"></path></svg>
+<span class="wa-label">WhatsApp</span>
+</a>
+<a href="#contact" style="display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 18px; background: #134F53; color: #FFFFFF; border-radius: 0; text-decoration: none; font-size: 14px; font-weight: 600; box-sizing: border-box; white-space: nowrap">
+Book a call
+<svg width="14" height="11" viewBox="0 0 18 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><path d="M1 7h15M10 1l6 6-6 6"></path></svg>
+</a>
+<button type="button" aria-label="Search" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: transparent; border: 0; color: #0F1416; cursor: pointer">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="M15.5 15.5L21 21"></path></svg>
+</button>
+<button type="button" onClick="{{openMenu}}" style="display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 16px; background: #0F1416; color: #FFFFFF; border: 0; border-radius: 0; font: 600 12px Inter, sans-serif; letter-spacing: 0.14em; cursor: pointer">
+MENU
+<svg width="18" height="12" viewBox="0 0 18 12" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M0 1h18M0 6h18M0 11h18"></path></svg>
+</button>
+</div>
+</header>
+
+<div style="position: absolute; left: clamp(16px, 3vw, 40px); bottom: clamp(32px, 7vh, 72px); max-width: min(680px, calc(100% - 32px))">
+<div style="display: flex; align-items: center; gap: 12px; margin-bottom: 22px; font-size: 12px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: #134F53">
+<span style="display: block; width: 32px; height: 2px; background: #ED9D39"></span>
+Software &amp; app studio
+</div>
+<h1 style="margin: 0; font-family: 'Inter Tight', Inter, sans-serif; font-weight: 600; font-size: clamp(40px, 5.4vw, 82px); line-height: 1.02; letter-spacing: -0.03em; color: #0F1416">Ideas, woven into software that works.</h1>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 28px; margin-top: 36px">
+<a href="#contact" style="display: flex; align-items: center; gap: 14px; min-height: 52px; padding: 0 24px; background: #134F53; color: #FFFFFF; text-decoration: none; font-size: 15px; font-weight: 600">
+Start a project
+<svg width="18" height="14" viewBox="0 0 18 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><path d="M1 7h15M10 1l6 6-6 6"></path></svg>
+</a>
+<a href="#work" style="font-size: 15px; font-weight: 600; text-underline-offset: 6px; min-height: 44px; display: flex; align-items: center">See our work</a>
+</div>
+</div>
+
+<div aria-hidden="true" style="position: absolute; right: clamp(16px, 3vw, 40px); bottom: clamp(32px, 7vh, 72px); display: flex; align-items: center; gap: 12px; font-size: 11px; font-weight: 600; letter-spacing: 0.2em; color: #4A5558">
+SCROLL
+<span style="display: block; width: 1px; height: 44px; background: #0F1416"></span>
+</div>
+</section>
+
+<!-- SERVICES -->
+<section id="services" style="position: relative; z-index: 1; padding: clamp(96px, 14vw, 200px) clamp(16px, 3vw, 40px)">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 24px; margin-bottom: 56px">
+<h2 style="margin: 0; font-family: 'Inter Tight', Inter, sans-serif; font-weight: 600; font-size: clamp(32px, 3.6vw, 52px); line-height: 1.05; letter-spacing: -0.025em; max-width: 720px">What we do</h2>
+<a href="#services" style="font-size: 15px; font-weight: 600; text-underline-offset: 6px; min-height: 44px; display: flex; align-items: center">All services</a>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px">
+<a href="#services" style="display: flex; flex-direction: column; gap: 18px; padding: 32px 32px 36px; border-top: 2px solid #0F1416; background: rgba(255,255,255,0.94); text-decoration: none; min-height: 300px; box-sizing: border-box">
+<span style="font-size: 13px; font-weight: 600; letter-spacing: 0.12em; color: #134F53">01</span>
+<span style="font-family: 'Inter Tight', Inter, sans-serif; font-size: 28px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.1">[Service one]</span>
+<span style="font-size: 16px; line-height: 1.55; color: #3D4749">[One or two lines on what this service delivers and for whom.]</span>
+<span style="margin-top: auto; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600">Learn more <svg width="16" height="12" viewBox="0 0 18 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><path d="M1 7h15M10 1l6 6-6 6"></path></svg></span>
+</a>
+<a href="#services" style="display: flex; flex-direction: column; gap: 18px; padding: 32px 32px 36px; border-top: 2px solid #0F1416; background: rgba(255,255,255,0.94); text-decoration: none; min-height: 300px; box-sizing: border-box">
+<span style="font-size: 13px; font-weight: 600; letter-spacing: 0.12em; color: #134F53">02</span>
+<span style="font-family: 'Inter Tight', Inter, sans-serif; font-size: 28px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.1">[Service two]</span>
+<span style="font-size: 16px; line-height: 1.55; color: #3D4749">[One or two lines on what this service delivers and for whom.]</span>
+<span style="margin-top: auto; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600">Learn more <svg width="16" height="12" viewBox="0 0 18 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><path d="M1 7h15M10 1l6 6-6 6"></path></svg></span>
+</a>
+<a href="#services" style="display: flex; flex-direction: column; gap: 18px; padding: 32px 32px 36px; border-top: 2px solid #0F1416; background: rgba(255,255,255,0.94); text-decoration: none; min-height: 300px; box-sizing: border-box">
+<span style="font-size: 13px; font-weight: 600; letter-spacing: 0.12em; color: #134F53">03</span>
+<span style="font-family: 'Inter Tight', Inter, sans-serif; font-size: 28px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.1">[Service three]</span>
+<span style="font-size: 16px; line-height: 1.55; color: #3D4749">[One or two lines on what this service delivers and for whom.]</span>
+<span style="margin-top: auto; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600">Learn more <svg width="16" height="12" viewBox="0 0 18 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><path d="M1 7h15M10 1l6 6-6 6"></path></svg></span>
+</a>
+</div>
+</section>
+
+<!-- CONTACT BAND -->
+<section id="contact" style="position: relative; z-index: 1; color: #0F1416; padding: clamp(96px, 14vw, 200px) clamp(16px, 3vw, 40px) 40px">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 40px">
+<h2 style="margin: 0; font-family: 'Inter Tight', Inter, sans-serif; font-weight: 600; font-size: clamp(36px, 4.6vw, 68px); line-height: 1.02; letter-spacing: -0.03em; max-width: 820px">Have a project in mind? Let’s build it together.</h2>
+<a href="#contact" style="display: flex; align-items: center; gap: 14px; min-height: 56px; padding: 0 28px; background: #ED9D39; color: #0F1416; text-decoration: none; font-size: 15px; font-weight: 600">
+Talk to us
+<svg width="18" height="14" viewBox="0 0 18 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><path d="M1 7h15M10 1l6 6-6 6"></path></svg>
+</a>
+</div>
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; margin-top: clamp(160px, 22vw, 320px); padding: 20px 0 0; border-top: 1px solid #0F1416; font-size: 13px; color: #3D4749; background: rgba(255,255,255,0.9)">
+<span>© WinApps</span>
+<span>[Address] · [Email] · [Phone]</span>
+</div>
+</section>
+
+<!-- MENU OVERLAY -->
+<sc-if value="{{menuOpen}}" hint-placeholder-val="{{false}}">
+<div role="dialog" aria-label="Menu" style="position: fixed; inset: 0; z-index: 50; background: #0E2E31; color: #FFFFFF; display: flex; flex-direction: column; padding: 0 clamp(16px, 3vw, 40px) 40px; box-sizing: border-box; overflow: auto">
+<div style="display: flex; align-items: center; justify-content: space-between; height: 76px; border-bottom: 1px solid #2B5357">
+<span style="display: flex; align-items: center; gap: 10px; font-family: 'Inter Tight', Inter, sans-serif; font-weight: 700; font-size: 19px; letter-spacing: 0.14em"><span style="display: block; width: 14px; height: 14px; background: #ED9D39"></span>WINAPPS</span>
+<button type="button" onClick="{{closeMenu}}" style="display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 16px; background: #FFFFFF; color: #0F1416; border: 0; border-radius: 0; font: 600 12px Inter, sans-serif; letter-spacing: 0.14em; cursor: pointer">
+CLOSE
+<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M1 1l12 12M13 1L1 13"></path></svg>
+</button>
+</div>
+<nav aria-label="Menu links" style="display: flex; flex-direction: column; margin-top: 48px; font-family: 'Inter Tight', Inter, sans-serif; font-weight: 600; font-size: clamp(40px, 6vw, 88px); letter-spacing: -0.03em; line-height: 1.12">
+<a href="#services" onClick="{{closeMenu}}" style="color: #FFFFFF; text-decoration: none; border-bottom: 1px solid #2B5357; padding: 8px 0">Services</a>
+<a href="#work" onClick="{{closeMenu}}" style="color: #FFFFFF; text-decoration: none; border-bottom: 1px solid #2B5357; padding: 8px 0">Work</a>
+<a href="#insights" onClick="{{closeMenu}}" style="color: #FFFFFF; text-decoration: none; border-bottom: 1px solid #2B5357; padding: 8px 0">Insights</a>
+<a href="#careers" onClick="{{closeMenu}}" style="color: #FFFFFF; text-decoration: none; border-bottom: 1px solid #2B5357; padding: 8px 0">Careers</a>
+<a href="#contact" onClick="{{closeMenu}}" style="color: #ED9D39; text-decoration: none; padding: 8px 0">Contact</a>
+</nav>
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"speed":{"editor":"range","default":1,"min":0.4,"max":2,"step":0.1,"section":"Ribbon"},"breeze":{"editor":"range","default":1,"min":0,"max":2.5,"step":0.1,"section":"Ribbon"},"gloss":{"editor":"range","default":1,"min":0,"max":2,"step":0.1,"section":"Ribbon"},"showWordmark":{"editor":"boolean","default":true,"section":"Ribbon"},"$preview":{"width":1440,"height":2400}}'>
+class Component extends DCLogic {
+  ensure() {
+    if (this._ready) return;
+    this._ready = true;
+    this.state = this.state || {};
+    this.cv = null; this.hero = null; this.word = null;
+    this.t0 = performance.now();
+    this.gust = 0; this.gustT = 0; this.lastX = null; this.lastScroll = null;
+    this.mx = 0; this.my = 0; this.smx = 0; this.smy = 0;
+    this._setCanvas = (el) => { this.cv = el; };
+    this._setHero = (el) => { this.hero = el; };
+    this._setRoot = (el) => { this.root = el; };
+    this._setWord = (el) => { this.word = el; };
+    this._open = () => this.setState({ menuOpen: true });
+    this._close = () => this.setState({ menuOpen: false });
+    this._onMove = (e) => {
+      const r = e.currentTarget.getBoundingClientRect();
+      this.mx = ((e.clientX - r.left) / r.width) * 2 - 1;
+      this.my = ((e.clientY - r.top) / r.height) * 2 - 1;
+      if (this.lastX !== null) this.gustT = Math.min(1.6, this.gustT + Math.abs(e.clientX - this.lastX) / 120);
+      this.lastX = e.clientX;
+    };
+  }
+
+  componentDidMount() {
+    this.ensure();
+    this.reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    const loop = (now) => {
+      try { this.frame(now); } catch (err) { if (!this._warned) { this._warned = true; console.warn(err); } }
+      this.raf = requestAnimationFrame(loop);
+    };
+    this.raf = requestAnimationFrame(loop);
+  }
+  componentWillUnmount() { cancelAnimationFrame(this.raf); }
+
+  initGL(el) {
+    const gl = el.getContext('webgl', { antialias: true, alpha: true });
+    if (!gl) return null;
+    const vs = [
+      'attribute vec3 aP; attribute vec3 aN; attribute vec3 aT; attribute vec3 aC;',
+      'uniform mat4 uPV; varying vec3 vP; varying vec3 vN; varying vec3 vT; varying vec3 vC;',
+      'void main(){ vP=aP; vN=aN; vT=aT; vC=aC; gl_Position=uPV*vec4(aP,1.0); }'
+    ].join('\n');
+    const fs = [
+      'precision highp float;',
+      'uniform vec3 uCam; uniform float uGloss;',
+      'varying vec3 vP; varying vec3 vN; varying vec3 vT; varying vec3 vC;',
+      'vec3 lin(vec3 c){ return pow(c, vec3(2.2)); }',
+      'void main(){',
+      '  vec3 N = normalize(vN); vec3 V = normalize(uCam - vP);',
+      '  float side = dot(N, V);',
+      '  bool front = side > 0.0;',
+      '  if(!front) N = -N;',
+      '  vec3 teal = lin(vec3(0.153,0.537,0.565));',
+      '  vec3 orng = lin(mix(vec3(0.929,0.616,0.224), vec3(0.961,0.757,0.125), clamp(vC.x,0.0,1.0)));',
+      '  float warm = clamp(mix(front ? 0.0 : 1.0, vC.y, vC.z), 0.0, 1.0);',
+      '  vec3 base = mix(teal, orng, warm);',
+      '  vec3 shade = mix(lin(vec3(0.024,0.361,0.420)), lin(vec3(0.780,0.478,0.133)), warm);',
+      '  vec3 glow = mix(lin(vec3(0.384,0.678,0.706)), lin(vec3(0.984,0.871,0.471)), warm);',
+      '  vec3 L1 = normalize(vec3(-0.45, 0.85, 0.75));',
+      '  vec3 L2 = normalize(vec3(0.8, -0.25, 0.55));',
+      '  float w1 = clamp((dot(N,L1) + 0.35) / 1.35, 0.0, 1.0);',
+      '  float w2 = clamp(dot(N,L2), 0.0, 1.0);',
+      '  float lit = w1 * 0.85 + w2 * 0.25;',
+      '  vec3 col = mix(shade, base, smoothstep(0.05, 0.75, lit));',
+      '  vec3 T = normalize(vT);',
+      '  vec3 H1 = normalize(L1 + V); vec3 H2 = normalize(L2 + V);',
+      '  float t1 = dot(T, H1); float s1 = sqrt(max(0.0, 1.0 - t1*t1));',
+      '  float t2 = dot(T, H2); float s2 = sqrt(max(0.0, 1.0 - t2*t2));',
+      '  float satin = pow(s1, 90.0) * 0.55 + pow(s1, 14.0) * 0.10 + pow(s2, 60.0) * 0.18;',
+      '  satin *= smoothstep(-0.1, 0.4, dot(N, L1)) * 0.7 + 0.3;',
+      '  col = mix(col, glow, clamp(satin * uGloss, 0.0, 0.85));',
+      '  float fres = pow(1.0 - abs(side), 4.0);',
+      '  col = mix(col, glow, fres * 0.25);',
+      '  gl_FragColor = vec4(pow(col, vec3(1.0/2.2)), 1.0);',
+      '}'
+    ].join('\n');
+    const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; };
+    const prog = gl.createProgram();
+    gl.attachShader(prog, sh(gl.VERTEX_SHADER, vs));
+    gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, fs));
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog));
+    gl.useProgram(prog);
+
+    const MAXN = 2400, M = 14;
+    const nv = MAXN * M;
+    const g = {
+      gl, prog, MAXN, M,
+      pos: new Float32Array(nv * 3), nor: new Float32Array(nv * 3), tan: new Float32Array(nv * 3), tone: new Float32Array(nv * 3),
+      uPV: gl.getUniformLocation(prog, 'uPV'), uCam: gl.getUniformLocation(prog, 'uCam'), uGloss: gl.getUniformLocation(prog, 'uGloss'),
+      bufs: {}
+    };
+    const mk = (name, arr, size) => {
+      const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, arr.byteLength, gl.DYNAMIC_DRAW);
+      const loc = gl.getAttribLocation(prog, name); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, size, gl.FLOAT, false, 0, 0);
+      g.bufs[name] = b;
+    };
+    mk('aP', g.pos, 3); mk('aN', g.nor, 3); mk('aT', g.tan, 3); mk('aC', g.tone, 3);
+    const idx = new Uint16Array((MAXN - 1) * (M - 1) * 6);
+    let k = 0;
+    for (let i = 0; i < MAXN - 1; i++) for (let j = 0; j < M - 1; j++) {
+      const a = i * M + j, b = a + 1, c = a + M, d = c + 1;
+      idx[k++] = a; idx[k++] = c; idx[k++] = b; idx[k++] = b; idx[k++] = c; idx[k++] = d;
+    }
+    const ib = gl.createBuffer(); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, idx, gl.STATIC_DRAW);
+    gl.enable(gl.DEPTH_TEST);
+    gl.disable(gl.CULL_FACE);
+    return g;
+  }
+
+  frame(now) {
+    const el = this.cv || document.getElementById('wa-gl');
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const cw = rect.width, ch = rect.height;
+    if (cw < 20 || ch < 20) return;
+    if (!this.g) { this.g = this.initGL(el); if (!this.g) return; }
+    const g = this.g, gl = g.gl, M = g.M;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const W = Math.round(cw * dpr), H = Math.round(ch * dpr);
+    if (el.width !== W || el.height !== H) { el.width = W; el.height = H; }
+    gl.viewport(0, 0, W, H);
+
+    const PI = Math.PI;
+    const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+    const lerp = (a, b, k) => a + (b - a) * k;
+    const sstep = (a, b, x) => { const k = clamp((x - a) / (b - a), 0, 1); return k * k * (3 - 2 * k); };
+    const easeIO = (k) => 0.5 - 0.5 * Math.cos(PI * clamp(k, 0, 1));
+
+    const speed = this.props.speed ?? 1, breeze = this.props.breeze ?? 1, gloss = this.props.gloss ?? 1;
+    const showWord = this.props.showWordmark ?? true;
+    let t = (now - this.t0) / 1000 * speed;
+    let tw = (now - this.t0) / 1000;
+    if (this.reduced) { t = 99; tw *= 0.1; }
+
+    // page scroll (the canvas is fixed to the viewport; the page moves under it)
+    const root = this.root || document.getElementById('wa-root');
+    const rr = root ? root.getBoundingClientRect() : { top: 0, height: ch };
+    const scrolled = Math.max(0, -rr.top);
+    const maxScroll = Math.max(1, rr.height - ch);
+    if (this.lastScroll != null) {
+      const dv = Math.abs(scrolled - this.lastScroll);
+      this.gustT = Math.min(1.0, this.gustT + dv / 400);
+    }
+    this.lastScroll = scrolled;
+    this.gustT *= 0.97; this.gust += (this.gustT - this.gust) * 0.02;
+    this.smx += (this.mx - this.smx) * 0.04; this.smy += (this.my - this.smy) * 0.04;
+    const gust = this.gust * breeze;
+
+    // camera / world scale
+    const fov = 35 * PI / 180, camZ = 6.2;
+    const aspect = cw / ch;
+    const halfH = camZ * Math.tan(fov / 2), halfW = halfH * aspect;
+    const pxToWorld = (2 * halfH) / ch;
+    const scrollW = scrolled * pxToWorld;
+    const pageBottomW = -(maxScroll * pxToWorld) - halfH;
+    const narrow = aspect < 1;
+    const Lh = Math.min(1.35, halfW * (narrow ? 0.62 : 0.5));
+    const cxW = narrow ? 0 : halfW * 0.26, cyW = narrow ? 0.55 : 0.32;
+    const xStart = -halfW * 1.35;
+
+    const WP = [[-0.78, 0.42], [-0.30, -0.48], [0.02, 0.16], [0.28, -0.48], [0.80, 0.50]].map(p => [cxW + p[0] * Lh, cyW + p[1] * Lh]);
+    const topY = cyW + 0.5 * Lh, botY = cyW - 0.48 * Lh;
+    const xW0 = WP[0][0];
+
+    const A = 0.22 * Lh;
+    const waveY = (x) => cyW + 0.05 + A * Math.sin(x * 1.5 - tw * 1.4) + A * 0.35 * Math.sin(x * 3.1 + tw * 0.9);
+    const waveZ = (x) => 0.55 * Math.sin(x * 1.15 - tw * 1.05 + 1.0);
+    const waveTw = (x) => 0.95 * Math.sin(x * 1.9 - tw * 1.6);
+
+    // control points: left wave · W · falling zig-zag down the page
+    const P = [];
+    const nL = 7;
+    const wStart = nL;
+    const nWP = 11;                     // W = start + 3 folds × 3 points + end
+    const dStart = wStart + nWP - 1;    // first point after the W
+    // intro head (in control-point units), then scroll takes over
+    const introQ = (dStart + 1.6) * easeIO(t / 6.5);
+    const m = easeIO(sstep(wStart - 0.4, wStart + nWP - 0.6, introQ));
+    if (m > 0.995 && this.formedAt == null) this.formedAt = t;
+    if (m < 0.5) this.formedAt = null;
+
+    // the W as one object (rotation helpers kept at 0)
+    const rz = 0, ry = 0;
+    const rotW = (p) => {
+      const x = p[0] - cxW, y = p[1] - cyW, z = p[2];
+      const x1 = x * Math.cos(rz) - y * Math.sin(rz), y1 = x * Math.sin(rz) + y * Math.cos(rz);
+      const x2 = x1 * Math.cos(ry) + z * Math.sin(ry), z2 = -x1 * Math.sin(ry) + z * Math.cos(ry);
+      return [x2 + cxW, y1 + cyW, z2];
+    };
+    const wAx = (() => { const q = rotW([cxW + 0.99, cyW + 0.15, 0]); return [q[0] - cxW, q[1] - cyW, q[2]]; })();
+    const W0r = rotW([WP[0][0], WP[0][1], 0]);
+    const W4r = rotW([WP[4][0], WP[4][1], -0.15 * Lh]);
+
+    for (let i = 0; i < nL; i++) {
+      const c = i / (nL - 1), x = lerp(xStart, W0r[0] - 0.4 * Lh, c), k = m * c * c;
+      P.push([x, lerp(waveY(x), W0r[1] - 0.06 * Lh, k), lerp(waveZ(x), W0r[2], k)]);
+    }
+    // the W as a paper-fold accordion: bottoms fold INTO the screen (yellow side comes up),
+    // the middle top folds back OUT toward you (teal goes down). Width stays horizontal.
+    const fRad = 0.075 * Lh, fdx = 0.05 * Lh, layer = 2 * fRad;
+    const WT = [[WP[0][0], WP[0][1], 0]];
+    const fold = (vx, vy, zIn, dir) => {          // dir -1: bottom (fold away), +1: top (fold back)
+      const zOut = zIn + (dir < 0 ? -layer : layer);
+      WT.push([vx - fdx, vy - dir * fRad, zIn]);
+      WT.push([vx, vy, (zIn + zOut) / 2]);
+      WT.push([vx + fdx, vy - dir * fRad, zOut]);
+    };
+    fold(WP[1][0], WP[1][1], 0, -1);
+    fold(WP[2][0], WP[2][1], -layer, 1);
+    fold(WP[3][0], WP[3][1], 0, -1);
+    WT.push([WP[4][0], WP[4][1], -layer]);
+    for (const p0 of WT) { const p = rotW(p0); P.push([p[0], lerp(waveY(p[0]), p[1] + 0.018 * Lh * Math.sin(tw * 0.7 + p[0] * 2.3), m), lerp(waveZ(p[0]), p[2] + 0.03 * Math.sin(tw * 0.6 + p[0] * 2), m)]); }
+
+    // descent: curl out of the W to the right, then sweep back and forth to the page bottom
+    const sway = (k) => 0.06 * Math.sin(tw * 0.35 + k * 1.3);
+    P.push([W4r[0] + 0.32 * Lh, W4r[1] + 0.1 * Lh, W4r[2] - 0.08]);
+    P.push([Math.max(halfW * 0.86, W4r[0] + 1.05 * Lh), W4r[1] - 0.75 * Lh, -0.45]);
+    const rowGap = 1.6 * halfH;
+    let y = W4r[1] - 0.75 * Lh, side = -1, r = 0;
+    while (y > pageBottomW - 2 * halfH && P.length < 60) {
+      r++;
+      const yMid = y - rowGap * 0.5;
+      P.push([side * halfW * 0.04 + sway(r) * halfW, yMid, 0.22 * Math.sin(r * 1.3 + tw * 0.25)]);
+      y -= rowGap;
+      P.push([side * halfW * 0.82, y + sway(r + 0.5), 0.25 * Math.sin(r * 1.7 + tw * 0.3) - 0.3]);
+      side = -side;
+    }
+    const lastQ = P.length - 1;
+
+    // where the ribbon tip should be: just below the middle of the screen
+    const camYbase = 0.1;
+    const viewY = camYbase - scrollW;
+    let targetQ = dStart + 1.6;
+    if (scrolled > 2) {
+      const want = viewY - halfH * 0.25;
+      for (let k = dStart; k < P.length; k++) {
+        if (P[k][1] <= want) {
+          const y0 = P[k - 1][1], y1 = P[k][1];
+          targetQ = (k - 1) + clamp((y0 - want) / Math.max(1e-4, y0 - y1), 0, 1);
+          break;
+        }
+        targetQ = k;
+      }
+      if (scrolled >= maxScroll - 2) targetQ = lastQ;
+    }
+    targetQ = Math.max(targetQ, dStart + 1.6);
+    if (this.headQ == null) this.headQ = 0;
+    const desired = Math.max(introQ, Math.min(targetQ, introQ >= dStart + 1.55 ? targetQ : introQ));
+    this.headQ += (desired - this.headQ) * (desired > this.headQ ? 0.07 : 0.05);
+    const headQ = this.reduced ? lastQ : this.headQ;
+
+    // sample Catmull-Rom
+    let total = 0;
+    for (let j = 0; j < P.length - 1; j++) total += Math.hypot(P[j + 1][0] - P[j][0], P[j + 1][1] - P[j][1], P[j + 1][2] - P[j][2]);
+    const step = Math.max(0.008, total / (g.MAXN - 60));
+    const S = [];
+    for (let j = 0; j < P.length - 1 && S.length < g.MAXN - 1; j++) {
+      const p0 = P[j - 1] || P[j], p1 = P[j], p2 = P[j + 1], p3 = P[j + 2] || P[j + 1];
+      const n = Math.max(4, Math.ceil(Math.hypot(p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]) / step));
+      for (let s = 0; s < n && S.length < g.MAXN - 1; s++) {
+        const u = s / n, u2 = u * u, u3 = u2 * u, q = [0, 0, 0];
+        for (let d = 0; d < 3; d++) q[d] = 0.5 * ((2 * p1[d]) + (-p0[d] + p2[d]) * u + (2 * p0[d] - 5 * p1[d] + 4 * p2[d] - p3[d]) * u2 + (-p0[d] + 3 * p1[d] - 3 * p2[d] + p3[d]) * u3);
+        S.push({ x: q[0], y: q[1], z: q[2], j, u });
+      }
+    }
+    const lastP = P[P.length - 1];
+    S.push({ x: lastP[0], y: lastP[1], z: lastP[2], j: P.length - 2, u: 1 });
+    const N = Math.min(S.length, g.MAXN);
+
+    // twist, width, tone, cloth amount
+    const bw = 0.11 * Lh;
+    const WW = 0.22 * Lh;              // one constant width through the whole W
+    let along = 0, dW = null;
+    for (let i = 0; i < N; i++) {
+      const s = S[i];
+      if (i > 0) along += Math.hypot(s.x - S[i - 1].x, s.y - S[i - 1].y, s.z - S[i - 1].z);
+      s.d = along;
+      s.q = s.j + s.u;
+      const wt = waveTw(s.x);
+      s.cloth = 0; s.paint = 0; s.pmix = 0; s.fx = 0;
+      if (s.j < wStart) {
+        const wl = sstep(W0r[0] - 1.4 * Lh, W0r[0], s.x);
+        s.a = wt * (1 - m * wl);
+        s.w = lerp(bw, WW, m * wl);
+        s.tone = 0.1;
+      } else if (s.j < dStart) {
+        s.a = wt * (1 - m);
+        s.fx = m;                       // width locked horizontal → the folds flip the ribbon over
+        s.cloth = 0.32 * m;             // a very light breeze through the W
+        s.w = lerp(bw, WW, m);
+        s.tone = clamp((s.x - cxW + 0.1 * Lh) / (0.7 * Lh), 0, 1);
+      } else {
+        const qq = s.q - dStart;
+        const ramp = sstep(0.8, 3.0, qq);
+        if (dW == null) dW = s.d;
+        const run = Math.max(0, s.d - dW - 0.8 * Lh);
+        s.fx = 1 - sstep(0, 1.2, qq);
+        s.a = 3 * PI + PI * run / 4.5 + 0.22 * Math.sin(s.d * 0.2 - tw * 0.35) * sstep(1, 2.5, qq);
+        s.w = lerp(WW, Lh * (0.95 + 0.06 * Math.sin(qq * 0.6 + tw * 0.25)), ramp);
+        s.tone = 0.5 + 0.5 * Math.sin(s.d * 0.22 + tw * 0.15);
+        s.cloth = sstep(0.9, 2.6, qq);
+      }
+      s.w *= sstep(0, 1, (headQ - s.q) / 0.55);
+    }
+
+    // centre frames + vertex grid
+    const pos = g.pos;
+    for (let i = 0; i < N; i++) {
+      const s = S[i], a = S[Math.max(0, i - 1)], b = S[Math.min(N - 1, i + 1)];
+      let tx = b.x - a.x, ty = b.y - a.y, tz = b.z - a.z;
+      const tl = Math.hypot(tx, ty, tz) || 1; tx /= tl; ty /= tl; tz /= tl;
+      let nx = -ty, ny = tx; const nl = Math.hypot(nx, ny) || 1; nx /= nl; ny /= nl;
+      const ca = Math.cos(s.a), sa = Math.sin(s.a);
+      let sx = ca * nx, sy = ca * ny, sz = sa;
+      if (s.fx > 0) { sx = lerp(sx, wAx[0], s.fx); sy = lerp(sy, wAx[1], s.fx); sz = lerp(sz, wAx[2], s.fx); }
+      const dt = sx * tx + sy * ty + sz * tz; sx -= tx * dt; sy -= ty * dt; sz -= tz * dt;
+      const sl = Math.hypot(sx, sy, sz) || 1; sx /= sl; sy /= sl; sz /= sl;
+      const ox = ty * sz - tz * sy, oy = tz * sx - tx * sz, oz = tx * sy - ty * sx;
+      const amp = 0.085 * Lh * (1 + gust * 0.5);
+      for (let j = 0; j < M; j++) {
+        const v = -1 + 2 * j / (M - 1);
+        const half = s.w * 0.5 * v;
+        let off = 0;
+        if (s.cloth > 0) {
+          const edge = 0.45 + 0.55 * (0.5 + 0.5 * v);
+          off += s.cloth * edge * (amp * Math.sin(s.d * 1.35 - tw * 1.05 + v * 1.1) + amp * 0.35 * Math.sin(s.d * 2.2 - tw * 0.7 - v * 1.4));
+        }
+        const o = (i * M + j) * 3;
+        pos[o] = s.x + sx * half + ox * off;
+        pos[o + 1] = s.y + sy * half + oy * off;
+        pos[o + 2] = s.z + sz * half + oz * off;
+      }
+    }
+    const nor = g.nor, tan = g.tan, tone = g.tone;
+    for (let i = 0; i < N; i++) {
+      const i0 = Math.max(0, i - 1), i1 = Math.min(N - 1, i + 1);
+      for (let j = 0; j < M; j++) {
+        const j0 = Math.max(0, j - 1), j1 = Math.min(M - 1, j + 1);
+        const a = (i0 * M + j) * 3, b = (i1 * M + j) * 3, c = (i * M + j0) * 3, d = (i * M + j1) * 3;
+        const ux = pos[b] - pos[a], uy = pos[b + 1] - pos[a + 1], uz = pos[b + 2] - pos[a + 2];
+        const vx = pos[d] - pos[c], vy = pos[d + 1] - pos[c + 1], vz = pos[d + 2] - pos[c + 2];
+        const nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
+        const nl = Math.hypot(nx, ny, nz) || 1;
+        const ul = Math.hypot(ux, uy, uz) || 1;
+        const o = (i * M + j) * 3;
+        nor[o] = nx / nl; nor[o + 1] = ny / nl; nor[o + 2] = nz / nl;
+        tan[o] = ux / ul; tan[o + 1] = uy / ul; tan[o + 2] = uz / ul;
+        const oc = (i * M + j) * 3; tone[oc] = S[i].tone; tone[oc + 1] = S[i].paint; tone[oc + 2] = S[i].pmix;
+      }
+    }
+    let end = 0;
+    while (end < N - 1 && S[end + 1].q <= headQ + 0.001) end++;
+
+    const upload = (name, arr, count) => { gl.bindBuffer(gl.ARRAY_BUFFER, g.bufs[name]); gl.bufferSubData(gl.ARRAY_BUFFER, 0, arr.subarray(0, count)); };
+    upload('aP', pos, N * M * 3); upload('aN', nor, N * M * 3); upload('aT', tan, N * M * 3); upload('aC', tone, N * M * 3);
+
+    // camera follows the page scroll 1:1, plus a little mouse parallax
+    const cam = [this.smx * 0.35, camYbase - this.smy * 0.2 - scrollW, camZ];
+    const tgt = [cxW * 0.25 * (1 - sstep(0, ch, scrolled)), cyW * 0.35 * (1 - sstep(0, ch, scrolled)) - scrollW, 0];
+    const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+    const norm = (a) => { const l = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
+    const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+    const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+    const zA = norm(sub(cam, tgt)), xA = norm(cross([0, 1, 0], zA)), yA = cross(zA, xA);
+    const V = [xA[0], yA[0], zA[0], 0, xA[1], yA[1], zA[1], 0, xA[2], yA[2], zA[2], 0, -dot(xA, cam), -dot(yA, cam), -dot(zA, cam), 1];
+    const f = 1 / Math.tan(fov / 2), nr = 0.1, fr = 50;
+    const Pm = [f / aspect, 0, 0, 0, 0, f, 0, 0, 0, 0, (fr + nr) / (nr - fr), -1, 0, 0, 2 * fr * nr / (nr - fr), 0];
+    const PV = new Array(16);
+    for (let c = 0; c < 4; c++) for (let rr2 = 0; rr2 < 4; rr2++) { let sum = 0; for (let k = 0; k < 4; k++) sum += Pm[k * 4 + rr2] * V[c * 4 + k]; PV[c * 4 + rr2] = sum; }
+
+    gl.clearColor(0, 0, 0, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.uniformMatrix4fv(g.uPV, false, new Float32Array(PV));
+    gl.uniform3f(g.uCam, cam[0], cam[1], cam[2]);
+    gl.uniform1f(g.uGloss, gloss);
+    if (end > 0) gl.drawElements(gl.TRIANGLES, end * (M - 1) * 6, gl.UNSIGNED_SHORT, 0);
+
+    // wordmark under the W (projected; it lives in the hero, so add the scroll offset back)
+    const wd = this.word || document.getElementById('wa-word');
+    if (wd) {
+      const px = cxW, py = botY - 0.36 * Lh;
+      const cx4 = PV[0] * px + PV[4] * py + PV[12], cy4 = PV[1] * px + PV[5] * py + PV[13], cw4 = PV[3] * px + PV[7] * py + PV[15];
+      const sxp = (cx4 / cw4 * 0.5 + 0.5) * cw, syp = (1 - (cy4 / cw4 * 0.5 + 0.5)) * ch + scrolled;
+      const a = (showWord && this.formedAt != null) ? sstep(0, 1, (t - this.formedAt) / 1.1) : 0;
+      const fpx = Math.max(14, Lh / (2 * halfH) * ch * 0.15);
+      wd.style.fontSize = fpx.toFixed(1) + 'px';
+      wd.style.opacity = a.toFixed(3);
+      wd.style.transform = 'translate(' + sxp.toFixed(1) + 'px,' + (syp + (1 - a) * 12).toFixed(1) + 'px) translate(-50%,-50%)';
+    }
+  }
+
+  renderVals() {
+    this.ensure();
+    return {
+      setCanvas: this._setCanvas, setHero: this._setHero, setRoot: this._setRoot, setWord: this._setWord,
+      onMove: this._onMove, openMenu: this._open, closeMenu: this._close,
+      menuOpen: !!(this.state && this.state.menuOpen)
+    };
+  }
+}
+</script>
+</body>
+</html>

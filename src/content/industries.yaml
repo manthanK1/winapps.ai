@@ -1,0 +1,69 @@
+# Industries page. TODO: review every summary and focus list. Keep claims to
+# what you can discuss on a reference call; link case studies by their file name.
+- id: healthcare
+  order: 1
+  image: ../assets/images/industries/healthcare.jpg
+  imageAlt: Gloved hands handling a sample tube in a laboratory
+  name: Healthcare & life sciences
+  icon: heart-pulse
+  summary: Software that handles sensitive personal data and regulated workflows, where privacy and traceability are requirements, not features.
+  focus: [Data protection and GDPR-aligned handling, Mobile tools for field teams, Modernising legacy platforms]
+  relatedWork: [pharma-saas-replatform]
+- id: fintech
+  order: 2
+  image: ../assets/images/industries/fintech.jpg
+  imageAlt: Glass office towers in a financial district
+  name: Fintech & banking
+  icon: landmark
+  summary: Systems that move money or hold financial data have to be correct, auditable and secure, with least-privilege access as the default.
+  focus: [Secure web and mobile products, Data pipelines and reporting, Cloud infrastructure as code]
+- id: manufacturing
+  order: 3
+  image: ../assets/images/industries/manufacturing.jpg
+  imageAlt: Precision milling and drilling tools
+  name: Manufacturing
+  icon: factory
+  summary: Computer vision and data systems that work on the factory floor, with traceability for every automated decision.
+  focus: [Visual quality inspection, Edge inference, MLOps]
+  relatedWork: [ai-visual-inspection]
+- id: logistics
+  order: 4
+  image: ../assets/images/industries/logistics.jpg
+  imageAlt: Tall warehouse racks stacked with pallets
+  name: Logistics & supply chain
+  icon: truck
+  summary: Real-time platforms that give dispatch, drivers and customers the same picture, and models that predict what happens next.
+  focus: [Real-time tracking, Event streaming, ETA and demand prediction]
+  relatedWork: [fleet-route-optimisation]
+- id: retail
+  order: 5
+  image: ../assets/images/industries/retail.jpg
+  imageAlt: Covered shopping arcade lined with shops
+  name: Retail & e-commerce
+  icon: shopping-bag
+  summary: Customer-facing web and mobile products that have to stay fast and reliable at peak, backed by data your teams can act on.
+  focus: [Web and mobile storefront products, Data and analytics, Cloud platforms]
+- id: media
+  order: 6
+  image: ../assets/images/industries/media.jpg
+  imageAlt: Cinema camera rigged for an outdoor shoot
+  name: Media & streaming
+  icon: clapperboard
+  summary: Platforms that serve content to large audiences across web and mobile, where performance and reliability are visible to every user.
+  focus: [Web and mobile apps, Cloud and platform engineering, Observability]
+- id: education
+  order: 7
+  image: ../assets/images/industries/education.jpg
+  imageAlt: University library with bookshelves and study desks
+  name: Education
+  icon: graduation-cap
+  summary: Learning products for students and staff that are simple to use, accessible and careful with personal data.
+  focus: [Web and mobile products, Data protection, Analytics]
+- id: travel
+  order: 8
+  image: ../assets/images/industries/travel.jpg
+  imageAlt: Airport terminal corridor with gate signs
+  name: Travel & hospitality
+  icon: plane
+  summary: Booking and guest-facing products that integrate with many third-party systems and must keep working when demand spikes.
+  focus: [Web and mobile products, Integrations and APIs, Cloud platforms]

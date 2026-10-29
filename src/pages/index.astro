@@ -1,0 +1,8 @@
+---
+// PLACEHOLDER — replaced by the full home page.
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { HOME } from "../data/copy";
+---
+<BaseLayout title={HOME.meta.title} description={HOME.meta.description} ribbon="home">
+  <section class="section"><div class="container"><h1 class="display">{HOME.hero.title}</h1></div></section>
+</BaseLayout>

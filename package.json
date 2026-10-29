@@ -1,0 +1,27 @@
+{
+  "name": "winapps-ai",
+  "type": "module",
+  "version": "2.0.0",
+  "private": true,
+  "description": "WinApps website V2: the new design and 3D ribbon, with all V1 content. Static Astro site.",
+  "engines": {
+    "node": ">=22.23.4"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "brand": "node scripts/build-brand.mjs",
+    "indexnow": "node scripts/indexnow.mjs"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.12",
+    "@astrojs/sitemap": "^3.7.4",
+    "@fontsource/inter": "^5.3.0",
+    "@fontsource/inter-tight": "^5.3.0",
+    "astro": "^7.4.4",
+    "sharp": "^0.35.5",
+    "typescript": "^6.0.3"
+  }
+}

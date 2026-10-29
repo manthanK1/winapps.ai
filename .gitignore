@@ -1,0 +1,26 @@
+# build output
+dist/
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+
+# environment
+.env
+.env.*
+
+# editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local QA output (screenshots, Lighthouse reports)
+qa/
+
+# The design export's own runtime is not ours to ship or version.
+design-export/vendor/
+design-export/support.js

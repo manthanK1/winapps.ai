@@ -1,0 +1,39 @@
+---
+// Inner-page hero in the design's language: breadcrumbs, eyebrow with the
+// orange rule, the page's single <h1>, and a lead. Sits under the header;
+// the calm inner-page ribbon sweeps in from the top right, so the text block
+// carries the white veil for contrast.
+import Breadcrumbs from "./Breadcrumbs.astro";
+
+interface Props {
+  title: string;
+  /** Second phrase of V1's two-tone headings; set in ink like the rest. */
+  accent?: string;
+  lead?: string;
+  eyebrow?: string;
+  breadcrumbs: { name: string; path: string }[];
+}
+const { title, accent, lead, eyebrow, breadcrumbs } = Astro.props;
+---
+<section class="page-hero">
+  <div class="container">
+    <Breadcrumbs items={breadcrumbs} />
+    <div class="page-hero__text veil">
+      {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+      <h1 class="h1">{title}{accent && <> {accent}</>}</h1>
+      {lead && <p class="lead page-hero__lead">{lead}</p>}
+      <slot />
+    </div>
+  </div>
+</section>
+
+<style>
+  .page-hero {
+    position: relative;
+    z-index: 1;
+    padding: calc(var(--header-h) + clamp(20px, 3vw, 40px)) 0 clamp(48px, 6vw, 96px);
+  }
+  .page-hero__text { max-width: 900px; margin-top: clamp(32px, 5vw, 72px); }
+  .page-hero__text > .eyebrow { margin-bottom: 22px; }
+  .page-hero__lead { margin-top: 24px; max-width: 64ch; }
+</style>
