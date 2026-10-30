@@ -3,11 +3,17 @@
 // text block bottom-left. The header (absolute, outside <main>) overlays the
 // top. #ribbon-word is the WINAPPS wordmark the ribbon places under its W.
 //
-// Wide screens (landscape): text bottom-left within 44vw, the W upper right.
+// Wide screens (landscape): the W fills the upper middle and its left wave
+// dips to ~48% of the height, and the wordmark spans ~69–78% from 50vw. V1's
+// copy is taller than the design's, so the headline, CTAs and WhatsApp line
+// stay bottom-left (headline sized by height as well as width, like the W) and
+// the lead moves to the right column, under the wordmark. DOM order is kept.
 // Narrow screens (portrait phones and tablets): the ribbon draws the W centred
 // at ~29–52% of the viewport height and the wordmark at ~55%, so the text
 // starts below 60svh and the hero grows taller than the screen if it must.
-// The h1 is the LCP element: no entrance animation.
+// The text carries .veil: invisible at rest, but once the page scrolls the
+// ribbon's descent passes behind it. The h1 is the LCP element: no entrance
+// animation.
 import Icon from "../Icon.astro";
 import { HOME } from "../../data/copy";
 import { SITE } from "../../data/site";
@@ -18,14 +24,14 @@ const { hero } = HOME;
 <section class="hero" aria-labelledby="hero-title">
   <div id="ribbon-word" class="ribbon-word" aria-hidden="true">WINAPPS</div>
   <div class="hero__text">
-    <p class="eyebrow">{hero.eyebrow}</p>
-    <h1 id="hero-title" class="display hero__title">{hero.title}</h1>
-    <p class="lead hero__lead">{hero.lead}</p>
-    <div class="hero__actions">
+    <p class="eyebrow veil">{hero.eyebrow}</p>
+    <h1 id="hero-title" class="display hero__title veil">{hero.title}</h1>
+    <p class="lead hero__lead veil">{hero.lead}</p>
+    <div class="hero__actions veil">
       <a href={href(SITE.bookingPath)} class="btn btn--primary">{hero.primary.label} <Icon name="arrow" size={18} class="arrow" /></a>
       <a href={href(hero.secondary.href)} class="link-u">{hero.secondary.label}</a>
     </div>
-    <p class="hero__wa">
+    <p class="hero__wa veil">
       {hero.whatsappNote} <a class="hero__wa-link" href={SITE.whatsappHref} target="_blank" rel="noopener">WhatsApp</a>
     </p>
   </div>
@@ -74,6 +80,21 @@ const { hero } = HOME;
     color: var(--muted);
   }
   .hero__scroll span { display: block; width: 1px; height: 44px; background: var(--ink); }
+
+  /* Strictly landscape: an exactly square screen keeps the portrait layout below. */
+  @media (min-aspect-ratio: 1001/1000) {
+    .hero__text {
+      --hero-gap: 48px;
+      display: grid;
+      grid-template-columns: minmax(0, calc(50vw - var(--gutter) - var(--hero-gap))) minmax(0, 1fr);
+      column-gap: var(--hero-gap);
+      max-width: none;
+      padding-right: 96px; /* clear of the SCROLL indicator */
+    }
+    .hero__text > * { grid-column: 1; }
+    .hero__title { font-size: clamp(40px, min(5.4vw, 7.2vh), 82px); }
+    .hero__text > .hero__lead { grid-column: 2; grid-row: 1 / span 4; align-self: end; max-width: 40ch; margin: 0; }
+  }
 
   /* Portrait: the W and wordmark fill the top ~56%; text flows below. Listed
      after the landscape rules so an exactly square viewport gets this one. */

@@ -317,7 +317,8 @@ address { font-style: normal; }
 .btn--accent:hover { background: var(--accent-hover); color: var(--ink); }
 .btn--dark { background: var(--ink); color: #fff; }
 .btn--dark:hover { background: #263136; color: #fff; }
-.btn--outline { background: transparent; border-color: var(--ink); color: var(--ink); }
+/* White fill, not transparent: the label stays readable when the ribbon passes behind. */
+.btn--outline { background: #fff; border-color: var(--ink); color: var(--ink); }
 .btn--outline:hover { background: var(--ink); color: #fff; }
 .btn--light { background: #fff; color: var(--ink); }
 .btn--light:hover { background: #e7f0f1; color: var(--ink); }
@@ -402,10 +403,14 @@ address { font-style: normal; }
 .on-dark a:not(.btn):hover { color: var(--accent); }
 
 /* Subtle white backing so text stays ≥ 4.5:1 wherever the ribbon passes
-   behind it. Invisible on plain white; no layout shift (spread shadow). */
-.veil { background: var(--veil); box-shadow: 0 0 0 12px var(--veil); }
+   behind it. Invisible on plain white; no layout shift (spread shadow). The
+   shadow is feathered so the ribbon fades under the text instead of being
+   cut by a hard rectangle; the text box itself keeps the full backing. */
+.veil { background: var(--veil); box-shadow: 0 0 20px 12px var(--veil); }
+/* A short label hugs its text instead of laying a full-width band across the ribbon. */
+.eyebrow.veil { width: fit-content; }
 @media (max-width: 640px) {
-  .veil { box-shadow: 0 0 0 8px var(--veil); }
+  .veil { box-shadow: 0 0 14px 8px var(--veil); }
 }
 
 /* ---- Lists ----------------------------------------------------------------- */
