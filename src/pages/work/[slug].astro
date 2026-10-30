@@ -1,0 +1,204 @@
+---
+// Case study (V1 work/[slug].astro): facts → photo → challenge and approach
+// (Markdown) → architecture → results → stack → next case study → CTA.
+// Clients are under NDA, so the photo is an illustrative sector image.
+import type { GetStaticPaths, InferGetStaticPropsType } from "astro";
+import { render, type CollectionEntry } from "astro:content";
+import { Picture } from "astro:assets";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHero from "../../components/PageHero.astro";
+import ArchitectureDiagram from "../../components/ArchitectureDiagram.astro";
+import Icon from "../../components/Icon.astro";
+import CtaBand from "../../components/CtaBand.astro";
+import { WORK_DETAIL } from "../../data/copy";
+import { getServices, getWork, stripComments } from "../../lib/content";
+import { href } from "../../lib/url";
+
+export const getStaticPaths = (async () => {
+  const work = await getWork();
+  return work.map((entry, i) => ({
+    params: { slug: entry.id },
+    props: { entry, next: work[(i + 1) % work.length] },
+  }));
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { entry, next } = Astro.props;
+const d = entry.data;
+// V1's Markdown carries editor notes as HTML comments (<!-- TODO … -->).
+// Use the pre-rendered HTML without them so the notes never ship.
+const bodyHtml = entry.rendered?.html ? stripComments(entry.rendered.html) : undefined;
+const { Content } = await render(entry);
+const services = await getServices();
+const practices = d.services
+  .map((ref) => services.find((s) => s.id === ref.id))
+  .filter((s): s is CollectionEntry<"services"> => s !== undefined);
+
+const path = `/work/${entry.id}/`;
+const crumbs = [
+  { name: "Work", path: "/work/" },
+  { name: d.title, path },
+];
+const eyebrow = [d.sector, d.region].filter(Boolean).join(" · ");
+const hasNext = next !== undefined && next.id !== entry.id;
+---
+<BaseLayout
+  title={d.title}
+  description={d.seoDescription}
+  breadcrumbs={crumbs}
+  pageType="ItemPage"
+  markdownPath={`/work/${entry.id}.md`}
+>
+  <PageHero breadcrumbs={crumbs} eyebrow={eyebrow} title={d.title} lead={d.delivered} />
+
+  <section class="section section--flush-top" aria-label="Case study">
+    <div class="container cs">
+      <div class="cs__aside">
+        <dl class="panel facts">
+          <div>
+            <dt>{WORK_DETAIL.sector}</dt>
+            <dd>{d.sector}</dd>
+          </div>
+          {d.region && (
+            <div>
+              <dt>{WORK_DETAIL.region}</dt>
+              <dd>{d.region}</dd>
+            </div>
+          )}
+          <div>
+            <dt>{WORK_DETAIL.disciplines}</dt>
+            <dd>{d.disciplines.join(" · ")}</dd>
+          </div>
+          {practices.length > 0 && (
+            <div>
+              <dt>{WORK_DETAIL.practices}</dt>
+              <dd>
+                <ul class="list-reset">
+                  {practices.map((s) => (
+                    <li><a class="link facts__link" href={href(`/services/${s.id}/`)}>{s.data.title}</a></li>
+                  ))}
+                </ul>
+              </dd>
+            </div>
+          )}
+          <div>
+            <dt>{WORK_DETAIL.client}</dt>
+            <dd>{WORK_DETAIL.clientText}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="cs__main">
+        <figure class="cs__photo">
+          <Picture
+            src={d.image}
+            alt={d.imageAlt}
+            formats={["avif", "webp"]}
+            widths={[480, 720, 1024]}
+            sizes="(min-width: 1520px) 840px, (min-width: 1024px) 58vw, 100vw"
+            loading="eager"
+            fetchpriority="high"
+          />
+          <figcaption class="small muted">{WORK_DETAIL.photoCaption}</figcaption>
+        </figure>
+
+        <div class="prose veil cs__body">
+          {bodyHtml !== undefined ? <Fragment set:html={bodyHtml} /> : <Content />}
+        </div>
+
+        <h2 class="cs__h veil">{WORK_DETAIL.architecture}</h2>
+        <ArchitectureDiagram layers={d.architecture} />
+
+        <h2 class="cs__h veil">{WORK_DETAIL.results}</h2>
+        {d.results?.length ? (
+          <dl class="results">
+            {d.results.map((r) => (
+              <div class="card results__item">
+                <dt class="small text-2">{r.label}</dt>
+                <dd class="results__value">{r.value}</dd>
+              </div>
+            ))}
+          </dl>
+        ) : (
+          <p class="text-2 veil cs__text">{WORK_DETAIL.resultsFallback}</p>
+        )}
+
+        <h2 class="cs__h veil">{WORK_DETAIL.stack}</h2>
+        <ul class="chips" aria-label={`${WORK_DETAIL.stack}: ${d.title}`}>
+          {d.stack.map((t) => <li class="chip">{t}</li>)}
+        </ul>
+
+        {hasNext && (
+          <nav class="cs__next" aria-label={WORK_DETAIL.next}>
+            <a href={href(`/work/${next.id}/`)} class="next veil">
+              <span class="next__label">{WORK_DETAIL.next}</span>
+              <span class="next__title">{next.data.title} <Icon name="arrow" size={20} class="arrow" /></span>
+            </a>
+          </nav>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <CtaBand title={WORK_DETAIL.cta.title} />
+</BaseLayout>
+
+<style>
+  /* Facts first on small screens (as in V1); a sticky column on the right
+     from 1024px. */
+  .cs { display: grid; gap: 48px; }
+  @media (min-width: 1024px) {
+    .cs { grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); gap: clamp(40px, 6vw, 112px); align-items: start; }
+    .cs__aside { grid-column: 2; grid-row: 1; position: sticky; top: 32px; }
+    .cs__main { grid-column: 1; grid-row: 1; }
+  }
+
+  .facts { display: grid; padding-block: 8px; font-size: 15px; }
+  .facts > div { padding-block: 16px; }
+  .facts > div + div { border-top: 1px solid var(--rule-2); }
+  .facts dt { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .facts dd { margin-top: 4px; color: var(--ink-2); }
+  .facts__link { display: inline-flex; align-items: center; min-height: 44px; }
+
+  .cs__photo { margin-bottom: clamp(40px, 4vw, 56px); }
+  .cs__photo :global(img) { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--rule); }
+  .cs__photo figcaption { display: inline-block; margin-top: 12px; padding: 2px 0; background: var(--veil); }
+
+  .cs__h {
+    margin: clamp(56px, 5vw, 72px) 0 24px;
+    font-size: clamp(24px, 1.2vw + 16px, 32px);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+  .cs__text { max-width: 65ch; }
+
+  .results { display: grid; gap: 16px; }
+  @media (min-width: 640px) {
+    .results { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  .results__item { gap: 6px; }
+  .results__value {
+    font-family: var(--font-display);
+    font-size: clamp(32px, 2.4vw + 16px, 48px);
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+  }
+
+  .cs__next { margin-top: clamp(56px, 5vw, 72px); padding-top: 28px; border-top: 1px solid var(--ink); }
+  .next { display: inline-flex; flex-direction: column; gap: 6px; min-height: 44px; text-decoration: none; }
+  .next__label { font-size: 14px; color: var(--muted); }
+  .next__title {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--font-display);
+    font-size: clamp(20px, 0.8vw + 14px, 26px);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+  }
+  .next :global(.arrow) { flex: none; transition: transform 0.25s var(--ease); }
+  .next:hover :global(.arrow) { transform: translateX(4px); }
+</style>

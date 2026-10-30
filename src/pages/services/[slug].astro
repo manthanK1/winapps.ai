@@ -1,0 +1,208 @@
+---
+// Service page (V1 services/[slug].astro): plain answer → What you get → How
+// we deliver → related case study + technology → related guides → FAQ → CTA.
+// The opening answer (for AI assistants and featured snippets) uses only V1
+// words: the Markdown body, the outcome and V1's "how to start" line; the
+// summary is already the hero lead. FAQPage JSON-LD = the FAQ shown here.
+import type { GetStaticPaths, InferGetStaticPropsType } from "astro";
+import { getEntry, render, type CollectionEntry } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHero from "../../components/PageHero.astro";
+import Icon from "../../components/Icon.astro";
+import SectionHead from "../../components/SectionHead.astro";
+import CaseCard from "../../components/CaseCard.astro";
+import PostCard from "../../components/PostCard.astro";
+import FaqList from "../../components/FaqList.astro";
+import CtaBand from "../../components/CtaBand.astro";
+import { SERVICE_DETAIL } from "../../data/copy";
+import { contactFor } from "../../data/site";
+import { getBlog, getServices, stripComments } from "../../lib/content";
+import { faqPage, service } from "../../lib/schema";
+import { href } from "../../lib/url";
+
+export const getStaticPaths = (async () =>
+  (await getServices()).map((entry) => ({ params: { slug: entry.id }, props: { entry } }))) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { entry } = Astro.props;
+const d = entry.data;
+// V1's Markdown carries editor notes as HTML comments (<!-- TODO … -->).
+// Use the pre-rendered HTML without them so the notes never ship.
+const bodyHtml = entry.rendered?.html ? stripComments(entry.rendered.html) : undefined;
+const { Content } = await render(entry);
+const related = d.relatedWork ? await getEntry(d.relatedWork) : undefined;
+const blog = await getBlog();
+const posts = d.relatedPosts
+  .map((ref) => blog.find((p) => p.id === ref.id))
+  .filter((p): p is CollectionEntry<"blog"> => p !== undefined);
+
+const path = `/services/${entry.id}/`;
+const crumbs = [
+  { name: "Services", path: "/services/" },
+  { name: d.title, path },
+];
+const jsonLd: object[] = [
+  service(Astro.site, { name: d.title, description: d.seoDescription, path, deliverables: d.deliverables }),
+  ...(d.faq.length ? [faqPage(d.faq)] : []),
+];
+const { deliver, guides } = SERVICE_DETAIL;
+const num = (i: number) => String(i + 1).padStart(2, "0");
+---
+<BaseLayout
+  title={d.title}
+  description={d.seoDescription}
+  breadcrumbs={crumbs}
+  jsonLd={jsonLd}
+  markdownPath={`/services/${entry.id}.md`}
+>
+  <PageHero breadcrumbs={crumbs} eyebrow={SERVICE_DETAIL.eyebrow} title={d.title} accent={d.tagline} lead={d.summary}>
+    <div class="hero-cta">
+      <a href={href(contactFor(entry.id))} class="btn btn--primary">
+        {SERVICE_DETAIL.cta} <Icon name="arrow" size={18} class="arrow" />
+      </a>
+      <p class="small text-2">{SERVICE_DETAIL.reply}</p>
+    </div>
+  </PageHero>
+
+  <!-- What it is (the plain answer) + What you get -->
+  <section class="section section--flush-top" aria-labelledby="what-title">
+    <div class="container intro">
+      <div class="answer veil">
+        <h2 id="what-title" class="eyebrow answer__label">{SERVICE_DETAIL.whatItIs}</h2>
+        <div class="lead answer__body">{bodyHtml !== undefined ? <Fragment set:html={bodyHtml} /> : <Content />}</div>
+        <p class="lead answer__body">{d.outcome} {SERVICE_DETAIL.startLine}</p>
+      </div>
+
+      <div class="panel get">
+        <div class="get__head">
+          <p class="eyebrow">{SERVICE_DETAIL.whatYouGet}</p>
+          <h2 id="get-title" class="get__title">{d.outcome}</h2>
+        </div>
+        <ul class="ticks get__list">
+          {d.deliverables.map((item) => (
+            <li><Icon name="check" size={16} /><span>{item}</span></li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="deliver-title">
+    <div class="container">
+      <SectionHead id="deliver-title" eyebrow={deliver.eyebrow} title={deliver.title} accent={deliver.accent} />
+      <ol class="list-reset steps">
+        {d.delivery.map((step, i) => (
+          <li class="card step">
+            <span class="card__num" aria-hidden="true">{num(i)}</span>
+            <h3 class="card__title step__title">{step.title}</h3>
+            <p class="card__text">{step.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section--flush-top" aria-label="Related work and technology">
+    <div class="container related">
+      {related && (
+        <div class="related__case">
+          <h2 class="eyebrow label-h veil">{SERVICE_DETAIL.relatedCase}</h2>
+          <CaseCard item={related} featured />
+        </div>
+      )}
+      <div class:list={["related__tech veil", { "related__tech--full": !related }]}>
+        <h2 class="eyebrow label-h">{SERVICE_DETAIL.tech}</h2>
+        <ul class="chips" aria-label={`Technology for ${d.title}`}>
+          {d.tech.map((t) => <li class="chip">{t}</li>)}
+        </ul>
+        <p class="small text-2 related__note">{SERVICE_DETAIL.techNote}</p>
+      </div>
+    </div>
+  </section>
+
+  {posts.length > 0 && (
+    <section class="section" aria-labelledby="guides-title">
+      <div class="container">
+        <SectionHead
+          id="guides-title"
+          eyebrow={guides.eyebrow}
+          title={guides.title}
+          accent={guides.accent}
+          link={{ label: guides.all, href: "/blog/" }}
+        />
+        <ul class="list-reset guides">
+          {posts.map((p, i) => <li><PostCard post={p} num={i + 1} /></li>)}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  {d.faq.length > 0 && (
+    <section class="section" aria-labelledby="service-faq-title">
+      <div class="container faq-row">
+        <div class="faq-row__head">
+          <SectionHead id="service-faq-title" eyebrow={SERVICE_DETAIL.faqEyebrow} title={SERVICE_DETAIL.faqTitle(d.title)} />
+        </div>
+        <div class="faq-row__list veil">
+          <FaqList items={d.faq} name="service-faq" />
+        </div>
+      </div>
+    </section>
+  )}
+
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .hero-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; margin-top: 36px; }
+
+  /* Answer block, then the "What you get" panel. */
+  .intro { display: grid; gap: clamp(48px, 5vw, 72px); }
+  .answer { max-width: 72ch; }
+  .answer__label { margin-bottom: 20px; font-family: var(--font-body); }
+  .answer__body + .answer__body { margin-top: 16px; }
+  .answer__body :global(p + p) { margin-top: 16px; }
+
+  .get { display: grid; gap: 32px; }
+  @media (min-width: 1024px) {
+    .get { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(40px, 5vw, 96px); }
+  }
+  .get__head .eyebrow { margin-bottom: 20px; }
+  .get__title { font-size: clamp(24px, 1.2vw + 16px, 34px); line-height: 1.15; letter-spacing: -0.02em; }
+  .get__list { gap: 14px; }
+
+  .steps { display: grid; gap: 24px; }
+  @media (min-width: 640px) {
+    .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1100px) {
+    .steps { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+  .step__title { font-size: clamp(20px, 0.6vw + 14px, 24px); }
+
+  /* Eyebrow-styled h2 labels (V1 shows these as small labels). */
+  .label-h { margin-bottom: 24px; font-family: var(--font-body); }
+
+  .related { display: grid; gap: 56px; }
+  @media (min-width: 1024px) {
+    .related { grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); gap: clamp(40px, 6vw, 112px); align-items: start; }
+    .related__tech--full { grid-column: 1 / -1; }
+  }
+  .related__note { margin-top: 24px; max-width: 46ch; }
+
+  .guides { display: grid; gap: 24px; }
+  @media (min-width: 768px) {
+    .guides { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1024px) {
+    .guides { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+
+  .faq-row { display: grid; gap: 8px; }
+  .faq-row__head :global(.section-head) { margin-bottom: 32px; }
+  @media (min-width: 1024px) {
+    .faq-row { grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: clamp(40px, 6vw, 112px); align-items: start; }
+    .faq-row__head { position: sticky; top: 32px; }
+  }
+</style>

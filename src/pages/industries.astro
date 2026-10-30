@@ -1,0 +1,112 @@
+---
+// Industries (V1 /industries/): one numbered card per industry, each with
+// id=<industry-id> so V1 anchors like /industries/#healthcare keep working.
+// The summary is the plain answer (who it's for, what matters); focus areas,
+// related case studies and a contact link follow.
+import type { CollectionEntry } from "astro:content";
+import { Picture } from "astro:assets";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHero from "../components/PageHero.astro";
+import Icon from "../components/Icon.astro";
+import CtaBand from "../components/CtaBand.astro";
+import { INDUSTRIES_PAGE } from "../data/copy";
+import { getIndustries, getWork } from "../lib/content";
+import { href } from "../lib/url";
+
+const [industries, work] = await Promise.all([getIndustries(), getWork()]);
+const items = industries.map((ind) => ({
+  ind,
+  cases: ind.data.relatedWork
+    .map((ref) => work.find((w) => w.id === ref.id))
+    .filter((w): w is CollectionEntry<"work"> => w !== undefined),
+}));
+const crumbs = [{ name: "Industries", path: "/industries/" }];
+const { hero } = INDUSTRIES_PAGE;
+const num = (i: number) => String(i + 1).padStart(2, "0");
+---
+<BaseLayout
+  title={INDUSTRIES_PAGE.meta.title}
+  description={INDUSTRIES_PAGE.meta.description}
+  breadcrumbs={crumbs}
+  pageType="CollectionPage"
+  markdownPath="/industries.md"
+>
+  <PageHero breadcrumbs={crumbs} eyebrow={hero.eyebrow} title={hero.title} accent={hero.accent} lead={hero.lead} />
+
+  <section class="section section--flush-top" aria-label="Industries we serve">
+    <div class="container">
+      <ul class="list-reset ind-grid">
+        {items.map(({ ind, cases }, i) => (
+          <li>
+            <article id={ind.id} class="card ind" aria-labelledby={`${ind.id}-title`}>
+              <div class="ind__media">
+                <Picture
+                  src={ind.data.image}
+                  alt={ind.data.imageAlt}
+                  formats={["avif", "webp"]}
+                  widths={[400, 640, 960]}
+                  sizes="(min-width: 1520px) 720px, (min-width: 768px) 48vw, 100vw"
+                  loading={i < 2 ? "eager" : "lazy"}
+                  decoding="async"
+                />
+              </div>
+              <div class="ind__body">
+                <span class="card__num" aria-hidden="true">{num(i)}</span>
+                <h2 id={`${ind.id}-title`} class="card__title">{ind.data.name}</h2>
+                <p class="card__text">{ind.data.summary}</p>
+                <ul class="chips" aria-label={`Focus areas in ${ind.data.name}`}>
+                  {ind.data.focus.map((f) => <li class="chip">{f}</li>)}
+                </ul>
+                <div class="ind__links">
+                  {cases.map((w) => (
+                    <a class="ind__case" href={href(`/work/${w.id}/`)}>
+                      <span>{INDUSTRIES_PAGE.caseStudy} {w.data.title}</span>
+                      <Icon name="arrow" size={16} class="arrow" />
+                    </a>
+                  ))}
+                  <a class="link-u" href={href("/contact/")}>
+                    {INDUSTRIES_PAGE.discuss(ind.data.name)} <Icon name="arrow" size={16} />
+                  </a>
+                </div>
+              </div>
+            </article>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <CtaBand title={INDUSTRIES_PAGE.cta.title} />
+</BaseLayout>
+
+<style>
+  .ind-grid { display: grid; gap: 24px; }
+  @media (min-width: 768px) {
+    .ind-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  .ind { height: 100%; padding: 0; gap: 0; }
+  .ind__media { overflow: hidden; aspect-ratio: 16 / 9; background: var(--rule); }
+  .ind__media :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .ind__body { display: flex; flex: 1; flex-direction: column; gap: 18px; padding: 28px 32px 32px; }
+  .ind .chips { margin-top: 4px; }
+  /* Links sit at the bottom so cards in a row line up. */
+  .ind__links { display: flex; flex-direction: column; align-items: flex-start; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--rule); }
+  .ind__case {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding-block: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.35;
+    text-decoration: none;
+  }
+  .ind__case span { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+  .ind__case:hover span { text-decoration-thickness: 2px; }
+  .ind__case :global(.arrow) { flex: none; transition: transform 0.25s var(--ease); }
+  .ind__case:hover :global(.arrow) { transform: translateX(4px); }
+  @media (max-width: 640px) {
+    .ind__body { padding: 24px 20px 28px; }
+  }
+</style>

@@ -1,0 +1,163 @@
+---
+// One page per course (new in V2): /training/<course-id>/. Everything on it
+// is V1 training copy: the course's summary, topics and logos, its track's
+// name and intro, and the training page's "how to join" line. V1 publishes
+// no fees, batch dates or duration, so none appear here; people enquire on
+// WhatsApp or by phone, as on /training/.
+import type { GetStaticPaths, InferGetStaticPropsType } from "astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHero from "../../components/PageHero.astro";
+import Icon from "../../components/Icon.astro";
+import SectionHead from "../../components/SectionHead.astro";
+import TechLogos from "../../components/TechLogos.astro";
+import { HOME, TRAINING_ADVICE, TRAINING_PAGE } from "../../data/copy";
+import { SITE, whatsappFor } from "../../data/site";
+import { getCourses, getTracks } from "../../lib/content";
+import { course as courseSchema, coursePath } from "../../lib/schema";
+import { href } from "../../lib/url";
+
+export const getStaticPaths = (async () => {
+  const [tracks, courses] = await Promise.all([getTracks(), getCourses()]);
+  // The training lead's closing sentence: "Pick a course and message us on
+  // WhatsApp for the next batch, timings and fees."
+  const howToJoin = TRAINING_PAGE.hero.lead(courses.length, tracks.length).replace(/^.*\.\s+(?=[A-Z])/, "");
+  return courses.map((course) => ({
+    params: { slug: course.id },
+    props: {
+      course,
+      howToJoin,
+      trackNum: tracks.findIndex((t) => t.id === course.track.id) + 1,
+      siblings: courses.filter((c) => c.track.id === course.track.id && c.id !== course.id),
+    },
+  }));
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { course: c, howToJoin, trackNum, siblings } = Astro.props;
+const path = coursePath(c.id);
+const trackHref = `/training/#${c.track.id}`;
+const crumbs = [
+  { name: "Training", path: "/training/" },
+  { name: c.name, path },
+];
+const num = (i: number) => String(i + 1).padStart(2, "0");
+---
+<BaseLayout
+  title={c.name}
+  description={`${c.summary} Part of our ${c.track.name} track.`}
+  breadcrumbs={crumbs}
+  jsonLd={[courseSchema(Astro.site, c)]}
+  pageType="ItemPage"
+  markdownPath={`/training/${c.id}.md`}
+>
+  <PageHero breadcrumbs={crumbs} eyebrow={c.track.name} title={c.name} lead={c.summary}>
+    <p class="answer text-2">Part of our {c.track.name} track: {c.track.intro} {howToJoin}</p>
+  </PageHero>
+
+  <section class="section section--flush-top" aria-labelledby="learn-title">
+    <div class="container learn">
+      <div class="panel learn__topics">
+        <h2 id="learn-title" class="learn__title">{TRAINING_PAGE.learn}</h2>
+        <ul class="ticks">
+          {c.topics.map((topic) => (
+            <li><Icon name="check" size={16} /><span>{topic}</span></li>
+          ))}
+        </ul>
+      </div>
+      <div class="panel enquire">
+        <TechLogos logos={c.logos} />
+        <div class="enquire__actions">
+          <a
+            href={whatsappFor(TRAINING_PAGE.courseMessage(c.name))}
+            target="_blank"
+            rel="noopener"
+            class="btn btn--primary btn--block wa-btn"
+          >
+            <Icon name="whatsapp" size={20} class="wa-icon" /> {TRAINING_PAGE.enquire}
+          </a>
+          <a href={SITE.phoneHref} class="btn btn--outline btn--block"><Icon name="phone" size={18} /> {SITE.phone}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {siblings.length > 0 ? (
+    <section class="section" aria-labelledby="more-title">
+      <div class="container">
+        <SectionHead
+          id="more-title"
+          eyebrow={TRAINING_PAGE.trackEyebrow(trackNum)}
+          title={`Other courses in ${c.track.name}`}
+          link={{ label: HOME.training.allLink, href: trackHref }}
+        />
+        <ul class="list-reset siblings">
+          {siblings.map((s, i) => (
+            <li class="card sibling">
+              <div class="sibling__top">
+                <span class="card__num" aria-hidden="true">{num(i)}</span>
+                <TechLogos logos={s.logos} small />
+              </div>
+              <h3 class="card__title sibling__title">
+                <a class="stretched" href={href(coursePath(s.id))}>{s.name}</a>
+              </h3>
+              <p class="card__text">{s.summary}</p>
+              <p class="card__more" aria-hidden="true"><Icon name="arrow" size={16} class="arrow" /></p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  ) : (
+    <div class="container back">
+      <a class="link-u veil" href={href(trackHref)}>{HOME.training.allLink} <Icon name="arrow" size={16} /></a>
+    </div>
+  )}
+
+  <section class:list={["section", { "section--flush-top": siblings.length > 0 }]} aria-labelledby="advice-title">
+    <div class="container">
+      <div class="panel panel--dark on-dark advice">
+        <div class="advice__text">
+          <h2 id="advice-title" class="advice__title">{TRAINING_ADVICE.title}</h2>
+          <p class="lead">{TRAINING_ADVICE.text}</p>
+        </div>
+        <a href={whatsappFor(TRAINING_ADVICE.message)} target="_blank" rel="noopener" class="btn btn--light">
+          <Icon name="whatsapp" size={20} class="wa-icon" /> {TRAINING_ADVICE.cta}
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .answer { margin-top: 16px; max-width: 64ch; }
+
+  .learn { display: grid; gap: 24px; }
+  @media (min-width: 1024px) {
+    .learn { grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); align-items: start; }
+  }
+  .learn__title { margin-bottom: 28px; font-size: clamp(28px, 1.8vw + 14px, 40px); line-height: 1.08; letter-spacing: -0.025em; }
+  .learn__topics .ticks { gap: 14px; font-size: 17px; }
+  .enquire { display: grid; gap: 28px; }
+  .enquire__actions { display: grid; gap: 12px; }
+  .enquire .btn { white-space: normal; text-align: center; }
+  /* White glyph on the solid button (the green mark is for white grounds). */
+  .wa-btn :global(.wa-icon path) { fill: currentColor; }
+
+  .siblings { display: grid; gap: 24px; }
+  @media (min-width: 768px) {
+    .siblings { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1100px) {
+    .siblings { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  .sibling__top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  .sibling__title { font-size: clamp(20px, 0.6vw + 14px, 24px); }
+
+  .advice { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 28px 40px; }
+  .advice__text { max-width: 720px; }
+  .advice__title { margin-bottom: 16px; font-size: clamp(28px, 2.4vw + 12px, 44px); line-height: 1.05; letter-spacing: -0.025em; }
+  @media (max-width: 520px) {
+    .advice .btn { width: 100%; }
+  }
+</style>

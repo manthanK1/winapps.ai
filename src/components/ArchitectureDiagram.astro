@@ -1,0 +1,89 @@
+---
+// Layered system diagram from a case study's `architecture` field: one row
+// per layer (label left, square node tiles right), joined top to bottom by
+// thin connectors with an arrowhead. Illustrative only: simplified to protect
+// client confidentiality, which the caption says.
+import { WORK_DETAIL } from "../data/copy";
+
+interface Props {
+  layers: readonly { layer: string; nodes: readonly string[] }[];
+}
+const { layers } = Astro.props;
+---
+<figure class="panel arch">
+  <ol class="list-reset arch__layers">
+    {layers.map((l) => (
+      <li class="arch__layer">
+        <p class="arch__label">{l.layer}</p>
+        <ul class="list-reset arch__nodes">
+          {l.nodes.map((n) => <li class="arch__node">{n}</li>)}
+        </ul>
+      </li>
+    ))}
+  </ol>
+  <figcaption class="arch__caption">{WORK_DETAIL.architectureCaption}</figcaption>
+</figure>
+
+<style>
+  .arch { --label-w: 10rem; --col-gap: 24px; --link-h: 40px; }
+  .arch__layers { display: grid; row-gap: var(--link-h); }
+  .arch__layer { position: relative; display: grid; gap: 12px; }
+  @media (min-width: 640px) {
+    .arch__layer { grid-template-columns: var(--label-w) minmax(0, 1fr); align-items: center; gap: var(--col-gap); }
+  }
+
+  /* Connector to the layer above: a 1px line and a square-cap arrowhead, in
+     the gap between rows, lined up with the first node tile. */
+  .arch__layer + .arch__layer::before,
+  .arch__layer + .arch__layer::after {
+    content: "";
+    position: absolute;
+    left: 24px;
+    pointer-events: none;
+  }
+  .arch__layer + .arch__layer::before {
+    top: calc(var(--link-h) * -1 + 6px);
+    height: calc(var(--link-h) - 12px);
+    width: 1px;
+    background: var(--ink);
+  }
+  .arch__layer + .arch__layer::after {
+    top: -14px;
+    width: 9px;
+    height: 9px;
+    margin-left: -4px;
+    border-right: 1.5px solid var(--ink);
+    border-bottom: 1.5px solid var(--ink);
+    transform: rotate(45deg);
+  }
+  @media (min-width: 640px) {
+    .arch__layer + .arch__layer::before,
+    .arch__layer + .arch__layer::after { left: calc(var(--label-w) + var(--col-gap) + 24px); }
+  }
+
+  .arch__label {
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--primary);
+  }
+  .arch__nodes { display: flex; flex-wrap: wrap; gap: 8px; }
+  .arch__node {
+    padding: 10px 14px;
+    border: 1px solid var(--rule-2);
+    background: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--ink);
+  }
+  .arch__caption {
+    margin-top: 28px;
+    padding-top: 16px;
+    border-top: 1px solid var(--rule-2);
+    font-size: 14px;
+    color: var(--muted);
+  }
+</style>

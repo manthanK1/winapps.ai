@@ -1,0 +1,161 @@
+---
+// All training courses, grouped by track (V1 /training/). V1's anchors stay:
+// each track section has id=<track-id>, each course card id=<course-id>. Each
+// course also has its own page (/training/<course-id>/). No fees or batch
+// dates are published, so every course enquires on WhatsApp.
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHero from "../../components/PageHero.astro";
+import Icon from "../../components/Icon.astro";
+import TechLogos from "../../components/TechLogos.astro";
+import { TRAINING_ADVICE, TRAINING_PAGE } from "../../data/copy";
+import { SITE, whatsappFor } from "../../data/site";
+import { getCourses, getTracks } from "../../lib/content";
+import { courseList, coursePath } from "../../lib/schema";
+import { href } from "../../lib/url";
+
+const [tracks, courses] = await Promise.all([getTracks(), getCourses()]);
+const crumbs = [{ name: "Training", path: "/training/" }];
+const { hero, cta } = TRAINING_PAGE;
+const num = (i: number) => String(i + 1).padStart(2, "0");
+---
+<BaseLayout
+  title={TRAINING_PAGE.meta.title}
+  description={TRAINING_PAGE.meta.description(courses.length)}
+  breadcrumbs={crumbs}
+  jsonLd={[courseList(Astro.site, courses)]}
+  pageType="CollectionPage"
+  markdownPath="/training.md"
+>
+  <PageHero
+    breadcrumbs={crumbs}
+    eyebrow={hero.eyebrow}
+    title={hero.title}
+    accent={hero.accent}
+    lead={hero.lead(courses.length, tracks.length)}
+  >
+    <div class="actions">
+      <a href={whatsappFor(TRAINING_PAGE.askMessage)} target="_blank" rel="noopener" class="btn btn--primary wa-btn">
+        <Icon name="whatsapp" size={20} class="wa-icon" /> {TRAINING_ADVICE.cta}
+      </a>
+      <a href={SITE.phoneHref} class="btn btn--outline"><Icon name="phone" size={18} /> {SITE.phone}</a>
+    </div>
+    <nav aria-label="Training tracks" class="track-nav">
+      <ul class="list-reset">
+        {tracks.map((t) => (
+          <li><a href={`#${t.id}`} class="btn btn--outline btn--sm">{t.data.name}</a></li>
+        ))}
+      </ul>
+    </nav>
+  </PageHero>
+
+  {tracks.map((t, i) => (
+    <section id={t.id} class="section section--tight track" aria-labelledby={`${t.id}-title`}>
+      <div class="container">
+        <div class="track__head veil">
+          <p class="eyebrow">{TRAINING_PAGE.trackEyebrow(i + 1)}</p>
+          <h2 id={`${t.id}-title`} class="h2">{t.data.name}</h2>
+          <p class="lead">{t.data.intro}</p>
+        </div>
+        <ul class="list-reset courses">
+          {t.data.courses.map((c, j) => (
+            <li>
+              <article id={c.id} class="card course" aria-labelledby={`${c.id}-title`}>
+                <div class="course__top">
+                  <span class="card__num" aria-hidden="true">{num(j)}</span>
+                  <TechLogos logos={c.logos} />
+                </div>
+                <h3 id={`${c.id}-title`} class="card__title">
+                  <a class="course__name" href={href(coursePath(c.id))}>{c.name}</a>
+                </h3>
+                <p class="card__text">{c.summary}</p>
+                <div class="course__learn">
+                  <p id={`${c.id}-learn`} class="eyebrow">{TRAINING_PAGE.learn}</p>
+                  <ul class="ticks" aria-labelledby={`${c.id}-learn`}>
+                    {c.topics.map((topic) => (
+                      <li><Icon name="check" size={16} /><span>{topic}</span></li>
+                    ))}
+                  </ul>
+                </div>
+                <div class="course__actions">
+                  <a
+                    href={whatsappFor(TRAINING_PAGE.courseMessage(c.name))}
+                    target="_blank"
+                    rel="noopener"
+                    class="btn btn--primary wa-btn"
+                  >
+                    <Icon name="whatsapp" size={20} class="wa-icon" />
+                    <span>{TRAINING_PAGE.enquire}<span class="sr-only">: {c.name}</span></span>
+                  </a>
+                  <a class="link-u" href={href(coursePath(c.id))}>
+                    Course details<span class="sr-only">: {c.name}</span> <Icon name="arrow" size={16} />
+                  </a>
+                </div>
+              </article>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  ))}
+
+  <section class="section" aria-labelledby="training-cta-title">
+    <div class="container closing">
+      <div class="closing__text veil">
+        <h2 id="training-cta-title" class="closing__title">{cta.title}</h2>
+        <p class="lead closing__lead">{cta.text}</p>
+      </div>
+      <div class="closing__actions">
+        <a href={whatsappFor(TRAINING_ADVICE.message)} target="_blank" rel="noopener" class="btn btn--primary wa-btn">
+          <Icon name="whatsapp" size={20} class="wa-icon" /> {TRAINING_ADVICE.cta}
+        </a>
+        <a href={SITE.phoneHref} class="btn btn--outline"><Icon name="phone" size={18} /> {SITE.phone}</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px; }
+  /* White glyph on the solid button (the green mark is for white grounds). */
+  .wa-btn :global(.wa-icon path) { fill: currentColor; }
+
+  .track-nav { margin-top: 28px; }
+  .track-nav ul { display: flex; flex-wrap: wrap; gap: 8px; }
+  .track-nav .btn { white-space: normal; text-align: center; }
+
+  .track__head { max-width: 760px; margin-bottom: clamp(32px, 3vw, 48px); }
+  .track__head .eyebrow { margin-bottom: 22px; }
+  .track__head .lead { margin-top: 20px; }
+
+  .courses { display: grid; gap: 24px; }
+  @media (min-width: 768px) {
+    .courses { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1280px) {
+    .courses { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  .course { height: 100%; }
+  .course__top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  .course__name {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    text-decoration: none;
+  }
+  .course__name:hover { color: var(--primary); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 5px; }
+  .course__learn { padding-top: 18px; border-top: 1px solid var(--rule-2); }
+  .course__learn .eyebrow { margin-bottom: 14px; }
+  .course__learn .ticks { gap: 10px; font-size: 15px; }
+  .course__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; margin-top: auto; padding-top: 8px; }
+
+  .closing { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 32px 40px; }
+  .closing__text { max-width: 820px; }
+  .closing__title { font-size: clamp(36px, 4.6vw, 68px); line-height: 1.02; letter-spacing: -0.03em; }
+  .closing__lead { margin-top: 20px; max-width: 60ch; }
+  .closing__actions { display: flex; flex-wrap: wrap; gap: 12px; }
+
+  @media (max-width: 520px) {
+    .actions .btn, .closing__actions, .closing__actions .btn { width: 100%; }
+    .course__actions .btn { width: 100%; }
+  }
+</style>

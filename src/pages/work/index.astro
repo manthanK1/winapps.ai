@@ -1,0 +1,49 @@
+---
+// Case studies (V1 /work/): numbered case cards with h2 titles; the first
+// and fourth are the wide ones, as in V1 and on the home page.
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHero from "../../components/PageHero.astro";
+import CaseCard from "../../components/CaseCard.astro";
+import CtaBand from "../../components/CtaBand.astro";
+import { WORK_PAGE } from "../../data/copy";
+import { getWork } from "../../lib/content";
+
+const work = await getWork();
+const crumbs = [{ name: "Work", path: "/work/" }];
+const { hero } = WORK_PAGE;
+const isWide = (i: number) => i === 0 || i === 3;
+---
+<BaseLayout
+  title={WORK_PAGE.meta.title}
+  description={WORK_PAGE.meta.description}
+  breadcrumbs={crumbs}
+  pageType="CollectionPage"
+  markdownPath="/work.md"
+>
+  <PageHero breadcrumbs={crumbs} eyebrow={hero.eyebrow} title={hero.title} accent={hero.accent} lead={hero.lead} />
+
+  <section class="section section--flush-top" aria-label="Case studies">
+    <div class="container">
+      <ul class="list-reset work-grid">
+        {work.map((item, i) => (
+          <li class:list={{ "work-grid__wide": isWide(i) }}>
+            <CaseCard item={item} num={i + 1} featured={isWide(i)} headingLevel="h2" />
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <CtaBand title={WORK_PAGE.cta.title} text={WORK_PAGE.cta.text} />
+</BaseLayout>
+
+<style>
+  .work-grid { display: grid; gap: 24px; }
+  @media (min-width: 768px) {
+    .work-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1024px) {
+    .work-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .work-grid__wide { grid-column: span 2; }
+  }
+</style>
