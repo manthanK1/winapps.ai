@@ -170,7 +170,8 @@ export function course(site: Site, c: CourseInput) {
     description: c.summary,
     url,
     teaches: [...c.topics],
-    educationalLevel: c.track.name,
+    // The training track is a subject area, not an educationalLevel (beginner, advanced…).
+    about: { "@type": "Thing", name: c.track.name },
     provider: { "@type": "Organization", "@id": orgId(site), name: SITE.legalName, sameAs: absolute("/", site) },
     hasCourseInstance: {
       "@type": "CourseInstance",

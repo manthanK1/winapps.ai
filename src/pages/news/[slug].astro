@@ -7,7 +7,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import PageHero from "../../components/PageHero.astro";
 import CtaBand from "../../components/CtaBand.astro";
 import Icon from "../../components/Icon.astro";
-import { NEWS_PAGE } from "../../data/copy";
+import { BLOG_POST, NEWS_PAGE } from "../../data/copy";
 import { getNews } from "../../lib/content";
 import { article } from "../../lib/schema";
 import { absolute, href } from "../../lib/url";
@@ -47,7 +47,11 @@ const schema = article(Astro.site, {
   modified={d.date}
   markdownPath={`/news/${entry.id}.md`}
 >
-  <PageHero breadcrumbs={crumbs} eyebrow={`News · ${d.dateLabel}`} title={d.title} />
+  {/* V1 put the date in the eyebrow ("News · Mar 2026"); it moves to an "Updated"
+      line with a machine-readable <time>, at V1's published (month) precision. */}
+  <PageHero breadcrumbs={crumbs} eyebrow="News" title={d.title}>
+    <p class="post-meta">{BLOG_POST.card.updated} <time datetime={d.date.toISOString().slice(0, 10)}>{d.dateLabel}</time></p>
+  </PageHero>
 
   <section class="section section--flush-top" aria-label="News post">
     <div class="container news-post">
@@ -86,6 +90,7 @@ const schema = article(Astro.site, {
 </BaseLayout>
 
 <style>
+  .post-meta { margin-top: 28px; font-size: 15px; color: var(--ink-2); }
   .news-post { display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px; }
   @media (min-width: 1024px) {
     .news-post { grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); gap: clamp(32px, 5vw, 96px); align-items: start; }

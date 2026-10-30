@@ -633,8 +633,8 @@ export async function newsPostMd(site: Site, entry: NewsPost) {
   return finish(
     join(
       `# ${d.title}`,
+      `${NEWS_PAGE.card.meta} · ${BLOG_POST.card.updated} ${d.dateLabel}`,
       body(entry.body) || d.description,
-      `${NEWS_PAGE.card.meta} · ${d.dateLabel}`,
       `${L.link(pf.before, "/blog/")}${pf.middle}${L.link(pf.after, "/services/")}.`,
       more.length > 0 && join(`## ${NEWS_PAGE.more}`, bullets(more.map((p) => newsLine(L, p))), L.link(NEWS_PAGE.all, "/news/")),
       ctaBlock(L)
