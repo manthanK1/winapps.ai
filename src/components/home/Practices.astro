@@ -1,0 +1,140 @@
+---
+// The six practices (V1 PracticeStack) as numbered panels 01–06: 2px ink top
+// rule on near-white. Left: label, title + tagline, summary, related case
+// study and the two actions. Right: "What you get", the outcome, the first
+// four deliverables and the first six technologies.
+import { getEntry } from "astro:content";
+import Icon from "../Icon.astro";
+import SectionHead from "../SectionHead.astro";
+import { HOME, SERVICES_PAGE } from "../../data/copy";
+import { PRACTICE_LABELS, contactFor } from "../../data/site";
+import { getServices } from "../../lib/content";
+import { href } from "../../lib/url";
+
+const services = await getServices();
+const items = await Promise.all(
+  services.map(async (s) => ({ s, related: s.data.relatedWork ? await getEntry(s.data.relatedWork) : undefined }))
+);
+const { practices } = HOME;
+---
+<section class="section" aria-labelledby="practices-title">
+  <div class="container">
+    <SectionHead
+      id="practices-title"
+      eyebrow={practices.eyebrow}
+      title={practices.title}
+      accent={practices.accent}
+      intro={practices.intro}
+      link={{ label: practices.allLink, href: "/services/" }}
+    />
+    <ol class="practices">
+      {items.map(({ s, related }, i) => (
+        <li>
+          <article class="panel practice" aria-labelledby={`practice-${s.id}`}>
+            <div class="practice__main">
+              <p class="practice__meta">
+                <span class="card__num" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+                <span class="practice__label">{PRACTICE_LABELS[s.id] ?? s.data.title}</span>
+              </p>
+              <h3 id={`practice-${s.id}`} class="practice__title">
+                {s.data.title}{" "}<span class="practice__tagline">{s.data.tagline}</span>
+              </h3>
+              <p class="practice__summary">{s.data.summary}</p>
+              <div class="practice__foot">
+                {related && (
+                  <p class="practice__case">
+                    <strong>Case study:</strong>
+                    <a class="link" href={href(`/work/${related.id}/`)}>{related.data.title}</a>
+                  </p>
+                )}
+                <div class="practice__actions">
+                  <a class="btn btn--primary" href={href(`/services/${s.id}/`)}>
+                    Explore {s.data.title}<span class="sr-only"> service</span> <Icon name="arrow" size={18} class="arrow" />
+                  </a>
+                  <a class="btn btn--outline" href={href(contactFor(s.id))}>
+                    Discuss a project<span class="sr-only"> in {s.data.title}</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div class="practice__get">
+              <p class="eyebrow">{SERVICES_PAGE.whatYouGet}</p>
+              <p class="practice__outcome">{s.data.outcome}</p>
+              <ul class="ticks">
+                {s.data.deliverables.slice(0, 4).map((d) => (
+                  <li><Icon name="check" size={16} /><span>{d}</span></li>
+                ))}
+              </ul>
+              <ul class="chips practice__tech" aria-label={`Technology for ${s.data.title}`}>
+                {s.data.tech.slice(0, 6).map((t) => <li class="chip">{t}</li>)}
+              </ul>
+            </div>
+          </article>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .practices { display: grid; gap: 24px; margin: 0; padding: 0; list-style: none; }
+  .practice { display: grid; gap: 40px; }
+  @media (min-width: 1024px) {
+    .practice { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0; padding: 0; }
+    .practice__main { padding: clamp(32px, 3.2vw, 48px); }
+    .practice__get { padding: clamp(32px, 3.2vw, 48px); border-left: 1px solid var(--rule-2); }
+  }
+  .practice__main { display: flex; flex-direction: column; }
+  .practice__meta { display: flex; align-items: center; gap: 16px; }
+  .practice__label {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 4px 10px;
+    border: 1px solid var(--ink);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .practice__title {
+    margin-top: 28px;
+    font-size: clamp(28px, 2.2vw + 12px, 44px);
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+  }
+  .practice__tagline { display: block; }
+  .practice__summary { margin-top: 20px; max-width: 52ch; color: var(--ink-2); }
+  .practice__foot { margin-top: auto; padding-top: 32px; }
+  .practice__case {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 6px;
+    font-size: 14px;
+    color: var(--ink-2);
+  }
+  .practice__case strong { font-weight: 600; color: var(--ink); }
+  .practice__case a { display: inline-flex; align-items: center; min-height: 44px; }
+  .practice__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+
+  .practice__get { display: flex; flex-direction: column; gap: 20px; }
+  .practice__outcome {
+    font-family: var(--font-display);
+    font-size: clamp(20px, 0.6vw + 14px, 24px);
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+  }
+  .practice__get .ticks { font-size: 15px; }
+  .practice__tech { margin-top: 4px; padding-top: 20px; border-top: 1px solid var(--rule); }
+  @media (max-width: 1023px) {
+    .practice__get { padding-top: 32px; border-top: 1px solid var(--rule-2); }
+  }
+  @media (max-width: 520px) {
+    .practice__actions, .practice__actions .btn { width: 100%; }
+    .practice__actions .btn { white-space: normal; text-align: center; padding-block: 12px; }
+  }
+</style>

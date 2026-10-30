@@ -1,0 +1,40 @@
+---
+// A row of official technology logos on square white tiles with a 1px rule
+// (training tracks and courses). The logo's alt text is the technology name.
+import { techLogo, type TechLogo } from "../lib/tech-logos";
+
+interface Props {
+  logos: readonly TechLogo[];
+  /** Smaller tiles, for dense lists such as course cards. */
+  small?: boolean;
+  class?: string;
+}
+const { logos, small = false, class: className } = Astro.props;
+const size = small ? 20 : 28;
+---
+<ul class:list={["logos", { "logos--sm": small }, className]} aria-label="Technologies">
+  {logos.map((key) => {
+    const { src, name } = techLogo(key);
+    return (
+      <li class="logos__tile">
+        <img src={src} alt={name} width={size} height={size} loading="lazy" decoding="async" />
+      </li>
+    );
+  })}
+</ul>
+
+<style>
+  .logos { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  .logos__tile {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 48px;
+    height: 48px;
+    border: 1px solid var(--rule-2);
+    background: #fff;
+  }
+  .logos__tile img { width: 28px; height: 28px; object-fit: contain; }
+  .logos--sm .logos__tile { width: 36px; height: 36px; }
+  .logos--sm .logos__tile img { width: 20px; height: 20px; }
+</style>

@@ -1,8 +1,207 @@
 ---
-// PLACEHOLDER — replaced by the full home page.
+// Home page: V1's sections in V1's order, in the new design language. Every
+// word is in the HTML; scripts only add the ribbon and the live clocks.
 import BaseLayout from "../layouts/BaseLayout.astro";
+import Icon from "../components/Icon.astro";
+import SectionHead from "../components/SectionHead.astro";
+import Hero from "../components/home/Hero.astro";
+import TrustStrip from "../components/home/TrustStrip.astro";
+import Practices from "../components/home/Practices.astro";
+import BuildPrompt from "../components/BuildPrompt.astro";
+import TrainingTracks from "../components/TrainingTracks.astro";
+import CaseCard from "../components/CaseCard.astro";
+import ProcessSteps from "../components/ProcessSteps.astro";
+import TrustSection from "../components/TrustSection.astro";
+import EngagementModels from "../components/EngagementModels.astro";
+import TechStack from "../components/TechStack.astro";
+import PostCard from "../components/PostCard.astro";
+import FaqList from "../components/FaqList.astro";
+import CtaBand from "../components/CtaBand.astro";
 import { HOME } from "../data/copy";
+import { SITE } from "../data/site";
+import { getBlog, getCourses, getFaq, getNews, getWork } from "../lib/content";
+import { faqPage } from "../lib/schema";
+import { href } from "../lib/url";
+
+const work = await getWork();
+const faq = await getFaq();
+const blog = (await getBlog()).slice(0, 3);
+const news = (await getNews()).slice(0, 2);
+const courseCount = (await getCourses()).length;
+// V1's layout: the first and fourth case studies are the wide ones.
+const isWide = (i: number) => i === 0 || i === 3;
 ---
-<BaseLayout title={HOME.meta.title} description={HOME.meta.description} ribbon="home">
-  <section class="section"><div class="container"><h1 class="display">{HOME.hero.title}</h1></div></section>
+<BaseLayout
+  title={HOME.meta.title}
+  description={HOME.meta.description}
+  ribbon="home"
+  jsonLd={[faqPage(faq)]}
+  markdownPath="/index.md"
+>
+  <Hero />
+
+  <TrustStrip />
+
+  <Practices />
+
+  <!-- What do you want to build? → the contact form, pre-filled -->
+  <section class="section section--tight" aria-labelledby="build-title">
+    <div class="container build-row">
+      <h2 id="build-title" class="h2 build-row__title veil">{HOME.build.title}</h2>
+      <BuildPrompt />
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="training-title">
+    <div class="container">
+      <SectionHead
+        id="training-title"
+        eyebrow={HOME.training.eyebrow}
+        title={HOME.training.title}
+        accent={HOME.training.accent}
+        intro={HOME.training.intro(courseCount)}
+      />
+      <TrainingTracks />
+      <div class="more">
+        <a href={href("/training/")} class="btn btn--dark">{HOME.training.allLink} <Icon name="arrow" size={18} class="arrow" /></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="work-title">
+    <div class="container">
+      <SectionHead
+        id="work-title"
+        eyebrow={HOME.work.eyebrow}
+        title={HOME.work.title}
+        accent={HOME.work.accent}
+        intro={HOME.work.intro}
+        link={{ label: HOME.work.allLink, href: "/work/" }}
+      />
+      <ul class="work-grid">
+        {work.map((item, i) => (
+          <li class:list={{ "work-grid__wide": isWide(i) }}>
+            <CaseCard item={item} num={i + 1} featured={isWide(i)} />
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="process-title">
+    <div class="container">
+      <div class="split-head">
+        <SectionHead id="process-title" eyebrow={HOME.process.eyebrow} title={HOME.process.title} accent={HOME.process.accent} />
+        <div class="split-head__aside veil">
+          <p class="lead">{HOME.process.text}</p>
+          <a class="link-u" href={href("/how-we-work/")}>{HOME.process.link} <Icon name="arrow" size={16} /></a>
+        </div>
+      </div>
+      <ProcessSteps />
+    </div>
+  </section>
+
+  <TrustSection />
+
+  <section class="section" aria-labelledby="engage-title">
+    <div class="container">
+      <SectionHead
+        id="engage-title"
+        eyebrow={HOME.engagement.eyebrow}
+        title={HOME.engagement.title}
+        accent={HOME.engagement.accent}
+        intro={HOME.engagement.intro}
+      />
+      <EngagementModels />
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="stack-title">
+    <div class="container">
+      <SectionHead id="stack-title" eyebrow={HOME.tech.eyebrow} title={HOME.tech.title} accent={HOME.tech.accent} intro={HOME.tech.text} />
+      <TechStack />
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="insights-title">
+    <div class="container">
+      <SectionHead
+        id="insights-title"
+        eyebrow={HOME.insights.eyebrow}
+        title={HOME.insights.title}
+        accent={HOME.insights.accent}
+        link={{ label: HOME.insights.allLink, href: "/blog/" }}
+      />
+      <ul class="insights">
+        {blog.map((post, i) => (
+          <li class="insights__guide"><PostCard post={post} num={i + 1} /></li>
+        ))}
+        {news.map((post, i) => (
+          <li class="insights__news"><PostCard post={post} num={blog.length + i + 1} /></li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="faq-title">
+    <div class="container faq-row">
+      <div class="faq-row__head">
+        <SectionHead id="faq-title" eyebrow={HOME.faq.eyebrow} title={HOME.faq.title} accent={HOME.faq.accent}>
+          <p class="faq-row__else">{HOME.faq.somethingElse} <a class="link-u" href={`mailto:${SITE.email}`}>{SITE.email}</a></p>
+        </SectionHead>
+      </div>
+      <div class="faq-row__list veil">
+        <FaqList items={faq} />
+      </div>
+    </div>
+  </section>
+
+  <CtaBand />
 </BaseLayout>
+
+<style>
+  /* Grids and two-column rows for the home sections; the components inside
+     carry their own look. */
+  .build-row { display: grid; gap: 32px; }
+  @media (min-width: 1024px) {
+    .build-row { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(40px, 5vw, 96px); align-items: start; }
+  }
+  .build-row__title { justify-self: start; }
+
+  .more { margin-top: clamp(32px, 4vw, 48px); }
+
+  .work-grid { display: grid; gap: 24px; margin: 0; padding: 0; list-style: none; }
+  @media (min-width: 768px) {
+    .work-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1024px) {
+    .work-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .work-grid__wide { grid-column: span 2; }
+  }
+
+  .split-head { display: grid; gap: 24px; margin-bottom: clamp(40px, 4vw, 56px); }
+  .split-head :global(.section-head) { margin-bottom: 0; }
+  .split-head__aside { justify-self: start; max-width: 46ch; }
+  .split-head__aside .link-u { margin-top: 8px; }
+  @media (min-width: 1024px) {
+    .split-head { grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); align-items: end; gap: 40px; }
+  }
+
+  .insights { display: grid; gap: 24px; margin: 0; padding: 0; list-style: none; }
+  @media (min-width: 768px) {
+    .insights { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1024px) {
+    .insights { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+    .insights__guide { grid-column: span 2; }
+    .insights__news { grid-column: span 3; }
+  }
+
+  .faq-row { display: grid; gap: 8px; }
+  .faq-row__head :global(.section-head) { margin-bottom: 32px; }
+  .faq-row__else { color: var(--ink-2); }
+  @media (min-width: 1024px) {
+    .faq-row { grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: clamp(40px, 6vw, 112px); align-items: start; }
+    .faq-row__head { position: sticky; top: 32px; }
+  }
+</style>

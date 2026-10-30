@@ -1,0 +1,94 @@
+---
+// Discovery → Build → Launch & scale (V1 ProcessTimeline) in the design's
+// language: a 1px ink rule with a square marker per step, the number in the
+// card__num style. Three columns on desktop, stacked on phones.
+import { PROCESS_STEPS } from "../data/copy";
+
+interface Props {
+  /** Adds each step's "more" bullets (How we work page). */
+  detailed?: boolean;
+}
+const { detailed = false } = Astro.props;
+---
+<ol class="steps">
+  {PROCESS_STEPS.map((s, i) => (
+    <li class="step">
+      <p class="step__meta">
+        <span class="card__num" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+        <span class="step__time">{s.time}</span>
+      </p>
+      <h3 class="h3 step__title"><span class="sr-only">Step {i + 1}: </span>{s.title}</h3>
+      <p class="step__text">{s.text}</p>
+      {detailed && (
+        <ul class="step__more">
+          {s.more.map((m) => <li>{m}</li>)}
+        </ul>
+      )}
+    </li>
+  ))}
+</ol>
+
+<style>
+  .steps {
+    display: grid;
+    gap: 24px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 900px) {
+    .steps { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  .step {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 36px 32px 36px;
+    border-top: 1px solid var(--ink);
+    background: var(--card);
+  }
+  /* Square marker sitting on the rule. */
+  .step::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: -6px;
+    width: 11px;
+    height: 11px;
+    background: var(--primary);
+  }
+  .step:first-child::before { background: var(--accent); }
+  .step__meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; }
+  .step__time {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .step__text { color: var(--ink-2); max-width: 42ch; }
+  .step__more {
+    display: grid;
+    gap: 10px;
+    margin: 6px 0 0;
+    padding: 18px 0 0;
+    border-top: 1px solid var(--rule);
+    list-style: none;
+    font-size: 15px;
+    color: var(--ink-2);
+  }
+  .step__more li { position: relative; padding-left: 20px; }
+  .step__more li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.6em;
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+  }
+  @media (max-width: 640px) {
+    .step { padding: 28px 20px 28px; }
+  }
+</style>

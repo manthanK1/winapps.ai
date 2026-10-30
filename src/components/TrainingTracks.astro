@@ -1,0 +1,89 @@
+---
+// The training tracks as numbered cards (home page). Each card opens its part
+// of /training/ (the title link stretches over the card); its course chips
+// link to the course pages and sit above that overlay. The last card points
+// anyone undecided to WhatsApp.
+import Icon from "./Icon.astro";
+import TechLogos from "./TechLogos.astro";
+import { TRAINING_ADVICE } from "../data/copy";
+import { whatsappFor } from "../data/site";
+import { getTracks } from "../lib/content";
+import { coursePath } from "../lib/schema";
+import { href } from "../lib/url";
+
+const tracks = await getTracks();
+---
+<ul class="tracks">
+  {tracks.map((t, i) => (
+    <li class="card track">
+      <div class="track__top">
+        <span class="card__num" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+        <TechLogos logos={t.data.logos} small />
+      </div>
+      <h3 class="card__title">
+        <a class="stretched" href={href(`/training/#${t.id}`)}>{t.data.name}</a>
+      </h3>
+      <p class="card__text">{t.data.intro}</p>
+      <ul class="chips track__courses" aria-label={`${t.data.name} courses`}>
+        {t.data.courses.map((c) => (
+          <li><a class="above track__course" href={href(coursePath(c.id))}>{c.name}</a></li>
+        ))}
+      </ul>
+    </li>
+  ))}
+  <li class="card track track--advice on-dark">
+    <span class="track__wa" aria-hidden="true"><Icon name="whatsapp" size={26} /></span>
+    <h3 class="card__title">{TRAINING_ADVICE.title}</h3>
+    <p class="card__text">{TRAINING_ADVICE.text}</p>
+    <div class="track__ask">
+      <a href={whatsappFor(TRAINING_ADVICE.message)} target="_blank" rel="noopener" class="btn btn--light">
+        <Icon name="whatsapp" size={20} class="wa-icon" /> {TRAINING_ADVICE.cta}
+      </a>
+    </div>
+  </li>
+</ul>
+
+<style>
+  .tracks {
+    display: grid;
+    gap: 24px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 768px) {
+    .tracks { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1100px) {
+    .tracks { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  .track__top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  .track__courses { margin-top: auto; padding-top: 6px; }
+  /* Course links: square chips, tall enough to tap (44px). */
+  .track__course {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 6px 12px;
+    border: 1px solid var(--rule-2);
+    background: #fff;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.25;
+    text-decoration: none;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .track__course:hover { border-color: var(--ink); color: var(--primary); }
+
+  .track--advice { background: var(--overlay); border-top-color: var(--accent); }
+  .track--advice .card__text { color: var(--on-dark-2); }
+  .track__wa {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    background: #fff;
+  }
+  .track__ask { margin-top: auto; padding-top: 6px; }
+</style>

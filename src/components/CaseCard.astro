@@ -1,0 +1,93 @@
+---
+// Case study card (home, /work/, service and industry pages). The title is
+// the card's one link and stretches over the whole card; the "Read the case
+// study" line is visual only, so screen readers hear the title once.
+import type { CollectionEntry } from "astro:content";
+import { Picture } from "astro:assets";
+import Icon from "./Icon.astro";
+import { WORK_PAGE } from "../data/copy";
+import { href } from "../lib/url";
+
+interface Props {
+  item: CollectionEntry<"work">;
+  /** Shows "01", "02"… above the title. */
+  num?: number;
+  /** Wider card (spans two columns on desktop) with a 2:1 photo. */
+  featured?: boolean;
+  headingLevel?: "h2" | "h3";
+}
+const { item, num, featured = false, headingLevel: H = "h3" } = Astro.props;
+const d = item.data;
+const sizes = featured
+  ? "(min-width: 1024px) 66vw, (min-width: 768px) 50vw, 100vw"
+  : "(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw";
+---
+<article class:list={["card case", { "case--featured": featured }]}>
+  <div class="case__media">
+    <Picture
+      src={d.image}
+      alt={d.imageAlt}
+      formats={["avif", "webp"]}
+      widths={[400, 640, 1024]}
+      sizes={sizes}
+      loading="lazy"
+      decoding="async"
+    />
+  </div>
+  <div class="case__body">
+    {num !== undefined && <span class="card__num" aria-hidden="true">{String(num).padStart(2, "0")}</span>}
+    <p class="eyebrow">{d.sector}{d.region && <> · {d.region}</>}</p>
+    <H class="card__title case__title">
+      <a class="stretched" href={href(`/work/${item.id}/`)}>{d.title}</a>
+    </H>
+    <dl class="case__facts">
+      <div>
+        <dt>{WORK_PAGE.card.problem}</dt>
+        <dd>{d.problem}</dd>
+      </div>
+      <div>
+        <dt>{WORK_PAGE.card.delivered}</dt>
+        <dd>{d.delivered}</dd>
+      </div>
+    </dl>
+    <ul class="chips" aria-label="Technology">
+      {d.stack.map((t) => <li class="chip">{t}</li>)}
+    </ul>
+    <p class="card__more" aria-hidden="true">{WORK_PAGE.card.read} <Icon name="arrow" size={16} class="arrow" /></p>
+  </div>
+</article>
+
+<style>
+  .case { height: 100%; padding: 0; gap: 0; }
+  .case__media { overflow: hidden; aspect-ratio: 16 / 9; background: var(--rule); }
+  .case__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s var(--ease);
+  }
+  .case:hover .case__media :global(img) { transform: scale(1.03); }
+  .case__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 18px;
+    padding: 28px 32px 32px;
+  }
+  .case__title { font-size: clamp(20px, 0.6vw + 14px, 24px); }
+  .case--featured .case__title { font-size: clamp(22px, 1.1vw + 14px, 28px); }
+  .case__facts { display: grid; gap: 14px; font-size: 15px; line-height: 1.5; }
+  .case__facts dt { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .case__facts dd { margin-top: 4px; color: var(--ink-2); }
+  .case .chips { margin-top: 4px; }
+  @media (min-width: 1024px) {
+    .case--featured .case__media { aspect-ratio: 2 / 1; }
+    .case--featured .case__body { padding-inline: 40px; }
+  }
+  @media (max-width: 640px) {
+    .case__body { padding: 24px 20px 28px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .case:hover .case__media :global(img) { transform: none; }
+  }
+</style>

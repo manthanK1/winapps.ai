@@ -1,0 +1,92 @@
+---
+// Home hero, as in the design: a full-height stage for the WebGL W, with the
+// text block bottom-left. The header (absolute, outside <main>) overlays the
+// top. #ribbon-word is the WINAPPS wordmark the ribbon places under its W.
+//
+// Wide screens (landscape): text bottom-left within 44vw, the W upper right.
+// Narrow screens (portrait phones and tablets): the ribbon draws the W centred
+// at ~29–52% of the viewport height and the wordmark at ~55%, so the text
+// starts below 60svh and the hero grows taller than the screen if it must.
+// The h1 is the LCP element: no entrance animation.
+import Icon from "../Icon.astro";
+import { HOME } from "../../data/copy";
+import { SITE } from "../../data/site";
+import { href } from "../../lib/url";
+
+const { hero } = HOME;
+---
+<section class="hero" aria-labelledby="hero-title">
+  <div id="ribbon-word" class="ribbon-word" aria-hidden="true">WINAPPS</div>
+  <div class="hero__text">
+    <p class="eyebrow">{hero.eyebrow}</p>
+    <h1 id="hero-title" class="display hero__title">{hero.title}</h1>
+    <p class="lead hero__lead">{hero.lead}</p>
+    <div class="hero__actions">
+      <a href={href(SITE.bookingPath)} class="btn btn--primary">{hero.primary.label} <Icon name="arrow" size={18} class="arrow" /></a>
+      <a href={href(hero.secondary.href)} class="link-u">{hero.secondary.label}</a>
+    </div>
+    <p class="hero__wa">
+      {hero.whatsappNote} <a class="hero__wa-link" href={SITE.whatsappHref} target="_blank" rel="noopener">WhatsApp</a>
+    </p>
+  </div>
+  <div class="hero__scroll" aria-hidden="true">SCROLL<span></span></div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 640px;
+    min-height: max(640px, 100vh);
+    min-height: max(640px, 100svh);
+    padding: calc(var(--header-h) + 32px) var(--gutter) clamp(32px, 7vh, 72px);
+    overflow: clip;
+  }
+  .hero__text { max-width: min(680px, 44vw); }
+  .hero__text > .eyebrow { margin-bottom: 22px; }
+  .hero__lead { margin-top: 24px; max-width: 54ch; }
+  .hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px; margin-top: 36px; }
+  .hero__wa { margin-top: 12px; font-size: 14px; color: var(--ink-2); }
+  .hero__wa-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+  }
+  .hero__wa-link:hover { text-decoration-thickness: 2px; }
+
+  .hero__scroll {
+    position: absolute;
+    right: var(--gutter);
+    bottom: clamp(32px, 7vh, 72px);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+  }
+  .hero__scroll span { display: block; width: 1px; height: 44px; background: var(--ink); }
+
+  /* Portrait: the W and wordmark fill the top ~56%; text flows below. Listed
+     after the landscape rules so an exactly square viewport gets this one. */
+  @media (max-aspect-ratio: 1/1) {
+    .hero {
+      justify-content: flex-start;
+      min-height: 100vh;
+      min-height: 100svh;
+      padding-top: 60vh;
+      padding-top: 60svh;
+      padding-bottom: clamp(48px, 8vw, 72px);
+    }
+    .hero__text { max-width: 680px; }
+    .hero__scroll { display: none; }
+  }
+</style>

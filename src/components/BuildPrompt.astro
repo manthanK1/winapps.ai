@@ -1,0 +1,79 @@
+---
+// "What do you want to build?" (V1 BuildPrompt). A plain GET form to the
+// contact page: ?message= and ?interest= arrive pre-filled there, so nobody
+// types twice. Works without JavaScript; nothing is sent from here.
+import Icon from "./Icon.astro";
+import { HOME } from "../data/copy";
+import { NEEDS } from "../data/site";
+import { href } from "../lib/url";
+
+interface Props {
+  /** id of the visible heading that names this form. */
+  labelledBy?: string;
+}
+const { labelledBy = "build-title" } = Astro.props;
+---
+<form action={href("/contact/")} method="get" class="build" aria-labelledby={labelledBy}>
+  <div class="build__box">
+    <label for="build-message" class="sr-only">{HOME.build.label}</label>
+    <textarea id="build-message" name="message" rows="4" class="build__input" placeholder={HOME.build.placeholder}></textarea>
+    <div class="build__tray">
+      <fieldset class="build__needs">
+        <legend class="sr-only">{HOME.build.legend}</legend>
+        <ul class="build__choices">
+          {NEEDS.map((n) => (
+            <li>
+              <label class="choice">
+                <input type="checkbox" name="interest" value={n.label} />
+                <span>{n.label}</span>
+              </label>
+            </li>
+          ))}
+        </ul>
+      </fieldset>
+      <button type="submit" class="btn btn--primary build__submit" aria-label={HOME.build.submitLabel}>
+        <Icon name="arrow" size={20} class="arrow" />
+      </button>
+    </div>
+  </div>
+  <p class="build__note veil">{HOME.build.note}</p>
+</form>
+
+<style>
+  .build { width: 100%; }
+  .build__box {
+    border: 1px solid var(--field-border);
+    background: #fff;
+    transition: border-color 0.2s;
+  }
+  .build__box:has(.build__input:focus) { border-color: var(--primary); outline: 1px solid var(--primary); }
+  .build__input {
+    display: block;
+    width: 100%;
+    min-height: 144px;
+    padding: 18px 20px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--ink);
+    font: 400 17px/1.45 var(--font-body);
+    resize: vertical;
+  }
+  .build__input:focus { outline: none; }
+  .build__input::placeholder { color: #6b7678; }
+  .build__tray {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    padding: 12px;
+    border-top: 1px solid var(--rule);
+  }
+  .build__needs { flex: 1; }
+  .build__choices { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  .build__submit { flex: none; width: 52px; padding: 0; }
+  .build__note { display: inline-block; margin-top: 20px; font-size: 14px; color: var(--muted); }
+  @media (max-width: 520px) {
+    .build__tray { flex-direction: column; align-items: stretch; }
+    .build__submit { width: 100%; }
+  }
+</style>

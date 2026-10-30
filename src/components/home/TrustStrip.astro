@@ -1,0 +1,61 @@
+---
+// Under the hero: V1's intro statement, then the four commitments as one
+// sharp row split by 1px rules (Est. 2013 · NDA · reply time · your IP).
+import { HOME } from "../../data/copy";
+import { PROMISES } from "../../data/site";
+
+const { intro } = HOME;
+---
+<section class="section section--tight strip" aria-labelledby="intro-title">
+  <div class="container">
+    <h2 id="intro-title" class="h2 strip__title veil">
+      {intro.before}<strong>{intro.strong1}</strong>{intro.middle}<strong>{intro.strong2}</strong>{intro.after}
+    </h2>
+    <ul class="strip__list" aria-label="Our commitments">
+      {PROMISES.map((p, i) => (
+        <li class="strip__item">
+          <span class="card__num" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+          <span class="strip__label">{p.label}</span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .strip__title {
+    max-width: 21em;
+    font-weight: 500;
+    color: var(--ink-2);
+  }
+  .strip__title strong { font-weight: 600; color: var(--ink); }
+  /* 1px rules between cells: the list's colour shows through the gaps. */
+  .strip__list {
+    display: grid;
+    gap: 1px;
+    margin: clamp(40px, 5vw, 64px) 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--ink);
+    border-bottom: 1px solid var(--rule-2);
+    background: var(--rule-2);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  @media (min-width: 1024px) {
+    .strip__list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+  .strip__item {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: clamp(18px, 2vw, 24px) clamp(14px, 2vw, 32px) clamp(20px, 2vw, 28px);
+    background: #fff;
+  }
+  .strip__label {
+    font-family: var(--font-display);
+    font-size: clamp(18px, 0.5vw + 14px, 22px);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+  }
+</style>
