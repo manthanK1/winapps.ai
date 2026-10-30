@@ -36,6 +36,11 @@ jobs:
           BASE_PATH: ${{ vars.BASE_PATH || '/' }}
           PUBLIC_WEB3FORMS_KEY: ${{ vars.WEB3FORMS_KEY }}
           PUBLIC_PLAUSIBLE_DOMAIN: ${{ vars.PLAUSIBLE_DOMAIN }}
+      # Headings, images, ids, JSON-LD, meta limits, links, routes, sitemap.
+      - run: npm run qa
+        env:
+          SITE_URL: ${{ vars.SITE_URL || 'https://www.winapps.co.in' }}
+          BASE_PATH: ${{ vars.BASE_PATH || '/' }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

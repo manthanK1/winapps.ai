@@ -13,7 +13,8 @@
     "preview": "astro preview",
     "check": "astro check",
     "brand": "node scripts/build-brand.mjs",
-    "indexnow": "node scripts/indexnow.mjs"
+    "indexnow": "node scripts/indexnow.mjs",
+    "qa": "node scripts/qa-html.mjs"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.12",

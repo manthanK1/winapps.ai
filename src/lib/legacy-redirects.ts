@@ -1,10 +1,10 @@
 // Old www.winapps.co.in URLs → pages on this site, so links, bookmarks and
 // search results keep working after the switch. Paths are without the base
-// path. The full journey map behind these choices is in PAGE-JOURNEYS.md.
+// path.
 //
-// Astro writes each entry as a small redirect page (works on any static
-// host); astro.config.mjs also emits them as a Netlify/Cloudflare
-// `_redirects` file for real 301s.
+// Astro writes each entry as a small redirect page (meta refresh plus a
+// canonical to the target), which works on GitHub Pages, where real 301s
+// aren't available.
 
 // Live case studies that are the same engagement as one of ours.
 const sameCaseStudy: Record<string, string> = {

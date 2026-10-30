@@ -34,7 +34,7 @@ Tracks every step and sub-item of [WINAPPS_V2_PROMPT.md](WINAPPS_V2_PROMPT.md) a
 | Item | Status | Notes |
 |---|---|---|
 | Astro SSG, plain CSS custom properties, vanilla TS, no UI framework | Done | Astro 7.4.4 with static output. |
-| Ribbon in `src/scripts/ribbon.ts`, raw WebGL, no Three.js | Done | Uncommitted. Port checked against the design's `frame()` in Node, using a mock GL. |
+| Ribbon in `src/scripts/ribbon.ts`, raw WebGL, no Three.js | Done | Port checked against the design's `frame()` in Node, using a mock GL. |
 | Fixed canvas behind content, `pointer-events:none`, `aria-hidden` | Done | |
 | Loads after first paint (`requestIdleCallback`) | Done | `BaseLayout.astro` |
 | rAF loop; scroll from `scrollY` and document height | Done | |
@@ -70,7 +70,7 @@ Tracks every step and sub-item of [WINAPPS_V2_PROMPT.md](WINAPPS_V2_PROMPT.md) a
 | Header menus and all submenus | Done | The brief says Training has "4 groups"; V1 renders all 5 tracks, so V2 keeps 5. |
 | MENU overlay (Services, Training, site links, expandable on mobile, Close, Escape, focus trap, plain links) | Done | Modal `<dialog>` |
 | Home sections 1–13 in V1's order | Done | The agent checked all 13 against V1. The intro grid of 6 service tiles was dropped as a duplicate of Practices. |
-| Other V1 routes (contact, industries, work, how we work, training and courses, blog, news, about, legal) | Done | Uncommitted. The page agent's final QA was cut off, so the integration checks are still pending. |
+| Other V1 routes (contact, industries, work, how we work, training and courses, blog, news, about, legal) | Done | All V1 URLs, the 16 course pages and 35 legacy redirects build. Internal links and #anchors all resolve (checked by `npm run qa`). |
 | Calmer ribbon on inner pages | Partly done | `inner` variant exists; not checked in a browser. |
 | Footer columns, contact details, © 2013–2026 | Done | |
 | Contact details exactly as given | Done | |
@@ -80,17 +80,17 @@ Tracks every step and sub-item of [WINAPPS_V2_PROMPT.md](WINAPPS_V2_PROMPT.md) a
 | Item | Status | Notes |
 |---|---|---|
 | 6.1 All content in static HTML | Partly done | By design; the site-wide check (QA script, GPTBot curl) is still to run. |
-| 6.2 robots.txt (named crawlers, newer ones, sitemap line) | Done | 26 named agents, nothing disallowed. Uncommitted. |
-| 6.3 Sitemap with accurate lastmod | Done | 50 URLs. lastmod comes from git, so it becomes accurate once pages are committed. |
-| 6.3 Title ≤60, description ≤155, canonical, `en-GB`, OG and Twitter | Partly done | In the layout; the site-wide limits check is pending. |
+| 6.2 robots.txt (named crawlers, newer ones, sitemap line) | Done | 26 named agents, nothing disallowed. |
+| 6.3 Sitemap with accurate lastmod | Done | 49 URLs, exactly the indexable pages (checked by `npm run qa`). lastmod comes from each page's last commit, or post dates for blog and news. |
+| 6.3 Title ≤60, description ≤155, canonical, `en-GB`, OG and Twitter | Done | Checked on every page by `npm run qa` |
 | 6.3 Keep V1 URLs, add redirects | Done | `legacy-redirects.ts`. The new course pages are added URLs. |
-| 6.3 One h1, logical headings, descriptive links; images (alt, size, AVIF/WebP, lazy) | Partly done | Each agent checked its own pages; the site-wide check is pending. |
+| 6.3 One h1, logical headings, descriptive links; images (alt, size, AVIF/WebP, lazy) | Done | Checked on every page by `npm run qa`. Photos are AVIF/WebP `<picture>` with JPG fallback; 311 lazy, 6 eager above the fold. |
 | 6.4 JSON-LD: Organization/ProfessionalService, WebSite, BreadcrumbList | Done | V1 has no address, so the address is left out (gap). |
 | 6.4 Service, Course/CourseInstance, ItemList, FAQPage, Article/BlogPosting, ContactPage | Done | |
 | 6.4 Validate (Rich Results Test, validator.schema.org) | Not started | |
-| 6.5 llms.txt, llms-full.txt, .md twins | Done | 46 .md files. Uncommitted. |
+| 6.5 llms.txt, llms-full.txt, .md twins | Done | 46 .md files. All 202 site URLs in llms.txt and llms-full.txt resolve (checked by `npm run qa`). |
 | 6.6 Plain answers up front; consistent facts; "Updated" dates; About facts section | Done | Gaps are listed below. |
-| 6.7 security.txt, branded 404, favicon set, IndexNow key and ping | Done | Uncommitted |
+| 6.7 security.txt, branded 404, favicon set, IndexNow key and ping | Done | |
 
 ### Step 7: Quality bar
 | Item | Status | Notes |
@@ -106,15 +106,15 @@ Tracks every step and sub-item of [WINAPPS_V2_PROMPT.md](WINAPPS_V2_PROMPT.md) a
 |---|---|---|
 | Dev server URL; walk the home page | Not started | |
 | Show robots.txt, llms.txt, JSON-LD (home and one service), sitemap list, GPTBot curl | Not started | |
-| GitHub Pages: site/base, Actions workflow, CNAME | Done | `deploy.yml`, `public/CNAME`, `DEPLOY.md`. Uncommitted. No git remote is set. |
+| GitHub Pages: site/base, Actions workflow, CNAME | Done | `deploy.yml` (now runs `npm run qa` before deploying), `public/CNAME`, `DEPLOY.md`. No git remote is set. |
 | Search Console and Bing checklist | Done | In `DEPLOY.md`; it will be repeated in the final summary. |
 | Final list: what wasn't ported, placeholders, missing assets | Not started | |
-| Commit in small steps | Partly done | Two foundation commits; everything since is uncommitted. |
+| Commit in small steps | Partly done | Session 2: the workflow output went into 7 commits by area; one commit per completion step from here. |
 
 ## Completion plan (this session)
 
-1. Commit the workflow's uncommitted output in small commits, grouped by area.
-2. Integrate: add `scripts/qa-html.mjs` (headings, images, ids, JSON-LD, meta limits, canonicals, internal links, V1 URLs, sitemap), run it, and fix every failure.
+1. ✅ Commit the workflow's uncommitted output in small commits, grouped by area.
+2. ✅ Integrate: add `scripts/qa-html.mjs` (headings, images, ids, JSON-LD, meta limits, canonicals, internal links, V1 URLs, sitemap), run it, and fix every failure.
 3. Browser QA of every page at 360–1920: overflow, header row, console errors, axe, tap targets.
 4. Ribbon in a real browser: compare with the design references, fix the hero/W overlap, and check the inner variant, reduced motion and no-WebGL.
 5. Validate the structured data.
@@ -132,4 +132,6 @@ Tracks every step and sub-item of [WINAPPS_V2_PROMPT.md](WINAPPS_V2_PROMPT.md) a
 
 ## Log
 
+- 2026-10-30 step 2: added `scripts/qa-html.mjs` (`npm run qa`; also runs in CI) and tested it against a copy of dist with seeded faults. On the real build it reports 50 pages, 35 redirects, 6,027 internal references and 49 sitemap URLs, and every check passes. No fixes were needed. Corrected a stale comment in `legacy-redirects.ts`.
+- 2026-10-30 step 1: committed the workflow output in 7 commits.
 - 2026-10-30: recovered the brief, audited the repo and the session-1 agent reports, and wrote this file. `astro check` 0/0/0; `astro build` clean, 0 warnings.

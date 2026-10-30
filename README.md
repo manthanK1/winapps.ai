@@ -21,6 +21,7 @@ npm ci                # install
 npm run dev           # local preview at http://localhost:4321/
 npm run check         # astro check: types and templates, must be 0 errors / 0 warnings / 0 hints
 npm run build         # production build into dist/
+npm run qa            # static checks on dist/: headings, images, ids, JSON-LD, meta, links, routes, sitemap
 npm run preview       # serve dist/
 npm run brand         # rebuild the logo and favicon set (only when the logo changes)
 npm run indexnow      # ping IndexNow with the live sitemap (CI does this after each deploy)
@@ -61,7 +62,7 @@ src/
   data/         site.ts, copy.ts
   content/      editable content (Markdown / YAML)
 public/         static files served as-is (icons, robots.txt, manifest, CNAME, IndexNow key)
-scripts/        build-brand.mjs, indexnow.mjs
+scripts/        build-brand.mjs, indexnow.mjs, qa-html.mjs
 design-export/  the design spec (reference only, never shipped)
 ```
 
