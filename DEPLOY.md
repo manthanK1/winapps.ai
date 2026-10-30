@@ -1,6 +1,11 @@
 # Deploying www.winapps.co.in
 
-The site is static: `npm run build` writes plain HTML, CSS, a few small scripts and the SEO files to `dist/`. Production runs on **GitHub Pages** with the custom domain **www.winapps.co.in**, deployed by `.github/workflows/deploy.yml`.
+The site is static: `npm run build` writes plain HTML, CSS, a few small scripts and the SEO files to `dist/`. It is deployed to **GitHub Pages** by `.github/workflows/deploy.yml` on every push to `main`.
+
+- **Now (preview):** https://manthank1.github.io/winapps.ai/. The workflow builds with `SITE_URL=https://manthank1.github.io` and `BASE_PATH=/winapps.ai/` by default, so links, canonicals, the sitemap and llms.txt all point there. The IndexNow ping is skipped.
+- **Later (production):** www.winapps.co.in. See [Going live on www.winapps.co.in](#going-live-on-wwwwinappscoin).
+
+Local builds (`npm run build`) default to the production domain.
 
 ## Build settings
 
@@ -8,34 +13,40 @@ All are read at build time. In GitHub, set them as repository **variables** (Set
 
 | Repository variable | Build env | Default | What it does |
 | --- | --- | --- | --- |
-| `SITE_URL` | `SITE_URL` | `https://www.winapps.co.in` | Origin for canonicals, sitemap, Open Graph, JSON-LD, llms.txt and the .md pages |
-| `BASE_PATH` | `BASE_PATH` | `/` | Sub-path the site is served from. Keep `/` on the custom domain |
+| `SITE_URL` | `SITE_URL` | CI: `https://manthank1.github.io` · local: `https://www.winapps.co.in` | Origin for canonicals, sitemap, Open Graph, JSON-LD, llms.txt and the .md pages |
+| `BASE_PATH` | `BASE_PATH` | CI: `/winapps.ai/` · local: `/` | Sub-path the site is served from. `/` on the custom domain |
 | `WEB3FORMS_KEY` | `PUBLIC_WEB3FORMS_KEY` | _(empty)_ | Web3Forms access key for the contact form (get one at web3forms.com with sales@winapps.co.in). Without it the form opens the visitor's email app |
 | `PLAUSIBLE_DOMAIN` | `PUBLIC_PLAUSIBLE_DOMAIN` | _(empty)_ | Turns on cookieless Plausible analytics, e.g. `www.winapps.co.in` |
 
 ## GitHub Pages setup (once)
 
 1. Repository **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-2. Push to `main` (or run the workflow by hand). The workflow checks out full history (the sitemap's `<lastmod>` comes from git), builds with Node 24, publishes `dist/`, then pings IndexNow.
-3. **Custom domain**: Settings → Pages → Custom domain → `www.winapps.co.in` → Save. With an Actions workflow GitHub reads the domain from this setting; `public/CNAME` (`www.winapps.co.in`) is kept in the build for reference and for other hosts.
-4. Verify the domain first (Settings of your account or organisation → Pages → Add a verified domain) to prevent takeovers.
-5. **DNS** at the registrar:
+2. **Actions → Deploy to GitHub Pages → Run workflow** (or push to `main`). The workflow checks out full history (the sitemap's `<lastmod>` comes from git), builds with Node 24, runs `npm run qa`, and publishes `dist/`.
+
+## Going live on www.winapps.co.in
+
+www.winapps.co.in currently serves the old site from another host, so switching DNS replaces it. Do it when V2 is approved.
+
+1. **Settings → Secrets and variables → Actions → Variables**: add `SITE_URL` = `https://www.winapps.co.in` and `BASE_PATH` = `/`. This also turns on the IndexNow ping after each deploy.
+2. **Custom domain**: Settings → Pages → Custom domain → `www.winapps.co.in` → Save. With an Actions workflow GitHub reads the domain from this setting; `public/CNAME` (`www.winapps.co.in`) is kept in the build for reference and for other hosts.
+3. Verify the domain first (Settings of your account or organisation → Pages → Add a verified domain) to prevent takeovers.
+4. **DNS** in the panel of whoever hosts the domain's nameservers (today `ns1-ls1.pwh-r1.com`). Leave MX and other mail records alone:
 
    | Type | Name | Value |
    | --- | --- | --- |
-   | CNAME | `www` | `<user-or-org>.github.io` (no repository name) |
+   | CNAME | `www` | `manthank1.github.io` (no repository name) |
    | A | `@` | `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153` |
    | AAAA | `@` | `2606:50c0:8000::153`, `2606:50c0:8001::153`, `2606:50c0:8002::153`, `2606:50c0:8003::153` |
 
-   With both in place GitHub redirects `winapps.co.in` to `www.winapps.co.in`. No wildcard records. (IPs: [GitHub docs](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site).)
-6. Tick **Enforce HTTPS** once it becomes available (can take up to 24 hours after DNS resolves).
+   With both in place GitHub redirects `winapps.co.in` to `www.winapps.co.in`, and the github.io preview URL redirects to the domain as well. No wildcard records. (IPs: [GitHub docs](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site).)
+5. Tick **Enforce HTTPS** once it becomes available (can take up to 24 hours after DNS resolves).
 
 Old winapps.co.in URLs keep working: every path in `src/lib/legacy-redirects.ts` gets a small redirect page, and blog/news posts keep their slugs.
 
 ## IndexNow (Bing, Yandex and others)
 
 - The key is `public/<32 hex chars>.txt` (served at `https://www.winapps.co.in/<key>.txt`). Keep the file; changing the key means re-confirming it in Bing Webmaster Tools.
-- After each deploy from `main`, the `indexnow` job waits a minute, reads the **live** sitemap and POSTs every URL to `https://api.indexnow.org/indexnow`. It never fails a deploy.
+- Once `SITE_URL` is set to the real domain, after each deploy from `main` the `indexnow` job waits a minute, reads the **live** sitemap and POSTs every URL to `https://api.indexnow.org/indexnow`. It never fails a deploy.
 - By hand: `npm run indexnow -- --dry-run` shows what would be sent; `npm run indexnow` sends it.
 
 ## After launch

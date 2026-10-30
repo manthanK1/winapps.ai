@@ -82,7 +82,7 @@ Tracks every step and sub-item of [WINAPPS_V2_PROMPT.md](WINAPPS_V2_PROMPT.md) a
 | 6.1 All content in static HTML | Partly done | `npm run qa` confirms headings, links and every FAQ answer are in the built HTML. GPTBot `curl` proof: Deferred, after launch. |
 | 6.2 robots.txt (named crawlers, newer ones, sitemap line) | Done | 26 named agents, nothing disallowed. |
 | 6.3 Sitemap with accurate lastmod | Done | 49 URLs, exactly the indexable pages (checked by `npm run qa`). lastmod comes from each page's last commit, or post dates for blog and news. |
-| 6.3 Title ≤60, description ≤155, canonical, `en-GB`, OG and Twitter | Done | Checked on every page by `npm run qa` |
+| 6.3 Title ≤60, description ≤155, canonical, `en-GB`, OG and Twitter | Done | Checked on every page by `npm run qa`. On the github.io preview the canonicals point to github.io (your choice for now); they move to www.winapps.co.in when `SITE_URL` is set. |
 | 6.3 Keep V1 URLs, add redirects | Done | `legacy-redirects.ts`. The new course pages are added URLs. |
 | 6.3 One h1, logical headings, descriptive links; images (alt, size, AVIF/WebP, lazy) | Done | Checked on every page by `npm run qa`. Photos are AVIF/WebP `<picture>` with JPG fallback; 311 lazy, 6 eager above the fold. |
 | 6.4 JSON-LD: Organization/ProfessionalService, WebSite, BreadcrumbList | Done | V1 has no address, so the address is left out (gap). |
@@ -106,7 +106,7 @@ Tracks every step and sub-item of [WINAPPS_V2_PROMPT.md](WINAPPS_V2_PROMPT.md) a
 |---|---|---|
 | Dev server URL; walk the home page | Deferred, after launch | |
 | Show robots.txt, llms.txt, JSON-LD (home and one service), sitemap list, GPTBot curl | Deferred, after launch | |
-| GitHub Pages: site/base, Actions workflow, CNAME | Done | `deploy.yml` (now runs `npm run qa` before deploying), `public/CNAME`, `DEPLOY.md`. Remote `origin` is github.com/manthanK1/winapps.ai, and `main` was pushed on 2026-10-30. |
+| GitHub Pages: site/base, Actions workflow, CNAME | Done | `deploy.yml` (now runs `npm run qa` before deploying), `public/CNAME`, `DEPLOY.md`. Remote `origin` is github.com/manthanK1/winapps.ai, and `main` was pushed on 2026-10-30. On GitHub's runner the first run passed `npm ci`, build and `npm run qa`; deploy waits for Pages to be switched to "GitHub Actions". For now CI builds for the **github.io preview** (`https://manthank1.github.io/winapps.ai/`); moving to www.winapps.co.in takes two repository variables plus DNS (`DEPLOY.md`). |
 | Search Console and Bing checklist | Done | In `DEPLOY.md`; it will be repeated in the final summary. |
 | Final list: what wasn't ported, placeholders, missing assets | Partly done | The known gaps are listed below. The full report comes with the deferred Step 8 proofs. |
 | Commit in small steps | Done | Session 2 made small commits by area and by step. `dist/` is never committed. |
@@ -133,6 +133,7 @@ Tracks every step and sub-item of [WINAPPS_V2_PROMPT.md](WINAPPS_V2_PROMPT.md) a
 
 ## Log
 
+- 2026-10-30 preview: you chose to view the site on github.io for now, with no DNS change. CI now defaults to `SITE_URL=https://manthank1.github.io` and `BASE_PATH=/winapps.ai/`, and IndexNow is skipped until the real domain is set. `npm run qa` checks links against the base path and applies its "no github.io" rule only to real-domain builds. Both builds (preview and production) pass `npm run qa` locally. `DEPLOY.md` describes the preview and the later switch.
 - 2026-10-30 ship: plan changed to launch now. Stopped the in-flight browser QA run (it changes no files). On Node 24: `npm run check` 0/0/0, `npm run build` 0 warnings (50 pages), `npm run qa` all pass. Committed steps 3–5 and pushed `main` to github.com/manthanK1/winapps.ai, which triggers the Pages workflow. Shipped in this step:
   - header labels shed only at 900–1139 px; breadcrumbs 44 px tall and no overflow on long titles
   - home hero re-laid out around the W (headline sized by height and width, lead under the wordmark), with veils on its text
