@@ -5,11 +5,13 @@
 //
 // Every HTML page: one <h1>, no skipped heading levels, <img> with alt/width/
 // height, unique ids, JSON-LD that parses, title ≤ 60 and description ≤ 155,
-// lang="en-GB", canonical on the production origin, descriptive link text.
-// Across the site: every internal link and #fragment resolves, every V1 URL
-// still exists, the sitemap lists exactly the indexable pages, and nothing
-// points at github.io. Exits 1 on any failure. No dependencies: the HTML is
-// Astro's own output, so targeted regexes are enough.
+// lang="en-GB", canonical on SITE_URL, descriptive link text, FAQPage text
+// matching the visible FAQ. Across the site: every internal link and #fragment
+// resolves under BASE_PATH, every V1 URL still exists, the sitemap lists
+// exactly the indexable pages, and (on the real domain) nothing points at
+// github.io. Reads SITE_URL and BASE_PATH like the build. Exits 1 on any
+// failure. No dependencies: the HTML is Astro's own output, so targeted
+// regexes are enough.
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 
@@ -53,7 +55,8 @@ for (const file of html) {
     if (!a) continue;
     for (const part of a.split(",").map((s) => s.trim().split(/\s+/)[0])) if (part.startsWith("/") && !part.startsWith("//")) refs.push([path, decode(part)]);
   }
-  if (/github\.io/i.test(src)) fail(url, "mentions github.io");
+  // On the real domain nothing may point at github.io (a github.io preview build is exempt).
+  if (!/github\.io/i.test(origin) && /github\.io/i.test(src)) fail(url, "mentions github.io");
   if (isRedirect) continue;
 
   // ---- Document basics ----------------------------------------------------
@@ -114,6 +117,7 @@ for (const file of html) {
 
 // ---- Internal links and fragments -------------------------------------------
 const exists = (path) => {
+  if (!path.startsWith(`${base}/`)) return false; // a link that forgot the base path
   const p = join(dist, path.slice(base.length));
   if (existsSync(p) && statSync(p).isFile()) return true;
   return existsSync(join(p, "index.html"));

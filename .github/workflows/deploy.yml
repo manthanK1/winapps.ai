@@ -16,6 +16,14 @@ concurrency:
   group: pages
   cancel-in-progress: false
 
+# Where the site is served. Until www.winapps.co.in points at GitHub Pages it
+# is previewed at https://manthank1.github.io/winapps.ai/. To go live on the
+# domain, set repository variables SITE_URL=https://www.winapps.co.in and
+# BASE_PATH=/ (Settings → Secrets and variables → Actions → Variables).
+env:
+  SITE_URL: ${{ vars.SITE_URL || 'https://manthank1.github.io' }}
+  BASE_PATH: ${{ vars.BASE_PATH || '/winapps.ai/' }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -31,16 +39,11 @@ jobs:
       - run: npm ci
       - run: npm run build
         env:
-          # Optional repository variables (Settings → Secrets and variables → Actions → Variables).
-          SITE_URL: ${{ vars.SITE_URL || 'https://www.winapps.co.in' }}
-          BASE_PATH: ${{ vars.BASE_PATH || '/' }}
+          # Optional repository variables, as above.
           PUBLIC_WEB3FORMS_KEY: ${{ vars.WEB3FORMS_KEY }}
           PUBLIC_PLAUSIBLE_DOMAIN: ${{ vars.PLAUSIBLE_DOMAIN }}
       # Headings, images, ids, JSON-LD, meta limits, links, routes, sitemap.
       - run: npm run qa
-        env:
-          SITE_URL: ${{ vars.SITE_URL || 'https://www.winapps.co.in' }}
-          BASE_PATH: ${{ vars.BASE_PATH || '/' }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
@@ -55,9 +58,10 @@ jobs:
       - id: deployment
         uses: actions/deploy-pages@v4
 
+  # Only for the real domain: the github.io preview is not pinged to search engines.
   indexnow:
     needs: deploy
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.SITE_URL != '' && !contains(vars.SITE_URL, 'github.io')
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
@@ -68,6 +72,3 @@ jobs:
       # Give the Pages CDN a moment so the new sitemap and pages are live.
       - run: sleep 60
       - run: node scripts/indexnow.mjs
-        env:
-          SITE_URL: ${{ vars.SITE_URL || 'https://www.winapps.co.in' }}
-          BASE_PATH: ${{ vars.BASE_PATH || '/' }}
