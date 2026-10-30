@@ -23,8 +23,9 @@ const trail = [{ name: "Home", path: "/" }, ...items];
 
 <style>
   .crumbs ol { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; font-size: 13px; color: var(--muted); }
-  .crumbs li { display: flex; align-items: center; gap: 8px; }
-  .crumbs a { display: inline-flex; align-items: center; min-height: 32px; color: var(--ink-2); text-decoration: underline; text-underline-offset: 3px; }
+  /* min-width 0 lets a long current-page title shrink to the row and end in an ellipsis on phones. */
+  .crumbs li { display: flex; align-items: center; gap: 8px; min-width: 0; max-width: 100%; }
+  .crumbs a { display: inline-flex; align-items: center; min-height: 44px; color: var(--ink-2); text-decoration: underline; text-underline-offset: 3px; }
   .crumbs a:hover { color: var(--primary); }
   .crumbs [aria-current="page"] { color: var(--ink); max-width: 48ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .crumbs__sep { color: var(--rule-2); }

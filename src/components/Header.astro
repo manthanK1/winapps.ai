@@ -4,9 +4,10 @@
 // that opens the full-screen dark-teal overlay. Every menu and submenu link
 // is a plain <a href> in the HTML, so crawlers see them all.
 //
-// Widths: nav links show from 900px (MENU still holds everything). ≤640px is
-// one row: logo · WhatsApp (icon) · Book a call (text) · MENU; ≤400px MENU
-// is icon-only. Every control stays ≥ 44×44.
+// Widths: nav links show from 900px (MENU still holds everything); all labels
+// show from 1140px, and 900–1139 sheds the WhatsApp label (then, below 1000,
+// the MENU label). ≤640px is one row: logo · WhatsApp (icon) · Book a call
+// (text) · MENU; ≤400px MENU is icon-only. Every control stays ≥ 44×44.
 import Icon from "./Icon.astro";
 import { INSIGHTS, MENU_LINKS, NAV, SITE } from "../data/site";
 import { getCourses, getIndustries, getServices, getTracks } from "../lib/content";
@@ -335,12 +336,13 @@ const menuActive = (menu: string) =>
   }
   .hdr-menu:hover { background: #263136; }
 
-  /* 900–1279: tighten so nav + actions fit on one row. */
-  @media (min-width: 900px) and (max-width: 1279px) {
+  /* 900–1139: nav links and every label need ~1100px on one row (1140 leaves
+     slack for font metrics), so shed the least-needed labels first. */
+  @media (min-width: 900px) and (max-width: 1139px) {
     .hdr-wa { width: 44px; padding: 0; }
     .hdr-wa__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   }
-  @media (min-width: 900px) and (max-width: 1099px) {
+  @media (min-width: 900px) and (max-width: 999px) {
     .site-actions { gap: 6px; }
     .hdr-book { padding: 0 14px; }
     .hdr-book :global(.hdr-book__arrow) { display: none; }
