@@ -48,6 +48,12 @@ export interface RibbonConfig {
    * as short as the design's preview never reaches it (identical sampling).
    */
   headShare: number;
+  /**
+   * Most device pixels the canvas may have. The DPR cap of 2 alone gives a
+   * 4K-sized buffer on large high-DPI screens, which stalls integrated GPUs;
+   * above this budget the DPR is lowered to fit (1440×900 at 2× still fits).
+   */
+  maxPixels: number;
   segments: { desktop: RibbonSegments; mobile: RibbonSegments };
   inner: RibbonInnerConfig;
 }
@@ -61,6 +67,7 @@ export const RIBBON_CONFIG: RibbonConfig = {
   foldRadius: 0.075,
   descentCap: 200,
   headShare: 0.25,
+  maxPixels: 5_300_000,
   segments: {
     desktop: { maxSamples: 2400, across: 14 },
     mobile: { maxSamples: 1200, across: 10 },
@@ -546,7 +553,7 @@ class Ribbon {
     const cw = this.cw, ch = this.ch;
     if (cw < 20 || ch < 20) return;
     const gl = g.gl, M = g.M, MAXN = g.MAXN;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const dpr = Math.min(window.devicePixelRatio || 1, 2, Math.sqrt(this.cfg.maxPixels / Math.max(1, cw * ch)));
     const W = Math.round(cw * dpr), H = Math.round(ch * dpr);
     if (el.width !== W || el.height !== H) {
       el.width = W;
@@ -693,7 +700,11 @@ class Ribbon {
     // Inner pages have no intro: start with the tip already in place.
     if (this.headQ === null) this.headQ = inner ? desired : 0;
     this.headQ += (desired - this.headQ) * (desired > this.headQ ? 0.07 : 0.05);
-    const headQ = reduced ? lastQ : this.headQ;
+    // Reduced motion: the tip sits exactly where the animation would come to
+    // rest (the finished W at the top, then wherever the scroll puts it), with
+    // no easing. The design drew the whole ribbon (lastQ) instead, which sends
+    // the descent's first sweep through the hero and over the wordmark.
+    const headQ = reduced ? desired : this.headQ;
 
     // sample Catmull-Rom
     const seg = this.segLen;
