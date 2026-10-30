@@ -1,0 +1,222 @@
+---
+// About: V1's story, values, leadership (only once real people exist) and
+// "where we work" with the live clocks, plus a plain-facts list for buyers
+// and AI assistants. Every fact comes from src/data/site.ts or V1's copy.
+// TODO(Winapps): founding story in your own words (who started Winapps, why,
+// milestones since 2013), the office address and real team/office photos.
+import { existsSync, readdirSync } from "node:fs";
+import { getCollection } from "astro:content";
+import { Picture } from "astro:assets";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHero from "../components/PageHero.astro";
+import SectionHead from "../components/SectionHead.astro";
+import Clocks from "../components/Clocks.astro";
+import CtaBand from "../components/CtaBand.astro";
+import Icon from "../components/Icon.astro";
+import { ABOUT_PAGE, TRUST, headingText } from "../data/copy";
+import { PROMISES, SITE } from "../data/site";
+import { href } from "../lib/url";
+
+const { meta, hero, story, values, where, facts } = ABOUT_PAGE;
+// Same test as the team loader in content.config.ts: only real entries (not
+// "_TEMPLATE.md") count. Skipping getCollection while the folder is empty
+// keeps the build free of Astro's "collection is empty" warning.
+const TEAM_DIR = "./src/content/team";
+const hasTeam = existsSync(TEAM_DIR) && readdirSync(TEAM_DIR).some((f) => f.endsWith(".md") && !f.startsWith("_"));
+const team = hasTeam ? (await getCollection("team")).sort((a, b) => a.data.order - b.data.order) : [];
+const crumbs = [{ name: "About", path: "/about/" }];
+
+const [senior, written, , ip] = values.items;
+const gdpr = TRUST.commitments[1];
+const nda = PROMISES[1];
+
+// Plain facts, in the order a buyer checks them.
+const factRows: { term: string; text: string }[] = [
+  { term: "Company name", text: SITE.legalName },
+  { term: "Also known as", text: `${SITE.name}®, ${SITE.alternateName}` },
+  { term: "Founded", text: String(SITE.founded) },
+  { term: "Based in", text: SITE.country },
+  { term: "Clients in", text: SITE.regionsText },
+  { term: "Team approach", text: `${senior.title}; ${written.title.toLowerCase()}.` },
+  { term: "IP", text: `${ip.title}. ${ip.text}` },
+  { term: "NDA", text: nda.label },
+  { term: "GDPR", text: `${gdpr.title}. ${gdpr.text}` },
+  { term: "Time-zone overlap", text: where.intro },
+];
+---
+<BaseLayout title={meta.title} description={meta.description} breadcrumbs={crumbs} pageType="AboutPage" markdownPath="/about.md">
+  <PageHero breadcrumbs={crumbs} eyebrow={hero.eyebrow} title={hero.title} accent={hero.accent} lead={hero.lead} />
+
+  <section class="section section--flush-top" aria-labelledby="story-title">
+    <div class="container story">
+      <div class="story__text veil">
+        <p class="eyebrow">{story.eyebrow}</p>
+        <h2 id="story-title" class="h2">{headingText(story)}</h2>
+        <div class="story__body">
+          {story.paragraphs.map((p) => <p>{p}</p>)}
+        </div>
+      </div>
+      <div class="panel story__mark">
+        <img
+          src={href("/brand/winapps-logo-still.webp")}
+          alt={`${SITE.alternateName} logo`}
+          width="257"
+          height="287"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="values-title">
+    <div class="container">
+      <SectionHead id="values-title" eyebrow={values.eyebrow} title={values.title} accent={values.accent} />
+      <ul class="list-reset values">
+        {values.items.map((v, i) => (
+          <li class="card">
+            <span class="card__num" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+            <h3 class="card__title">{v.title}</h3>
+            <p class="card__text">{v.text}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  {/* Leadership: hidden until real people are added (src/content/team). */}
+  {team.length > 0 && (
+    <section class="section" aria-labelledby="team-title">
+      <div class="container">
+        <SectionHead id="team-title" eyebrow="Leadership" title="The people accountable for your project." />
+        <ul class="list-reset team">
+          {team.map((p) => (
+            <li class="card team__person">
+              {p.data.photo && (
+                <Picture
+                  src={p.data.photo}
+                  alt={p.data.name}
+                  formats={["avif", "webp"]}
+                  widths={[320, 480]}
+                  sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                  loading="lazy"
+                  class="team__photo"
+                />
+              )}
+              <h3 class="card__title">{p.data.name}</h3>
+              <p class="card__text">{p.data.role}</p>
+              {p.data.linkedin && (
+                <a class="link-u" href={p.data.linkedin} target="_blank" rel="noopener">
+                  LinkedIn<span class="sr-only"> profile of {p.data.name}</span>
+                </a>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <section class="section" aria-labelledby="facts-title">
+    <div class="container">
+      <SectionHead id="facts-title" eyebrow={facts.eyebrow} title={facts.title} />
+      <div class="panel">
+        <dl class="facts">
+          {factRows.map((r) => (
+            <div class="facts__row">
+              <dt>{r.term}</dt>
+              <dd>{r.text}</dd>
+            </div>
+          ))}
+          <div class="facts__row">
+            <dt>Contact</dt>
+            <dd>
+              <ul class="list-reset facts__contact">
+                <li><a href={`mailto:${SITE.email}`}><Icon name="mail" size={18} />{SITE.email}</a></li>
+                <li><a href={SITE.phoneHref}><Icon name="phone" size={18} />{SITE.phone}</a></li>
+                <li><a href={SITE.whatsappHref} target="_blank" rel="noopener"><Icon name="whatsapp" size={18} />WhatsApp</a></li>
+              </ul>
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="where-title">
+    <div class="container">
+      <div class="panel panel--dark on-dark where">
+        <div class="where__text">
+          <p class="eyebrow">{where.eyebrow}</p>
+          <h2 id="where-title" class="h2">{headingText(where)}</h2>
+          <p class="lead">{where.intro}</p>
+        </div>
+        <Clocks />
+      </div>
+    </div>
+  </section>
+
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .story { display: grid; grid-template-columns: minmax(0, 1fr); gap: 40px; }
+  @media (min-width: 1024px) {
+    .story { grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); gap: clamp(40px, 6vw, 112px); align-items: center; }
+  }
+  .story__text { justify-self: start; max-width: 760px; }
+  .story__text > .eyebrow { margin-bottom: 22px; }
+  .story__body { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1em; margin-top: 28px; font-size: clamp(17px, 0.45vw + 14px, 20px); line-height: 1.55; color: var(--ink-2); }
+  .story__mark { display: grid; place-items: center; padding: clamp(40px, 5vw, 72px); }
+  .story__mark img { width: min(200px, 60%); }
+
+  .values { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  @media (min-width: 640px) {
+    .values { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1280px) {
+    .values { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+
+  .team { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  @media (min-width: 640px) {
+    .team { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1024px) {
+    .team { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+  .team__person :global(.team__photo) { width: 100%; aspect-ratio: 6 / 7; object-fit: cover; }
+
+  .facts { max-width: 1040px; }
+  .facts__row {
+    display: grid;
+    gap: 4px 32px;
+    padding: 16px 0;
+    border-top: 1px solid var(--rule);
+  }
+  .facts__row:first-child { border-top: 0; padding-top: 0; }
+  @media (min-width: 768px) {
+    .facts__row { grid-template-columns: minmax(0, 3fr) minmax(0, 8fr); }
+  }
+  .facts dt { font-size: 14px; font-weight: 600; letter-spacing: 0.02em; color: var(--primary); }
+  .facts dd { color: var(--ink); line-height: 1.55; }
+  .facts__contact { display: flex; flex-wrap: wrap; gap: 0 28px; margin-top: -12px; margin-bottom: -12px; }
+  .facts__contact a {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+    overflow-wrap: anywhere;
+  }
+  .facts__contact :global(svg) { flex: none; color: var(--primary); }
+
+  .where { display: grid; grid-template-columns: minmax(0, 1fr); gap: 40px; padding: clamp(28px, 4.4vw, 72px); }
+  @media (min-width: 1024px) {
+    .where { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: clamp(40px, 5vw, 96px); align-items: center; }
+  }
+  .where__text > .eyebrow { margin-bottom: 22px; }
+  .where__text .lead { margin-top: 20px; max-width: 52ch; }
+</style>

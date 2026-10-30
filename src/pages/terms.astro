@@ -1,0 +1,50 @@
+---
+// Website terms of use, V1's text word for word, on a near-white panel.
+// TODO(Winapps): legal review. Add governing law and jurisdiction, and the
+// registered legal entity.
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHero from "../components/PageHero.astro";
+import { SITE } from "../data/site";
+import { href } from "../lib/url";
+
+const crumbs = [{ name: "Terms", path: "/terms/" }];
+---
+<BaseLayout title="Website terms of use" description="Terms that apply to using the Winapps website." breadcrumbs={crumbs}>
+  <PageHero
+    breadcrumbs={crumbs}
+    title="Website terms of use"
+    lead="These terms cover your use of this website. Client engagements are governed by their own contracts."
+  />
+  <section class="section section--flush-top" aria-label="Website terms of use">
+    <div class="container">
+      <div class="panel legal">
+        <div class="prose">
+          <h2>About this website</h2>
+          <p>This website is operated by {SITE.legalName}. It describes our services for general information. Nothing on it forms an offer or a contract; engagements are governed by the agreement we sign with each client.</p>
+
+          <h2>Content and trademarks</h2>
+          <p>The text, design and graphics on this website belong to {SITE.name} unless stated otherwise. Winapps® is a registered mark. The Winapps name and logo may not be used without our permission.</p>
+
+          <h2>Accuracy</h2>
+          <p>We work to keep this website accurate and up to date, but it is provided as is. Case studies are described in general terms to protect client confidentiality.</p>
+
+          <h2>Links to other websites</h2>
+          <p>Where we link to other websites, we are not responsible for their content or their privacy practices.</p>
+
+          <h2>Privacy</h2>
+          <p>How we handle personal data is described in our <a href={href("/privacy/")}>privacy notice</a>.</p>
+
+          <h2>Contact</h2>
+          <p>Questions about these terms: <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .legal { max-width: 960px; padding: clamp(24px, 4vw, 64px); }
+  /* Inline links: vertical padding grows the tap target to 44px without
+     changing the line height. */
+  .legal a { padding-block: 12px; }
+</style>

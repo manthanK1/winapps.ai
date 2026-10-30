@@ -1,0 +1,93 @@
+---
+// How we work: process (with each step's detail), principles, the trust
+// commitments with live clocks, engagement models and the contract FAQ.
+// The FAQPage JSON-LD uses exactly the visible FAQ items.
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHero from "../components/PageHero.astro";
+import SectionHead from "../components/SectionHead.astro";
+import ProcessSteps from "../components/ProcessSteps.astro";
+import TrustSection from "../components/TrustSection.astro";
+import EngagementModels from "../components/EngagementModels.astro";
+import FaqList from "../components/FaqList.astro";
+import CtaBand from "../components/CtaBand.astro";
+import { HOW_PAGE } from "../data/copy";
+import { getFaq } from "../lib/content";
+import { faqPage } from "../lib/schema";
+
+const { meta, hero, process, principles, engagement, faq: faqHead } = HOW_PAGE;
+const faq = await getFaq();
+const crumbs = [{ name: "How we work", path: "/how-we-work/" }];
+---
+<BaseLayout
+  title={meta.title}
+  description={meta.description}
+  breadcrumbs={crumbs}
+  jsonLd={[faqPage(faq)]}
+  markdownPath="/how-we-work.md"
+>
+  <PageHero breadcrumbs={crumbs} eyebrow={hero.eyebrow} title={hero.title} accent={hero.accent} lead={hero.lead} />
+
+  <section class="section section--flush-top" aria-labelledby="process-title">
+    <div class="container">
+      <SectionHead id="process-title" eyebrow={process.eyebrow} title={process.title} accent={process.accent} />
+      <ProcessSteps detailed />
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="principles-title">
+    <div class="container">
+      <SectionHead id="principles-title" eyebrow={principles.eyebrow} title={principles.title} accent={principles.accent} />
+      <ul class="list-reset principles">
+        {principles.items.map((p, i) => (
+          <li class="card">
+            <span class="card__num" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+            <h3 class="card__title">{p.title}</h3>
+            <p class="card__text">{p.text}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <TrustSection />
+
+  <section class="section" aria-labelledby="engage-title">
+    <div class="container">
+      <SectionHead
+        id="engage-title"
+        eyebrow={engagement.eyebrow}
+        title={engagement.title}
+        accent={engagement.accent}
+        intro={engagement.intro}
+      />
+      <EngagementModels />
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="hww-faq-title">
+    <div class="container faq-row">
+      <div class="faq-row__head">
+        <SectionHead id="hww-faq-title" eyebrow={faqHead.eyebrow} title={faqHead.title} accent={faqHead.accent} />
+      </div>
+      <div class="faq-row__list veil">
+        <FaqList items={faq} name="hww-faq" />
+      </div>
+    </div>
+  </section>
+
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .principles { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  @media (min-width: 900px) {
+    .principles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+
+  .faq-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .faq-row__head :global(.section-head) { margin-bottom: 32px; }
+  @media (min-width: 1024px) {
+    .faq-row { grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: clamp(40px, 6vw, 112px); align-items: start; }
+    .faq-row__head { position: sticky; top: 32px; }
+  }
+</style>

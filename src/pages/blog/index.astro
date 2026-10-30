@@ -1,0 +1,97 @@
+---
+// Insights hub: blog guides first (newest featured), the three latest news
+// posts below, then the closing call to action.
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHero from "../../components/PageHero.astro";
+import PostCard from "../../components/PostCard.astro";
+import SectionHead from "../../components/SectionHead.astro";
+import CtaBand from "../../components/CtaBand.astro";
+import Icon from "../../components/Icon.astro";
+import { BLOG_PAGE } from "../../data/copy";
+import { getBlog, getNews } from "../../lib/content";
+import { href } from "../../lib/url";
+
+const { meta, hero, news: newsHead, cta } = BLOG_PAGE;
+const [featured, ...rest] = await getBlog();
+const news = (await getNews()).slice(0, 3);
+const crumbs = [{ name: "Blog", path: "/blog/" }];
+---
+<BaseLayout
+  title={meta.title}
+  description={meta.description}
+  breadcrumbs={crumbs}
+  pageType="CollectionPage"
+  markdownPath="/blog.md"
+>
+  <PageHero breadcrumbs={crumbs} eyebrow={hero.eyebrow} title={hero.title} accent={hero.accent} lead={hero.lead} />
+
+  <section class="section section--flush-top" aria-labelledby="guides-title">
+    <div class="container">
+      <h2 id="guides-title" class="sr-only">Guides</h2>
+      <ul class="list-reset guides">
+        {featured && (
+          <li class="guides__featured"><PostCard post={featured} num={1} featured /></li>
+        )}
+        {rest.map((p, i) => (
+          <li><PostCard post={p} num={i + 2} /></li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  {news.length > 0 && (
+    <section class="section" aria-labelledby="news-title">
+      <div class="container">
+        <SectionHead
+          id="news-title"
+          eyebrow={newsHead.eyebrow}
+          title={newsHead.title}
+          accent={newsHead.accent}
+          link={{ label: newsHead.all, href: "/news/" }}
+        />
+        <ul class="list-reset news">
+          {news.map((p, i) => (
+            <li class="card news__item">
+              <div class="news__top">
+                <span class="card__num" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+                <Icon name="arrow-up-right" size={18} class="news__icon" />
+              </div>
+              <time class="news__date" datetime={p.data.date.toISOString().slice(0, 10)}>{p.data.dateLabel}</time>
+              <h3 class="card__title news__title">
+                <a class="stretched" href={href(`/news/${p.id}/`)}>{p.data.title}</a>
+              </h3>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <CtaBand title={cta.title} text={cta.text} />
+</BaseLayout>
+
+<style>
+  .guides { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  @media (min-width: 768px) {
+    .guides { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .guides__featured { grid-column: 1 / -1; }
+  }
+  /* Wide screens: the newest guide fills the left half, the rest sit in a
+     2 × 2 block beside it. */
+  @media (min-width: 1280px) {
+    .guides { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .guides__featured { grid-column: span 2; grid-row: span 2; }
+  }
+  .guides__featured :global(.post__text) { max-width: 52ch; }
+
+  .news { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  @media (min-width: 768px) {
+    .news { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  .news__item { gap: 14px; }
+  .news__top { display: flex; align-items: center; justify-content: space-between; }
+  .news__top :global(.news__icon) { color: var(--ink-2); transition: transform 0.25s var(--ease); }
+  .news__item:has(.stretched:hover) :global(.news__icon) { transform: translate(2px, -2px); color: var(--primary); }
+  .news__date { font-size: 14px; font-weight: 500; color: var(--muted); }
+  .news__title { font-size: clamp(20px, 0.6vw + 14px, 24px); }
+</style>

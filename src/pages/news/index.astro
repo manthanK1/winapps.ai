@@ -1,0 +1,51 @@
+---
+// News index: every news post, newest first, then a pointer to the
+// in-depth guides on the blog.
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHero from "../../components/PageHero.astro";
+import PostCard from "../../components/PostCard.astro";
+import CtaBand from "../../components/CtaBand.astro";
+import Icon from "../../components/Icon.astro";
+import { NEWS_PAGE } from "../../data/copy";
+import { getNews } from "../../lib/content";
+import { href } from "../../lib/url";
+
+const { meta, hero } = NEWS_PAGE;
+const news = await getNews();
+const crumbs = [{ name: "News", path: "/news/" }];
+---
+<BaseLayout
+  title={meta.title}
+  description={meta.description}
+  breadcrumbs={crumbs}
+  pageType="CollectionPage"
+  markdownPath="/news.md"
+>
+  <PageHero breadcrumbs={crumbs} eyebrow={hero.eyebrow} title={hero.title} accent={hero.accent} lead={hero.lead} />
+
+  <section class="section section--flush-top" aria-label="News posts">
+    <div class="container">
+      <ul class="list-reset news">
+        {news.map((p, i) => (
+          <li><PostCard post={p} num={i + 1} headingLevel="h2" /></li>
+        ))}
+      </ul>
+      <p class="news__more">
+        <a class="link-u veil" href={href("/blog/")}>{NEWS_PAGE.blogLink} <Icon name="arrow" size={16} /></a>
+      </p>
+    </div>
+  </section>
+
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .news { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  @media (min-width: 768px) {
+    .news { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1024px) {
+    .news { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  .news__more { margin-top: clamp(32px, 4vw, 48px); text-align: center; }
+</style>

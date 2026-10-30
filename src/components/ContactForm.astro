@@ -1,0 +1,267 @@
+---
+// Contact form (V1 ContactForm, restyled). With PUBLIC_WEB3FORMS_KEY set it
+// posts to Web3Forms (works without JS too: Web3Forms redirects back to
+// /contact/?sent=1). Without a key it falls back to composing an email. A
+// honeypot field blocks simple bots.
+// Links can pre-fill it: ?interest=<need> (repeatable) and ?message=<text>.
+// Service pages and the home "What do you want to build?" box use this.
+import Icon from "./Icon.astro";
+import { CONTACT_PAGE } from "../data/copy";
+import { BUDGETS, COUNTRIES, NEEDS, SITE } from "../data/site";
+import { absolute } from "../lib/url";
+
+const f = CONTACT_PAGE.form;
+const key = import.meta.env.PUBLIC_WEB3FORMS_KEY as string | undefined;
+const action = key ? "https://api.web3forms.com/submit" : `mailto:${SITE.email}`;
+const redirect = absolute("/contact/?sent=1", Astro.site);
+---
+<form
+  class="cf"
+  method="post"
+  action={action}
+  enctype={key ? undefined : "text/plain"}
+  novalidate
+  data-contact-form
+  data-mode={key ? "web3forms" : "mailto"}
+>
+  {key && (
+    <>
+      <input type="hidden" name="access_key" value={key} />
+      <input type="hidden" name="subject" value="New project inquiry from winapps website" />
+      <input type="hidden" name="from_name" value="Winapps website" />
+      <input type="hidden" name="redirect" value={redirect} />
+    </>
+  )}
+  <!-- Honeypot: humans never see or fill this. -->
+  <div class="cf__hp" aria-hidden="true">
+    <label>Leave this empty<input type="checkbox" name="botcheck" tabindex="-1" /></label>
+  </div>
+
+  <div class="cf__grid">
+    <div>
+      <label class="field-label" for="cf-name">{f.name}</label>
+      <input class="field" id="cf-name" name="name" type="text" autocomplete="name" required aria-describedby="cf-name-error" />
+      <p class="field-error" id="cf-name-error" hidden>{f.nameError}</p>
+    </div>
+    <div>
+      <label class="field-label" for="cf-email">{f.email}</label>
+      <input class="field" id="cf-email" name="email" type="email" autocomplete="email" required aria-describedby="cf-email-error" />
+      <p class="field-error" id="cf-email-error" hidden>{f.emailError}</p>
+    </div>
+    <div>
+      <label class="field-label" for="cf-company">{f.company} <span class="field-hint">{f.optional}</span></label>
+      <input class="field" id="cf-company" name="company" type="text" autocomplete="organization" />
+    </div>
+    <div>
+      <label class="field-label" for="cf-country">{f.country}</label>
+      <select class="field" id="cf-country" name="country" autocomplete="country-name">
+        {COUNTRIES.map((c) => <option>{c}</option>)}
+      </select>
+    </div>
+    <div>
+      <label class="field-label" for="cf-phone">{f.phone} <span class="field-hint">{f.optional}</span></label>
+      <input class="field" id="cf-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" />
+    </div>
+    <div>
+      <label class="field-label" for="cf-budget">{f.budget} <span class="field-hint">{f.optional}</span></label>
+      <select class="field" id="cf-budget" name="budget">
+        {BUDGETS.map((b) => <option>{b}</option>)}
+      </select>
+    </div>
+  </div>
+
+  <fieldset>
+    <legend class="field-label">{f.needs} <span class="field-hint">{f.optional}</span></legend>
+    <div class="cf__choices">
+      {NEEDS.map((n, i) => (
+        <label class="choice" for={`cf-need-${i}`}>
+          <input type="checkbox" name="needs" value={n.label} id={`cf-need-${i}`} />
+          <span>{n.label}</span>
+        </label>
+      ))}
+    </div>
+  </fieldset>
+
+  <div>
+    <label class="field-label" for="cf-message">{f.message}</label>
+    <textarea
+      class="field"
+      id="cf-message"
+      name="message"
+      rows="6"
+      required
+      aria-describedby="cf-message-error"
+      placeholder={f.messagePlaceholder}></textarea>
+    <p class="field-error" id="cf-message-error" hidden>{f.messageError}</p>
+  </div>
+
+  <div class="cf__actions">
+    <button type="submit" class="btn btn--primary cf__submit" data-submit>
+      {f.submit} <Icon name="arrow" size={18} class="arrow" />
+    </button>
+    <p class="cf__note">
+      {f.privacy}{" "}{f.preferEmail} <a class="link" href={`mailto:${SITE.email}`}>{SITE.email}</a>.
+    </p>
+  </div>
+
+  <div role="status" aria-live="polite" class="cf__status" data-form-status></div>
+</form>
+
+<style>
+  .cf { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .cf__hp { display: none; }
+  .cf__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  @media (min-width: 640px) {
+    .cf__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  .cf__choices { display: flex; flex-wrap: wrap; gap: 8px; }
+  .cf__actions { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; justify-items: start; }
+  .cf__submit { width: 100%; }
+  .cf__submit[disabled] { opacity: 0.6; cursor: progress; }
+  @media (min-width: 640px) {
+    .cf__submit { width: auto; }
+  }
+  .cf__note { max-width: 62ch; font-size: 14px; line-height: 1.55; color: var(--muted); }
+  /* Inline link: vertical padding grows the tap target to 44px. */
+  .cf__note a { padding-block: 13px; }
+  /* The live region stays in the accessibility tree (never display:none),
+     so screen readers announce what the script writes into it. */
+  .cf__status { font-size: 15px; line-height: 1.5; color: var(--ink); }
+  .cf__status:not(:empty) { padding: 16px 18px; border-left: 2px solid var(--rule-2); }
+  .cf__status[data-kind="ok"] { border-left-color: var(--primary); background: #e7f0f1; }
+  .cf__status[data-kind="error"] { border-left-color: var(--accent); background: #fdf1e2; }
+  .cf__status[data-kind="info"] { color: var(--ink-2); background: #fff; }
+</style>
+
+<script>
+  import { CONTACT_PAGE } from "../data/copy";
+  import { SITE } from "../data/site";
+
+  const T = CONTACT_PAGE.form;
+  type Field = HTMLInputElement | HTMLTextAreaElement;
+  type Kind = "ok" | "error" | "info";
+
+  const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  function link(hrefValue: string, text: string): HTMLAnchorElement {
+    const a = document.createElement("a");
+    a.className = "link";
+    a.href = hrefValue;
+    a.textContent = text;
+    return a;
+  }
+
+  function strong(text: string): HTMLElement {
+    const b = document.createElement("strong");
+    b.textContent = text;
+    return b;
+  }
+
+  const form = document.querySelector<HTMLFormElement>("[data-contact-form]");
+  if (form) {
+    const status = form.querySelector<HTMLElement>("[data-form-status]");
+    const submit = form.querySelector<HTMLButtonElement>("[data-submit]");
+    const fields = ["name", "email", "message"]
+      .map((n) => form.elements.namedItem(n))
+      .filter((el): el is Field => el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement);
+
+    const valid = (el: Field) => {
+      const v = el.value.trim();
+      return v !== "" && (el.type !== "email" || EMAIL.test(v));
+    };
+
+    const showError = (el: Field, show: boolean) => {
+      el.setAttribute("aria-invalid", String(show));
+      const error = document.getElementById(`${el.id}-error`);
+      if (error) error.hidden = !show;
+    };
+
+    // Messages are built as DOM nodes (no innerHTML), so nothing typed into
+    // the form can end up as markup.
+    const setStatus = (kind: Kind, ...parts: (string | Node)[]) => {
+      if (!status) return;
+      status.dataset.kind = kind;
+      status.replaceChildren(...parts);
+    };
+    const thanks = () => setStatus("ok", strong(T.thanks), ` ${T.thanksText}`);
+
+    for (const el of fields) {
+      el.addEventListener("blur", () => {
+        if (el.value) showError(el, !valid(el));
+      });
+      // Clear the error as soon as the field is fixed.
+      el.addEventListener("input", () => {
+        if (el.getAttribute("aria-invalid") === "true" && valid(el)) showError(el, false);
+      });
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const invalid = fields.filter((el) => !valid(el));
+      fields.forEach((el) => showError(el, invalid.includes(el)));
+      if (invalid.length) {
+        invalid[0].focus();
+        setStatus("error", T.checkFields);
+        return;
+      }
+
+      const data = new FormData(form);
+      if (data.get("botcheck")) return;
+      const needs = data.getAll("needs").join(", ") || "Not specified";
+      const summary = [
+        `Name: ${data.get("name")}`,
+        `Email: ${data.get("email")}`,
+        `Company: ${data.get("company") || "-"}`,
+        `Country: ${data.get("country")}`,
+        `Phone: ${data.get("phone") || "-"}`,
+        `Budget: ${data.get("budget")}`,
+        `Needs: ${needs}`,
+        "",
+        String(data.get("message")),
+      ].join("\n");
+      const subject = `Project inquiry from ${data.get("name")}`;
+      const mailto = `mailto:${SITE.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(summary)}`;
+
+      if (form.dataset.mode !== "web3forms") {
+        window.location.href = mailto;
+        setStatus("info", `${T.opening} `, link(`mailto:${SITE.email}`, SITE.email), ".");
+        return;
+      }
+
+      if (submit) submit.disabled = true;
+      setStatus("info", T.sending);
+      try {
+        data.set("needs", needs);
+        const res = await fetch(form.action, { method: "POST", headers: { Accept: "application/json" }, body: data });
+        const json: { success?: boolean } = await res.json().catch(() => ({}));
+        if (!res.ok || !json.success) throw new Error("Request failed");
+        form.reset();
+        thanks();
+      } catch {
+        setStatus(
+          "error",
+          `${T.failed} `,
+          link(mailto, T.failedLink),
+          ` ${T.failedOr} `,
+          link(`mailto:${SITE.email}`, SITE.email),
+          "."
+        );
+      } finally {
+        if (submit) submit.disabled = false;
+      }
+    });
+
+    const params = new URLSearchParams(location.search);
+    if (params.has("sent")) thanks();
+
+    // Pre-fill from links: ?message= from the home prompt box, one or more
+    // ?interest= from service pages and the prompt box's checkboxes.
+    const message = form.elements.namedItem("message");
+    const prefill = params.get("message")?.trim();
+    if (prefill && message instanceof HTMLTextAreaElement && !message.value) message.value = prefill.slice(0, 5000);
+    const wanted = params.getAll("interest").map((v) => v.trim());
+    for (const box of form.querySelectorAll<HTMLInputElement>('input[name="needs"]')) {
+      if (wanted.includes(box.value)) box.checked = true;
+    }
+  }
+</script>

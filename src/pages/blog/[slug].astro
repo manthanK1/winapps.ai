@@ -1,0 +1,219 @@
+---
+// Blog guide: meta → contents → article → FAQ → "planning a build" → more
+// guides. Slugs match the live site, so old /blog/<slug> links keep working.
+// The article sits on a near-white panel so long text stays readable over
+// the ribbon.
+import type { GetStaticPaths, InferGetStaticPropsType } from "astro";
+import { render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHero from "../../components/PageHero.astro";
+import PostCard from "../../components/PostCard.astro";
+import FaqList from "../../components/FaqList.astro";
+import SectionHead from "../../components/SectionHead.astro";
+import CtaBand from "../../components/CtaBand.astro";
+import Icon from "../../components/Icon.astro";
+import { BLOG_POST, headingText } from "../../data/copy";
+import { contactFor } from "../../data/site";
+import { getBlog, getServices } from "../../lib/content";
+import { article, faqPage } from "../../lib/schema";
+import { absolute, href } from "../../lib/url";
+
+export const getStaticPaths = (async () => {
+  const posts = await getBlog();
+  return posts.map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry, more: posts.filter((p) => p.id !== entry.id).slice(0, 3) },
+  }));
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { entry, more } = Astro.props;
+const d = entry.data;
+const { Content, headings } = await render(entry);
+const toc = headings.filter((h) => h.depth === 2);
+// The practice this guide belongs to (services list their guides in relatedPosts).
+const service = (await getServices()).find((s) => s.data.relatedPosts.some((p) => p.id === entry.id));
+const path = `/blog/${entry.id}/`;
+const crumbs = [{ name: "Blog", path: "/blog/" }, { name: d.title, path }];
+
+// "10 February 2026": fixed English month names, independent of the build
+// machine's ICU data.
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const longDate = (date: Date) => `${date.getUTCDate()} ${MONTHS[date.getUTCMonth()]} ${date.getUTCFullYear()}`;
+
+const schemas: object[] = [
+  article(Astro.site, {
+    type: "BlogPosting",
+    headline: d.title,
+    description: d.description,
+    path,
+    datePublished: d.updated,
+    dateModified: d.updated,
+    author: d.author,
+    imageUrl: absolute("/brand/og.png", Astro.site),
+  }),
+];
+if (d.faq.length) schemas.push(faqPage(d.faq));
+---
+<BaseLayout
+  title={d.title}
+  description={d.description}
+  breadcrumbs={crumbs}
+  jsonLd={schemas}
+  ogType="article"
+  published={d.updated}
+  modified={d.updated}
+  markdownPath={`/blog/${entry.id}.md`}
+>
+  <PageHero breadcrumbs={crumbs} eyebrow={BLOG_POST.eyebrow} title={d.title}>
+    <p class="post-meta">
+      <span>{BLOG_POST.card.updated} <time datetime={d.updated.toISOString().slice(0, 10)}>{longDate(d.updated)}</time></span>
+      <span aria-hidden="true">·</span>
+      <span>{d.readMinutes} min read</span>
+      <span aria-hidden="true">·</span>
+      <span>By {d.author}</span>
+    </p>
+  </PageHero>
+
+  <section class="section section--flush-top" aria-label="Article">
+    <div class="container post">
+      <nav class="post__toc" aria-labelledby="toc-title">
+        <div class="panel post__toc-box">
+          <h2 id="toc-title" class="eyebrow">{BLOG_POST.contents}</h2>
+          <ol class="list-reset toc">
+            {toc.map((h) => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}
+            {d.faq.length > 0 && <li><a href="#faq-title">{BLOG_POST.faq}</a></li>}
+          </ol>
+        </div>
+      </nav>
+
+      <div class="post__main">
+        <article class="panel post-body">
+          <div class="prose">
+            <Content />
+          </div>
+        </article>
+
+        {d.faq.length > 0 && (
+          <section class="panel post__faq" aria-labelledby="faq-title">
+            <h2 id="faq-title" class="h3">{BLOG_POST.faq}</h2>
+            <FaqList items={d.faq} name="post-faq" />
+          </section>
+        )}
+
+        <section class="panel panel--dark on-dark talk" aria-labelledby="talk-title">
+          <h2 id="talk-title" class="h2">{headingText(BLOG_POST.talk)}</h2>
+          <p class="lead talk__text">{BLOG_POST.talk.text}</p>
+          <div class="talk__actions">
+            <a class="btn btn--accent" href={href(service ? contactFor(service.id) : "/contact/")}>
+              {BLOG_POST.talk.cta} <Icon name="arrow" size={18} class="arrow" />
+            </a>
+            {service && (
+              <a class="btn btn--ghost-light" href={href(`/services/${service.id}/`)}>
+                {service.data.title} <Icon name="arrow" size={18} class="arrow" />
+              </a>
+            )}
+          </div>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  {more.length > 0 && (
+    <section class="section" aria-labelledby="more-title">
+      <div class="container">
+        <SectionHead
+          id="more-title"
+          eyebrow={BLOG_POST.more.eyebrow}
+          title={BLOG_POST.more.title}
+          link={{ label: BLOG_POST.more.all, href: "/blog/" }}
+        />
+        <ul class="list-reset more">
+          {more.map((p, i) => <li><PostCard post={p} num={i + 1} /></li>)}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .post-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 12px;
+    margin-top: 28px;
+    font-size: 15px;
+    color: var(--ink-2);
+  }
+
+  .post { display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  @media (min-width: 1024px) {
+    .post { grid-template-columns: minmax(0, 3fr) minmax(0, 8fr); gap: clamp(32px, 4vw, 72px); align-items: start; }
+    /* The grid item itself sticks (align-items: start keeps it short). */
+    .post__toc { position: sticky; top: 32px; }
+  }
+  .post__toc-box { padding: 24px; }
+  .toc { margin-top: 12px; border-top: 1px solid var(--rule); }
+  .toc a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 14px;
+    line-height: 1.35;
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+  .toc a:hover { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; }
+
+  .post__main { display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px; min-width: 0; }
+  .post-body { padding: clamp(24px, 4vw, 64px); }
+  /* Inline links: vertical padding grows the tap target to 44px without
+     changing the line height. */
+  .post-body :global(.prose a) { padding-block: 12px; }
+  /* Wide cost tables: the script wraps each in a focusable, labelled region
+     that scrolls sideways. Before it runs (or without JS) the table itself
+     scrolls, so the page never scrolls horizontally. */
+  .post-body :global(.prose > table) { display: block; overflow-x: auto; }
+  .post-body :global(.table-wrap > table) { min-width: 560px; }
+
+  .post__faq > h2 { margin-bottom: 20px; }
+
+  .talk { padding: clamp(28px, 4vw, 64px); }
+  .talk__text { margin-top: 20px; max-width: 56ch; }
+  .talk__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+  @media (max-width: 520px) {
+    .talk__actions .btn { width: 100%; white-space: normal; }
+  }
+
+  .more { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  @media (min-width: 768px) {
+    .more { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1024px) {
+    .more { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+</style>
+
+<script>
+  // Put each cost table in a keyboard-scrollable box named after its section,
+  // so wide tables scroll sideways on phones instead of squeezing.
+  for (const table of document.querySelectorAll<HTMLTableElement>(".post-body .prose table")) {
+    if (table.parentElement?.classList.contains("table-wrap")) continue;
+    let heading = table.previousElementSibling;
+    while (heading && !/^H[23]$/.test(heading.tagName)) heading = heading.previousElementSibling;
+    const label = heading?.textContent?.trim();
+    const wrap = document.createElement("div");
+    wrap.className = "table-wrap";
+    wrap.tabIndex = 0;
+    wrap.setAttribute("role", "region");
+    wrap.setAttribute("aria-label", label ? `Table: ${label}` : "Table");
+    table.before(wrap);
+    wrap.append(table);
+  }
+</script>

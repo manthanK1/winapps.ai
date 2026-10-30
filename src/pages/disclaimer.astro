@@ -1,0 +1,55 @@
+---
+// Disclaimer, V1's text word for word, on a near-white panel. (The old
+// site's footer linked /disclaimer, which returned an error page.)
+// TODO(Winapps): legal review. Confirm the wording, the registered legal
+// entity and governing law.
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHero from "../components/PageHero.astro";
+import { SITE } from "../data/site";
+import { href } from "../lib/url";
+
+const crumbs = [{ name: "Disclaimer", path: "/disclaimer/" }];
+---
+<BaseLayout
+  title="Disclaimer"
+  description="The limits of the information on the Winapps website: general guidance, estimates and third-party links."
+  breadcrumbs={crumbs}
+>
+  <PageHero
+    breadcrumbs={crumbs}
+    title="Disclaimer"
+    lead="What you can and can't rely on from the information on this website."
+  />
+  <section class="section section--flush-top" aria-label="Disclaimer">
+    <div class="container">
+      <div class="panel legal">
+        <div class="prose">
+          <h2>General information only</h2>
+          <p>The content on this website, including our guides and news posts, is general information about software development. It is not professional, legal or financial advice for your situation, and it does not create a client relationship with {SITE.legalName}.</p>
+
+          <h2>Cost ranges and estimates</h2>
+          <p>Cost, timeline and savings figures in our guides are indicative ranges for planning. Real figures depend on scope, team, region and timing. We give a specific estimate only after Discovery, in writing.</p>
+
+          <h2>Case studies</h2>
+          <p>Case studies are described in general terms to protect client confidentiality. Photos on case study and industry pages are illustrative, not the client's premises or product.</p>
+
+          <h2>Third-party names and links</h2>
+          <p>Products, platforms and companies we mention belong to their owners. Where we link to other websites, we are not responsible for their content or availability.</p>
+
+          <h2>No warranty</h2>
+          <p>We work to keep this website accurate and current, but it is provided as is. Engagements are governed only by the contract we sign with each client. See also our <a href={href("/terms/")}>terms of use</a> and <a href={href("/privacy/")}>privacy notice</a>.</p>
+
+          <h2>Contact</h2>
+          <p>Questions about this disclaimer: <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .legal { max-width: 960px; padding: clamp(24px, 4vw, 64px); }
+  /* Inline links: vertical padding grows the tap target to 44px without
+     changing the line height. */
+  .legal a { padding-block: 12px; }
+</style>

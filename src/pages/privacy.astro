@@ -1,0 +1,54 @@
+---
+// Privacy notice, V1's text word for word, on a near-white panel.
+// TODO(Winapps): legal review. Add the registered legal entity, address,
+// retention periods and any analytics you enable before relying on this notice.
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHero from "../components/PageHero.astro";
+import { SITE } from "../data/site";
+
+const crumbs = [{ name: "Privacy", path: "/privacy/" }];
+---
+<BaseLayout
+  title="Privacy notice"
+  description="How the Winapps website handles personal data: what we collect through the contact form, why, and your rights under GDPR."
+  breadcrumbs={crumbs}
+>
+  <PageHero
+    breadcrumbs={crumbs}
+    title="Privacy notice"
+    lead="This notice explains what personal data this website collects, why, and the rights you have."
+  />
+  <section class="section section--flush-top" aria-label="Privacy notice">
+    <div class="container">
+      <div class="panel legal">
+        <div class="prose">
+          <h2>Who we are</h2>
+          <p>This website is operated by {SITE.legalName}, a software engineering company based in India. For anything relating to your personal data, contact us at <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.</p>
+
+          <h2>What we collect</h2>
+          <p>We only collect the information you choose to send us through the contact form or by email: your name, work email address, company, country, phone number and budget range if you add them, the services you are interested in and your message.</p>
+          <p>This website does not set advertising or tracking cookies.</p>
+
+          <h2>Why we use it</h2>
+          <p>We use the information you send only to reply to your inquiry and, if you choose to work with us, to discuss and prepare that engagement. The legal basis is our legitimate interest in responding to requests you make, or steps taken at your request before entering into a contract.</p>
+
+          <h2>Who processes it</h2>
+          <p>When you submit the contact form, it is delivered to us by a form-processing provider acting on our behalf, or by your own email app. We do not sell your data or share it with third parties for marketing.</p>
+
+          <h2>How long we keep it</h2>
+          <p>We keep inquiry details only for as long as needed to handle your request and any resulting engagement, then delete them.</p>
+
+          <h2>Your rights</h2>
+          <p>If you are in the EU, the UK or another jurisdiction with similar laws, you can ask us to access, correct, delete or restrict the use of your personal data, or object to its use. Email <a href={`mailto:${SITE.email}`}>{SITE.email}</a> and we will respond within one month. You also have the right to complain to your local data protection authority.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .legal { max-width: 960px; padding: clamp(24px, 4vw, 64px); }
+  /* Inline links: vertical padding grows the tap target to 44px without
+     changing the line height. */
+  .legal a { padding-block: 12px; }
+</style>

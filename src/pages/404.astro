@@ -1,0 +1,53 @@
+---
+// Branded 404 (served by the host for any unknown URL; not indexed). Old
+// winapps.co.in URLs are redirected in astro.config.mjs before they get here.
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Icon from "../components/Icon.astro";
+import { NOT_FOUND } from "../data/copy";
+import { SITE } from "../data/site";
+import { href } from "../lib/url";
+---
+<BaseLayout title={NOT_FOUND.meta.title} description={NOT_FOUND.meta.description} noindex ribbon="inner">
+  <section class="nf" aria-labelledby="nf-title">
+    <div class="container nf__grid">
+      <div class="nf__text veil">
+        <p class="eyebrow">{NOT_FOUND.eyebrow}</p>
+        <h1 id="nf-title" class="h1">{NOT_FOUND.title} {NOT_FOUND.accent}</h1>
+        <p class="lead nf__lead">{NOT_FOUND.lead}</p>
+        <ul class="list-reset nf__links">
+          {NOT_FOUND.links.map((l) => (
+            <li><a class="btn btn--outline" href={href(l.href)}>{l.label} <Icon name="arrow" size={18} class="arrow" /></a></li>
+          ))}
+          <li><a class="btn btn--primary" href={href("/contact/")}>{NOT_FOUND.contact} <Icon name="arrow" size={18} class="arrow" /></a></li>
+        </ul>
+      </div>
+      <div class="nf__mark">
+        <img
+          src={href("/brand/winapps-logo-still.webp")}
+          alt={`${SITE.alternateName} logo`}
+          width="257"
+          height="287"
+          decoding="async"
+        />
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .nf {
+    position: relative;
+    z-index: 1;
+    padding: calc(var(--header-h) + clamp(40px, 6vw, 96px)) 0 clamp(64px, 8vw, 128px);
+  }
+  .nf__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 48px; }
+  @media (min-width: 1024px) {
+    .nf__grid { grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); gap: clamp(40px, 6vw, 112px); align-items: center; }
+  }
+  .nf__text { justify-self: start; max-width: 900px; }
+  .nf__text > .eyebrow { margin-bottom: 22px; }
+  .nf__lead { margin-top: 24px; max-width: 60ch; }
+  .nf__links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px; }
+  .nf__mark { justify-self: center; }
+  .nf__mark img { width: clamp(120px, 18vw, 220px); }
+</style>

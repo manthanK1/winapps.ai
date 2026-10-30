@@ -1,0 +1,135 @@
+---
+// Contact: the inquiry form beside the direct routes (email, phone,
+// WhatsApp, social) and what happens after you write. The ContactPage
+// JSON-LD node replaces the generic WebPage node.
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHero from "../components/PageHero.astro";
+import ContactForm from "../components/ContactForm.astro";
+import Icon from "../components/Icon.astro";
+import { CONTACT_PAGE } from "../data/copy";
+import { SITE } from "../data/site";
+import { contactPage } from "../lib/schema";
+import { metaDescription, pageTitle } from "../lib/seo";
+
+const { meta, hero } = CONTACT_PAGE;
+const crumbs = [{ name: "Contact", path: "/contact/" }];
+const schema = contactPage(Astro.site, {
+  name: pageTitle(meta.title),
+  description: metaDescription(meta.description),
+  path: "/contact/",
+});
+---
+<BaseLayout
+  title={meta.title}
+  description={meta.description}
+  breadcrumbs={crumbs}
+  pageType="ContactPage"
+  jsonLd={[schema]}
+  noWebPage
+  markdownPath="/contact.md"
+>
+  <PageHero breadcrumbs={crumbs} eyebrow={hero.eyebrow} title={hero.title} accent={hero.accent} lead={hero.lead} />
+
+  <section class="section section--flush-top" aria-label="Contact form and details">
+    <div class="container contact">
+      <div class="contact__main">
+        <h2 class="h3 contact__title veil">{CONTACT_PAGE.formTitle}</h2>
+        <div class="panel">
+          <ContactForm />
+        </div>
+      </div>
+
+      <div class="contact__side">
+        <div class="panel contact__box">
+          <h2 class="h4">{CONTACT_PAGE.direct}</h2>
+          <ul class="list-reset direct">
+            <li>
+              <a class="direct__link" href={`mailto:${SITE.email}`}><Icon name="mail" size={20} />{SITE.email}</a>
+            </li>
+            <li>
+              <a class="direct__link" href={SITE.phoneHref}><Icon name="phone" size={20} />{SITE.phone}</a>
+            </li>
+            <li>
+              <a class="direct__link" href={SITE.whatsappHref} target="_blank" rel="noopener"><Icon name="whatsapp" size={20} />WhatsApp</a>
+            </li>
+          </ul>
+          <p class="contact__row contact__social">
+            {CONTACT_PAGE.alsoOn} <a class="link" href={SITE.linkedin} target="_blank" rel="noopener">LinkedIn</a> and <a class="link" href={SITE.instagram} target="_blank" rel="noopener">Instagram</a>.
+          </p>
+          {SITE.address ? (
+            <address class="contact__row">
+              {SITE.address.street}<br />{SITE.address.city} {SITE.address.postalCode}<br />{SITE.address.country}
+            </address>
+          ) : (
+            <p class="contact__row">{CONTACT_PAGE.basedIn}</p>
+          )}
+        </div>
+
+        <div class="panel contact__box">
+          <h2 class="h4">{CONTACT_PAGE.nextTitle}</h2>
+          <ol class="list-reset next">
+            {CONTACT_PAGE.next.map((s, i) => (
+              <li class="next__step">
+                <span class="card__num" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+                <div>
+                  <p class="next__title">{s.title}</p>
+                  <p class="next__text">{s.text}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .contact { display: grid; grid-template-columns: minmax(0, 1fr); gap: 56px; }
+  @media (min-width: 1024px) {
+    .contact { grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); gap: clamp(40px, 5vw, 96px); align-items: start; }
+  }
+  .contact__title { display: inline-block; margin-bottom: 28px; }
+  .contact__side { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  @media (min-width: 1024px) {
+    /* Line the side boxes up with the form panel, not with its heading. */
+    .contact__side { padding-top: calc(clamp(22px, 1.1vw + 14px, 28px) * 1.1 + 28px); }
+  }
+  .contact__box > h2 { margin-bottom: 16px; }
+
+  .direct { display: grid; }
+  .direct__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+    font-weight: 500;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+  .direct__link :global(svg) { flex: none; color: var(--primary); }
+  .direct__link:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+  .contact__row {
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid var(--rule);
+    font-size: 15px;
+    color: var(--ink-2);
+  }
+  /* Inline social links still get a 44px tall target. */
+  .contact__social a { display: inline-flex; align-items: center; min-height: 44px; }
+
+  .next { display: grid; }
+  .next__step {
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: 12px;
+    padding: 16px 0;
+    border-top: 1px solid var(--rule);
+  }
+  .next__step:first-child { border-top-color: var(--ink); }
+  .next__step .card__num { padding-top: 2px; }
+  .next__title { font-weight: 600; color: var(--ink); }
+  .next__text { margin-top: 2px; font-size: 15px; color: var(--ink-2); }
+</style>

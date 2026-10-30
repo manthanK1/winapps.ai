@@ -1,0 +1,116 @@
+---
+// News post. Slugs match the live site's /news/<slug> URLs. The short body
+// sits on a near-white panel; "More news" lists the four latest others.
+import type { GetStaticPaths, InferGetStaticPropsType } from "astro";
+import { render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHero from "../../components/PageHero.astro";
+import CtaBand from "../../components/CtaBand.astro";
+import Icon from "../../components/Icon.astro";
+import { NEWS_PAGE } from "../../data/copy";
+import { getNews } from "../../lib/content";
+import { article } from "../../lib/schema";
+import { absolute, href } from "../../lib/url";
+
+export const getStaticPaths = (async () => {
+  const news = await getNews();
+  return news.map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry, more: news.filter((n) => n.id !== entry.id).slice(0, 4) },
+  }));
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { entry, more } = Astro.props;
+const d = entry.data;
+const { Content } = await render(entry);
+const path = `/news/${entry.id}/`;
+const crumbs = [{ name: "News", path: "/news/" }, { name: d.title, path }];
+const { postFooter } = NEWS_PAGE;
+const schema = article(Astro.site, {
+  type: "NewsArticle",
+  headline: d.title,
+  description: d.description,
+  path,
+  datePublished: d.date,
+  imageUrl: absolute("/brand/og.png", Astro.site),
+});
+---
+<BaseLayout
+  title={d.title}
+  description={d.description}
+  breadcrumbs={crumbs}
+  jsonLd={[schema]}
+  ogType="article"
+  published={d.date}
+  modified={d.date}
+  markdownPath={`/news/${entry.id}.md`}
+>
+  <PageHero breadcrumbs={crumbs} eyebrow={`News · ${d.dateLabel}`} title={d.title} />
+
+  <section class="section section--flush-top" aria-label="News post">
+    <div class="container news-post">
+      <article class="panel news-post__body">
+        <div class="prose news-post__prose">
+          <Content />
+          <p>
+            <a href={href("/blog/")}>{postFooter.before}</a>{postFooter.middle}<a href={href("/services/")}>{postFooter.after}</a>.
+          </p>
+        </div>
+      </article>
+
+      {more.length > 0 && (
+        <section class="panel news-post__more" aria-labelledby="more-news-title">
+          <h2 id="more-news-title" class="eyebrow">{NEWS_PAGE.more}</h2>
+          <ul class="list-reset more-news">
+            {more.map((n) => (
+              <li>
+                <a class="more-news__link" href={href(`/news/${n.id}/`)}>
+                  <span>
+                    <span class="more-news__title">{n.data.title}</span>
+                    <span class="more-news__date">{n.data.dateLabel}</span>
+                  </span>
+                  <Icon name="arrow" size={16} class="arrow" />
+                </a>
+              </li>
+            ))}
+          </ul>
+          <a class="link-u" href={href("/news/")}>{NEWS_PAGE.all} <Icon name="arrow" size={16} /></a>
+        </section>
+      )}
+    </div>
+  </section>
+
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .news-post { display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  @media (min-width: 1024px) {
+    .news-post { grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); gap: clamp(32px, 5vw, 96px); align-items: start; }
+  }
+  .news-post__body { padding: clamp(24px, 4vw, 64px); }
+  .news-post__prose { font-size: clamp(17px, 0.45vw + 14px, 20px); line-height: 1.6; }
+  /* Inline links: vertical padding grows the tap target to 44px without
+     changing the line height. */
+  .news-post__prose :global(a) { padding-block: 12px; }
+
+  .news-post__more > h2 { margin-bottom: 12px; }
+  .more-news { margin-bottom: 8px; border-top: 1px solid var(--rule); }
+  .more-news__link {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 44px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--rule);
+    text-decoration: none;
+  }
+  .more-news__title { display: block; font-size: 15px; font-weight: 600; line-height: 1.35; color: var(--ink); }
+  .more-news__date { display: block; margin-top: 4px; font-size: 13px; color: var(--muted); }
+  .more-news__link :global(.arrow) { flex: none; margin-top: 4px; color: var(--ink-2); transition: transform 0.25s var(--ease); }
+  .more-news__link:hover .more-news__title { color: var(--primary); }
+  .more-news__link:hover :global(.arrow) { transform: translateX(4px); color: var(--primary); }
+</style>
