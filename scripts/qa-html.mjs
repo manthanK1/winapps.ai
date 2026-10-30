@@ -87,11 +87,22 @@ for (const file of html) {
   for (const [img] of src.matchAll(/<img\b[^>]*>/gi)) {
     for (const n of ["alt", "width", "height"]) if (attr(img, n) === undefined) fail(url, `<img> without ${n}: ${img.slice(0, 90)}`);
   }
+  const visible = decode(strip(src.replace(/<(script|style|head)\b[\s\S]*?<\/\1>/gi, " "))).replace(/[‘’]/g, "'").replace(/[“”]/g, '"');
+  const same = (s) => visible.includes(s.replace(/\s+/g, " ").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').trim());
   for (const [, json] of src.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
+    let data;
     try {
-      JSON.parse(json);
+      data = JSON.parse(json);
     } catch (e) {
       fail(url, `JSON-LD does not parse: ${e.message}`);
+      continue;
+    }
+    // FAQPage must repeat the visible questions and answers word for word.
+    if (data["@type"] === "FAQPage") {
+      for (const q of data.mainEntity ?? []) {
+        if (!same(q.name)) fail(url, `FAQPage question not visible: "${q.name}"`);
+        if (!same(q.acceptedAnswer?.text ?? "")) fail(url, `FAQPage answer not visible for "${q.name}"`);
+      }
     }
   }
   for (const [a, open, inner] of src.matchAll(/(<a\b[^>]*>)([\s\S]*?)<\/a>/gi)) {
