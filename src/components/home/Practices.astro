@@ -3,6 +3,7 @@
 // rule on near-white. Left: label, title + tagline, summary, related case
 // study and the two actions. Right: "What you get", the outcome, the first
 // four deliverables and the first six technologies.
+import TechName from "../TechName.astro";
 import { getEntry } from "astro:content";
 import Icon from "../Icon.astro";
 import SectionHead from "../SectionHead.astro";
@@ -67,7 +68,7 @@ const { practices } = HOME;
                 ))}
               </ul>
               <ul class="chips practice__tech" aria-label={`Technology for ${s.data.title}`}>
-                {s.data.tech.slice(0, 6).map((t) => <li class="chip">{t}</li>)}
+                {s.data.tech.slice(0, 6).map((t) => <li class="chip"><TechName name={t} /></li>)}
               </ul>
             </div>
           </article>
@@ -136,5 +137,10 @@ const { practices } = HOME;
   @media (max-width: 520px) {
     .practice__actions, .practice__actions .btn { width: 100%; }
     .practice__actions .btn { white-space: normal; text-align: center; padding-block: 12px; }
+  }
+  .practice { transition: transform 0.3s var(--ease), box-shadow 0.3s, border-color 0.2s; }
+  .practice:hover { border-top-color: var(--yellow); box-shadow: 0 24px 48px -28px rgb(15 20 22 / 0.4); }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .practice:hover { transform: translateY(-4px); }
   }
 </style>

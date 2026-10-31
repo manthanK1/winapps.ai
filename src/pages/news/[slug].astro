@@ -118,4 +118,6 @@ const schema = article(Astro.site, {
   .more-news__link :global(.arrow) { flex: none; margin-top: 4px; color: var(--ink-2); transition: transform 0.25s var(--ease); }
   .more-news__link:hover .more-news__title { color: var(--primary); }
   .more-news__link:hover :global(.arrow) { transform: translateX(4px); color: var(--primary); }
+  .more-news__link { transition: background-color 0.2s, box-shadow 0.2s, padding 0.25s var(--ease); }
+  .more-news__link:hover { padding-inline: 12px; background: var(--yellow-tint); box-shadow: inset 3px 0 0 var(--yellow); }
 </style>

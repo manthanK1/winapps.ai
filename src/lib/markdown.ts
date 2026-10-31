@@ -5,9 +5,10 @@
 // "# <H1>", then a short plain answer taken from the page's own lead, then the
 // content. Links are absolute on the production origin (Astro `site`).
 import type { CollectionEntry } from "astro:content";
-import { PROMISES, SITE, SOCIAL, STACK, BUDGETS, NEEDS, whatsappFor } from "../data/site";
+import { EMAILS, PROMISES, SITE, SOCIAL, STACK, BUDGETS, NEEDS, contactFor, whatsappFor } from "../data/site";
 import {
   ABOUT_PAGE,
+  AI_PAGE,
   BLOG_PAGE,
   BLOG_POST,
   CLOCKS,
@@ -79,6 +80,7 @@ const waLink = (text: string, message?: string) =>
   `[${label(text)}](${safeUrl(message ? whatsappFor(message) : SITE.whatsappHref)})`;
 const telLink = () => `[${SITE.phone}](${SITE.phoneHref})`;
 const mailLink = () => `[${SITE.email}](mailto:${SITE.email})`;
+const trainingMail = () => `[${SITE.emailTraining}](mailto:${SITE.emailTraining})`;
 /** A collection entry's Markdown body: LF line endings, no HTML comments (V1's TODO notes). */
 const body = (md: string | undefined) => stripComments((md ?? "").replace(/\r\n?/g, "\n"));
 
@@ -125,7 +127,7 @@ function splitLead(md: string, min = 2): { lead: string; rest: string } {
 /** Contact facts, worded as in src/data/site.ts. */
 function contactList(L: Links) {
   return bullets([
-    `Email: ${mailLink()}`,
+    ...EMAILS.map((e) => `${e.label}: [${e.address}](mailto:${e.address})`),
     `Phone: ${telLink()}`,
     `WhatsApp: ${SITE.whatsappHref}`,
     `${CTA.primary}: ${L.url(SITE.bookingPath)}`,
@@ -418,6 +420,48 @@ export async function industriesMd(site: Site) {
   );
 }
 
+// ------------------------------------------------------------------- AI ----
+
+export async function aiMd(site: Site) {
+  const L = linker(site);
+  const { hero, services, why, expertise, benefits, solutions, stack, challenges, competencies, cta } = AI_PAGE;
+  const cards = (items: readonly { title: string; text: string }[]) => items.map((i) => join(`### ${i.title}`, i.text));
+  return finish(
+    join(
+      `# ${headingText(hero)}`,
+      hero.lead,
+      `${L.link(hero.primary, contactFor("ai-ml"))} · ${L.page(hero.secondary, servicePath("ai-ml"))}`,
+      `## ${headingText(services)}`,
+      services.intro,
+      numbered(services.items),
+      `### ${services.featured.title}`,
+      services.featured.text,
+      `## ${headingText(why)}`,
+      why.intro,
+      bullets(why.points),
+      `## ${headingText(expertise)}`,
+      expertise.intro,
+      ...cards(expertise.items),
+      `## ${headingText(benefits)}`,
+      benefits.intro,
+      ...cards(benefits.items),
+      `## ${headingText(solutions)}`,
+      solutions.intro,
+      ...cards(solutions.items),
+      `## ${headingText(stack)}`,
+      stack.intro,
+      bullets(["Python", "TensorFlow", "PyTorch", "scikit-learn", "pandas", ...stack.libraries, "AWS", "Azure", "Google Cloud", "Docker", "Kubernetes"]),
+      `## ${headingText(challenges)}`,
+      challenges.intro,
+      numbered(challenges.items.map((c) => `**${c.title}**: ${c.text}`)),
+      `## ${headingText(competencies)}`,
+      competencies.intro,
+      ...cards(competencies.items),
+      ctaBlock(L, cta.title)
+    )
+  );
+}
+
 // ------------------------------------------------------------- Training ----
 
 export async function trainingMd(site: Site) {
@@ -427,7 +471,7 @@ export async function trainingMd(site: Site) {
     join(
       `# ${headingText(TRAINING_PAGE.hero)}`,
       TRAINING_PAGE.hero.lead(courseCount(tracks), tracks.length),
-      bullets([waLink(TRAINING_ADVICE.cta, TRAINING_PAGE.askMessage), telLink()]),
+      bullets([waLink(TRAINING_ADVICE.cta, TRAINING_PAGE.askMessage), telLink(), trainingMail()]),
       ...tracks.map((t, n) =>
         join(
           `## ${TRAINING_PAGE.trackEyebrow(n + 1)}: ${L.link(t.data.name, `/training/#${t.id}`)}`,
@@ -445,7 +489,7 @@ export async function trainingMd(site: Site) {
       ),
       `## ${TRAINING_PAGE.cta.title}`,
       TRAINING_PAGE.cta.text,
-      bullets([waLink(TRAINING_ADVICE.cta, TRAINING_ADVICE.message), telLink()])
+      bullets([waLink(TRAINING_ADVICE.cta, TRAINING_ADVICE.message), telLink(), trainingMail()])
     )
   );
 }
@@ -464,7 +508,7 @@ export async function courseMd(site: Site, course: Course) {
       `${TRAINING_PAGE.trackEyebrow(n + 1)}: ${L.link(course.track.name, `/training/#${course.track.id}`)}. ${course.track.intro}`,
       `## ${TRAINING_PAGE.learn}`,
       bullets(course.topics),
-      `${waLink(TRAINING_PAGE.enquire, TRAINING_PAGE.courseMessage(course.name))} · ${telLink()} · ${mailLink()}`,
+      `${waLink(TRAINING_PAGE.enquire, TRAINING_PAGE.courseMessage(course.name))} · ${telLink()} · ${trainingMail()}`,
       siblings.length > 0 && join(`## ${course.track.name}`, bullets(siblings.map((c) => `${L.page(c.name, coursePath(c.id))}: ${c.summary}`))),
       L.link(HOME.training.allLink, "/training/"),
       `## ${TRAINING_ADVICE.title}`,
@@ -505,7 +549,7 @@ function factsList() {
     `Alternate name: ${SITE.alternateName}`,
     ...PROMISES.map((p) => p.label),
     CONTACT_PAGE.basedIn,
-    `Email: ${SITE.email}`,
+    ...EMAILS.map((e) => `${e.label}: ${e.address}`),
     `Phone: ${SITE.phone}`,
     `WhatsApp: ${SITE.whatsappHref}`,
     ...SOCIAL.map((s) => `${s.label}: ${s.href}`),
@@ -651,6 +695,7 @@ export async function markdownPages(site: Site): Promise<{ path: string; title: 
     { path: "/", title: "Home", build: () => homeMd(site) },
     { path: "/services/", title: SERVICES_PAGE.meta.title, build: () => servicesMd(site) },
     ...services.map((s) => ({ path: servicePath(s.id), title: s.data.title, build: () => serviceMd(site, s) })),
+    { path: "/ai/", title: AI_PAGE.meta.title, build: () => aiMd(site) },
     { path: "/how-we-work/", title: HOW_PAGE.meta.title, build: () => howWeWorkMd(site) },
     { path: "/about/", title: ABOUT_PAGE.meta.title, build: () => aboutMd(site) },
     { path: "/contact/", title: CONTACT_PAGE.meta.title, build: () => contactMd(site) },
@@ -704,6 +749,7 @@ export async function llmsTxt(site: Site) {
       bullets([
         `${L.page(SERVICES_PAGE.meta.title, "/services/")}: ${SERVICES_PAGE.meta.description}`,
         ...services.map((s) => `${L.page(s.data.title, servicePath(s.id))}: ${s.data.summary}`),
+        `${L.page(AI_PAGE.meta.title, "/ai/")}: ${AI_PAGE.meta.description}`,
       ]),
 
       `## Industries`,
@@ -744,7 +790,7 @@ export async function llmsTxt(site: Site) {
 
       `## How to contact`,
       bullets([
-        `Email: ${mailLink()}`,
+        ...EMAILS.map((e) => `${e.label}: [${e.address}](mailto:${e.address})`),
         `Phone: ${SITE.phoneIntl}`,
         `WhatsApp: ${SITE.whatsappHref}`,
         `${CTA.primary}: ${L.url(SITE.bookingPath)}`,

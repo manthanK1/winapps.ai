@@ -35,6 +35,19 @@ export function contactPoints() {
       telephone: SITE.phoneIntl,
       availableLanguage: ["English"],
     },
+    {
+      "@type": "ContactPoint",
+      contactType: "customer service",
+      email: SITE.emailInfo,
+      availableLanguage: ["English"],
+    },
+    {
+      "@type": "ContactPoint",
+      contactType: "training enquiries",
+      email: SITE.emailTraining,
+      telephone: SITE.phoneIntl,
+      availableLanguage: ["English"],
+    },
   ];
 }
 

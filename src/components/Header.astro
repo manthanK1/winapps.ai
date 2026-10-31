@@ -247,8 +247,29 @@ const menuActive = (menu: string) =>
     text-decoration: none;
     white-space: nowrap;
     cursor: pointer;
+    isolation: isolate;
+    transition: color 0.2s, transform 0.25s var(--ease);
   }
-  .site-nav__link:hover, .site-nav__link[aria-expanded="true"] { color: var(--primary); }
+  /* Hover: a logo-yellow block pops in behind the label (ink text keeps contrast). */
+  .site-nav__link::before {
+    content: "";
+    position: absolute;
+    inset: 5px -10px;
+    z-index: -1;
+    background: var(--yellow);
+    opacity: 0;
+    transform: scale(0.85);
+    transition: opacity 0.2s, transform 0.25s var(--ease), box-shadow 0.25s;
+  }
+  .site-nav__link:hover, .site-nav__link[aria-expanded="true"], .site-nav__link:focus-visible { color: var(--ink); }
+  .site-nav__link:hover::before, .site-nav__link[aria-expanded="true"]::before, .site-nav__link:focus-visible::before {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: var(--lift-shadow);
+  }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .site-nav__link:hover { transform: translateY(-2px); }
+  }
   .site-nav__link[aria-current="page"]::after,
   .site-nav__link[data-active]::after {
     content: "";
@@ -292,11 +313,13 @@ const menuActive = (menu: string) =>
     padding: 10px 0;
     border-bottom: 1px solid var(--rule);
     text-decoration: none;
+    transition: background-color 0.2s, box-shadow 0.2s, padding 0.25s var(--ease);
   }
   .mega__item--plain { justify-content: center; padding: 8px 0; font-size: 14px; font-weight: 500; }
   .mega__title { font-size: 15px; font-weight: 600; }
   .mega__sub { font-size: 13px; color: var(--muted); line-height: 1.4; }
-  .mega__item:hover .mega__title, .mega__item--plain:hover { color: var(--primary); }
+  .mega__item:hover .mega__title, .mega__item--plain:hover { color: var(--ink); }
+  .mega__item:hover, .mega__item:focus-visible { padding-left: 12px; background: var(--yellow-tint); box-shadow: inset 3px 0 0 var(--yellow); }
   .mega__item[aria-current="page"] { box-shadow: inset 2px 0 0 var(--accent); padding-left: 10px; }
   :global(.js) .mega:not([hidden]) { animation: mega-in 0.2s var(--ease); }
   @keyframes mega-in { from { opacity: 0; transform: translateY(-4px); } }
@@ -317,7 +340,8 @@ const menuActive = (menu: string) =>
     color: var(--ink);
     cursor: pointer;
   }
-  .hdr-icon:hover { color: var(--primary); }
+  .hdr-icon { transition: background-color 0.2s, color 0.2s; }
+  .hdr-icon:hover { background: var(--yellow); color: var(--ink); }
   .hdr-menu {
     display: flex;
     align-items: center;
@@ -334,7 +358,11 @@ const menuActive = (menu: string) =>
     letter-spacing: 0.14em;
     cursor: pointer;
   }
-  .hdr-menu:hover { background: #263136; }
+  .hdr-menu { transition: background-color 0.2s, color 0.2s, transform 0.25s var(--ease), box-shadow 0.25s; }
+  .hdr-menu:hover { background: var(--yellow); color: var(--ink); box-shadow: var(--lift-shadow); }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .hdr-menu:hover { transform: translateY(-2px); }
+  }
 
   /* 900–1139: nav links and every label need ~1100px on one row (1140 leaves
      slack for font metrics), so shed the least-needed labels first. */

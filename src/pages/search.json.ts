@@ -6,6 +6,7 @@ import type { APIRoute } from "astro";
 import { FOOTER, PROMISES, SITE } from "../data/site";
 import {
   ABOUT_PAGE,
+  AI_PAGE,
   BLOG_PAGE,
   CONTACT_PAGE,
   HOME,
@@ -41,6 +42,13 @@ export const GET: APIRoute = async () => {
     { title: "Home", description: HOME.meta.description, url: href("/"), kind: "Page", keywords: words(SITE.tagline, PROMISES.map((p) => p.label)) },
     { title: SERVICES_PAGE.meta.title, description: SERVICES_PAGE.meta.description, url: href("/services/"), kind: "Page" },
     { title: WORK_PAGE.meta.title, description: WORK_PAGE.meta.description, url: href("/work/"), kind: "Page", keywords: "case studies" },
+    {
+      title: AI_PAGE.meta.title,
+      description: AI_PAGE.meta.description,
+      url: href("/ai/"),
+      kind: "Page",
+      keywords: words("artificial intelligence machine learning", AI_PAGE.services.items, AI_PAGE.solutions.items.map((s) => s.title)),
+    },
     { title: INDUSTRIES_PAGE.meta.title, description: INDUSTRIES_PAGE.meta.description, url: href("/industries/"), kind: "Page" },
     {
       title: TRAINING_PAGE.meta.title,

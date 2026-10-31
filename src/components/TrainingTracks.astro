@@ -18,7 +18,7 @@ const tracks = await getTracks();
     <li class="card track">
       <div class="track__top">
         <span class="card__num" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
-        <TechLogos logos={t.data.logos} small />
+        <TechLogos logos={t.data.logos} small class="above" />
       </div>
       <h3 class="card__title">
         <a class="stretched" href={href(`/training/#${t.id}`)}>{t.data.name}</a>
@@ -72,9 +72,12 @@ const tracks = await getTracks();
     font-weight: 500;
     line-height: 1.25;
     text-decoration: none;
-    transition: border-color 0.15s, color 0.15s;
+    transition: border-color 0.2s, background-color 0.2s, color 0.2s, transform 0.25s var(--ease), box-shadow 0.25s;
   }
-  .track__course:hover { border-color: var(--ink); color: var(--primary); }
+  .track__course:hover { border-color: var(--yellow); background: var(--yellow-tint); color: var(--ink); box-shadow: var(--lift-shadow); }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .track__course:hover { transform: translateY(-2px); }
+  }
 
   .track--advice { background: var(--overlay); border-top-color: var(--accent); }
   .track--advice .card__text { color: var(--on-dark-2); }

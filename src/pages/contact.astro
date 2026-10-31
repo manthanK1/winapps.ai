@@ -7,7 +7,7 @@ import PageHero from "../components/PageHero.astro";
 import ContactForm from "../components/ContactForm.astro";
 import Icon from "../components/Icon.astro";
 import { CONTACT_PAGE } from "../data/copy";
-import { SITE } from "../data/site";
+import { EMAILS, SITE } from "../data/site";
 import { contactPage } from "../lib/schema";
 import { metaDescription, pageTitle } from "../lib/seo";
 
@@ -43,9 +43,14 @@ const schema = contactPage(Astro.site, {
         <div class="panel contact__box">
           <h2 class="h4">{CONTACT_PAGE.direct}</h2>
           <ul class="list-reset direct">
-            <li>
-              <a class="direct__link" href={`mailto:${SITE.email}`}><Icon name="mail" size={20} />{SITE.email}</a>
-            </li>
+            {EMAILS.map((e) => (
+              <li>
+                <a class="direct__link" href={`mailto:${e.address}`}>
+                  <Icon name="mail" size={20} />
+                  <span class="direct__text"><span class="direct__label">{e.label}</span>{e.address}</span>
+                </a>
+              </li>
+            ))}
             <li>
               <a class="direct__link" href={SITE.phoneHref}><Icon name="phone" size={20} />{SITE.phone}</a>
             </li>
@@ -109,6 +114,8 @@ const schema = contactPage(Astro.site, {
   }
   .direct__link :global(svg) { flex: none; color: var(--primary); }
   .direct__link:hover { text-decoration: underline; text-underline-offset: 4px; }
+  .direct__text { display: grid; padding-block: 6px; }
+  .direct__label { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
 
   .contact__row {
     margin-top: 18px;
@@ -132,4 +139,6 @@ const schema = contactPage(Astro.site, {
   .next__step .card__num { padding-top: 2px; }
   .next__title { font-weight: 600; color: var(--ink); }
   .next__text { margin-top: 2px; font-size: 15px; color: var(--ink-2); }
+  .next__step { transition: background-color 0.2s, box-shadow 0.2s, padding 0.25s var(--ease); }
+  .next__step:hover { padding-left: 12px; background: var(--yellow-tint); box-shadow: inset 3px 0 0 var(--yellow); }
 </style>

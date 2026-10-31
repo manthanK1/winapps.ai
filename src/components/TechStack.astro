@@ -1,6 +1,7 @@
 ---
 // Technology we use in production (V1 TechStack): four groups under a thin
 // ink rule, each an eyebrow-style label and a list of tools.
+import TechName from "./TechName.astro";
 import { STACK } from "../data/site";
 ---
 <dl class="stack">
@@ -9,7 +10,7 @@ import { STACK } from "../data/site";
       <dt class="stack__label">{group}</dt>
       <dd>
         <ul class="stack__list">
-          {items.map((t) => <li>{t}</li>)}
+          {items.map((t) => <li><TechName name={t} /></li>)}
         </ul>
       </dd>
     </div>
