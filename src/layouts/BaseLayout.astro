@@ -115,6 +115,8 @@ const plausibleDomain = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN;
   </head>
   <body>
     <a href="#main" class="skip-link">Skip to content</a>
+    {/* Decoration painted under the ribbon canvas (home hero depth). */}
+    <slot name="backdrop" />
     {ribbon !== "none" && <canvas class="ribbon-canvas" data-ribbon={ribbon} aria-hidden="true"></canvas>}
     <Header />
     <main id="main" class="site-main" tabindex="-1">
@@ -132,7 +134,7 @@ const plausibleDomain = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN;
           import("../scripts/ribbon")
             .then(({ mountRibbon }) => {
               const variant = canvas.dataset.ribbon === "home" ? "home" : "inner";
-              if (!mountRibbon(canvas, { variant, wordmark: document.getElementById("ribbon-word") })) canvas.remove();
+              if (!mountRibbon(canvas, { variant, wordmark: document.getElementById("ribbon-word"), depth: document.getElementById("hero-depth") })) canvas.remove();
             })
             .catch(() => canvas.remove());
         const whenIdle = () =>

@@ -1,30 +1,34 @@
 ---
 // Footer in the design's language (1px ink rule, near-white panel, 13px
 // meta row) carrying all of V1's columns: Services, Training, Explore,
-// Company, Legal, Social, plus contact details.
+// Company, Legal, Social, then every contact route as one strip of equal
+// cells (so the brand column and the link columns come out the same height).
 import Icon from "./Icon.astro";
-import { FOOTER, SITE, SOCIAL } from "../data/site";
+import { EMAILS, FOOTER, SITE, SOCIAL } from "../data/site";
 import { getServices, getTracks } from "../lib/content";
 import { href } from "../lib/url";
 
 const services = await getServices();
 const tracks = await getTracks();
 const year = new Date().getFullYear();
+const contacts = [
+  ...EMAILS.map((e) => ({ icon: "mail" as const, label: e.label, value: e.address, href: `mailto:${e.address}`, external: false })),
+  { icon: "phone" as const, label: "Phone", value: SITE.phone, href: SITE.phoneHref, external: false },
+  { icon: "whatsapp" as const, label: "WhatsApp", value: "Chat with us", href: SITE.whatsappHref, external: true },
+];
 ---
 <footer class="site-footer">
   <div class="container">
     <div class="site-footer__grid">
       <div class="site-footer__brand">
         <a href={href("/")} class="site-footer__logo" aria-label={`${SITE.name} home`}>
-          <img src={href("/brand/winapps-logo-still.webp")} alt={SITE.name} width="257" height="287" loading="lazy" decoding="async" />
+          <picture>
+            <source srcset={href("/brand/winapps-logo-still.webp")} type="image/webp" media="(prefers-reduced-motion: reduce)" />
+            <img src={href("/brand/winapps-logo.gif")} alt={SITE.name} width="257" height="287" loading="lazy" decoding="async" />
+          </picture>
         </a>
         <p class="site-footer__legal">{SITE.legalName}</p>
         <p class="site-footer__blurb">{FOOTER.blurb}</p>
-        <address class="site-footer__contact">
-          <a href={`mailto:${SITE.email}`}><Icon name="mail" size={18} />{SITE.email}</a>
-          <a href={SITE.phoneHref}><Icon name="phone" size={18} />{SITE.phone}</a>
-          <a href={SITE.whatsappHref} target="_blank" rel="noopener"><Icon name="whatsapp" size={18} />WhatsApp</a>
-        </address>
       </div>
 
       <nav class="site-footer__cols" aria-label="Footer">
@@ -66,6 +70,19 @@ const year = new Date().getFullYear();
       </nav>
     </div>
 
+    <address class="site-footer__contact">
+      {contacts.map((c) => (
+        <a class="site-footer__route" href={c.href} {...(c.external ? { target: "_blank", rel: "noopener" } : {})}>
+          <Icon name={c.icon} size={20} />
+          <span class="site-footer__route-text">
+            <span class="site-footer__route-label">{c.label}</span>
+            {/* An address may wrap at "@" if it must, never mid-word. */}
+            <span>{c.icon === "mail" ? <>{c.value.split("@")[0]}<wbr />@{c.value.split("@")[1]}</> : c.value}</span>
+          </span>
+        </a>
+      ))}
+    </address>
+
     <div class="site-footer__bar">
       <p>© {SITE.founded}–{year} {SITE.name}®. All rights reserved.</p>
       <p>{SITE.legalName} · <a href={`mailto:${SITE.email}`}>{SITE.email}</a> · <a href={SITE.phoneHref}>{SITE.phone}</a></p>
@@ -94,18 +111,46 @@ const year = new Date().getFullYear();
   .site-footer__logo img { height: 72px; width: auto; max-width: none; }
   .site-footer__legal { margin-top: 12px; font: 600 18px/1.25 var(--font-display); letter-spacing: -0.01em; }
   .site-footer__blurb { margin-top: 10px; max-width: 34ch; font-size: 14px; color: var(--ink-2); }
-  .site-footer__contact { display: grid; justify-items: start; margin-top: 18px; }
-  .site-footer__contact a {
-    display: inline-flex;
+  /* Contact strip: equal cells split by 1px rules (the list colour shows
+     through the gaps), like the home commitments row. */
+  .site-footer__contact {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1px;
+    margin-bottom: 48px;
+    border-block: 1px solid var(--rule-2);
+    background: var(--rule-2);
+    font-style: normal;
+  }
+  /* Mid widths: the three emails on one row, phone and WhatsApp on the next. */
+  @media (min-width: 560px) and (max-width: 1279px) {
+    .site-footer__contact { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+    .site-footer__route { grid-column: span 2; }
+    .site-footer__route:nth-child(n + 4) { grid-column: span 3; }
+  }
+  @media (min-width: 1280px) {
+    .site-footer__contact { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  }
+  .site-footer__route {
+    display: flex;
     align-items: center;
-    gap: 10px;
-    min-height: 44px;
+    gap: 14px;
+    min-height: 76px;
+    padding: 14px clamp(14px, 1.6vw, 24px);
+    background: #fff;
     font-size: 14px;
     font-weight: 600;
     text-decoration: none;
+    transition: background-color 0.2s, box-shadow 0.2s;
   }
-  .site-footer__contact a:hover { text-decoration: underline; text-underline-offset: 4px; }
-  .site-footer__contact :global(svg) { color: var(--primary); }
+  /* Narrow cells: the icon sits above the text to leave the address room. */
+  @media (min-width: 560px) and (max-width: 899px) {
+    .site-footer__route { flex-direction: column; align-items: flex-start; gap: 8px; padding-block: 16px; }
+  }
+  .site-footer__route:hover { background: var(--yellow-tint); box-shadow: inset 0 3px 0 var(--yellow); }
+  .site-footer__route :global(svg) { flex: none; color: var(--primary); }
+  .site-footer__route-text { display: grid; gap: 2px; line-height: 1.3; }
+  .site-footer__route-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
   .site-footer__cols {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));

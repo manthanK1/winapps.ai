@@ -44,8 +44,9 @@ const { labelledBy = "build-title" } = Astro.props;
   .build__box {
     border: 1px solid var(--field-border);
     background: #fff;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, box-shadow 0.25s;
   }
+  .build__box:hover { border-color: var(--yellow); box-shadow: var(--lift-shadow); }
   .build__box:has(.build__input:focus) { border-color: var(--primary); outline: 1px solid var(--primary); }
   .build__input {
     display: block;

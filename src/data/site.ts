@@ -15,7 +15,12 @@ export const SITE = {
   country: "India",
   areaServed: ["India", "United States", "United Kingdom", "Europe"],
   regionsText: "India, the US, the UK and Europe",
+  /** New projects and quotes: the default address everywhere. */
   email: "sales@winapps.co.in",
+  /** General enquiries, privacy and legal questions. */
+  emailInfo: "info@winapps.co.in",
+  /** Training courses: batches, timings and fees. */
+  emailTraining: "training@winapps.co.in",
   // Non-breaking spaces keep the number on one line.
   phone: "+91 70157 96830",
   /** schema.org / llms.txt form */
@@ -32,6 +37,13 @@ export const SITE = {
   address: null as null | { street: string; city: string; region: string; postalCode: string; country: string },
 } as const;
 
+/** Every published address, labelled for the contact page, footer and llms.txt. */
+export const EMAILS = [
+  { label: "New projects", address: SITE.email },
+  { label: "General enquiries", address: SITE.emailInfo },
+  { label: "Training", address: SITE.emailTraining },
+] as const;
+
 export const SOCIAL = [
   { label: "LinkedIn", href: SITE.linkedin },
   { label: "Instagram", href: SITE.instagram },
@@ -43,6 +55,7 @@ export const SOCIAL = [
 export const NAV = [
   { label: "What we do", href: "/services/", menu: "what-we-do" },
   { label: "Work", href: "/work/" },
+  { label: "AI", href: "/ai/" },
   { label: "How we work", href: "/how-we-work/" },
   { label: "Insights", href: "/blog/", menu: "insights" },
   { label: "About", href: "/about/" },
@@ -58,6 +71,7 @@ export const INSIGHTS = [
 export const MENU_LINKS = [
   { label: "Industries", href: "/industries/" },
   { label: "Work", href: "/work/" },
+  { label: "AI", href: "/ai/" },
   { label: "How we work", href: "/how-we-work/" },
   { label: "Blog", href: "/blog/" },
   { label: "News", href: "/news/" },
@@ -68,6 +82,7 @@ export const MENU_LINKS = [
 export const FOOTER = {
   explore: [
     { label: "Work", href: "/work/" },
+    { label: "AI", href: "/ai/" },
     { label: "Industries", href: "/industries/" },
     { label: "How we work", href: "/how-we-work/" },
     { label: "Blog", href: "/blog/" },

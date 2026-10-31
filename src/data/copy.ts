@@ -505,6 +505,149 @@ export const NEWS_PAGE = {
   card: { meta: "News", read: "Read more" },
 } as const;
 
+// AI development page (/ai/). Copy carried over from the pre-V1 page at
+// /services/artificial-intelligence-development-company. Its unsourced figures
+// (market size, accuracy rates, cost savings) and the unnamed-client case study
+// were left out under the "no invented statistics or clients" rule.
+// TODO(Winapps): supply sources before adding any figure back.
+export const AI_PAGE = {
+  meta: {
+    title: "AI development company",
+    description:
+      "Artificial intelligence development services: machine learning, NLP, computer vision, generative AI, virtual assistants and predictive analytics, built by Winapps since 2013.",
+  },
+  hero: {
+    eyebrow: "AI development",
+    title: "Artificial Intelligence",
+    accent: "Development Company",
+    lead: "Facing workflow inefficiencies, poor data handling, cyber threats or high customer loss? Partner with our AI development services to build intelligent solutions that automate your processes, enable smooth data operations and deliver robust security.",
+    primary: "Consult our AI experts",
+    secondary: "Our AI & ML practice",
+  },
+  services: {
+    eyebrow: "Services",
+    title: "Our artificial intelligence",
+    accent: "development services.",
+    intro: "As an AI development firm, we convert data into valuable intelligence, streamline operations and support smarter business choices.",
+    items: [
+      "Bespoke AI solutions",
+      "AI strategy consulting",
+      "Personalization engines",
+      "Conversational AI chatbots",
+      "Creative AI tools",
+      "AI system integration",
+      "Self-learning AI systems",
+      "Computer vision AI",
+      "Natural language processing",
+      "Predictive analytics AI",
+    ],
+    featured: {
+      title: "Bespoke AI solutions",
+      text: "We craft tailored AI systems designed for your unique business challenges and goals. From intelligent apps to workflow automation, we deliver scalable solutions that drive real results.",
+    },
+  },
+  why: {
+    eyebrow: "Why Winapps",
+    title: "An AI development partner",
+    accent: "for real business results.",
+    intro: "Our AI development services align your operations with emerging market demands and fuel data-backed decision-making.",
+    points: [
+      "Automate tasks with increased efficiency",
+      "Build brand loyalty with personalized experiences",
+      "Optimize how resources are used",
+      "Reduce cost with predictive maintenance",
+      "Make data-driven decisions",
+    ],
+    cta: "Start your AI project",
+  },
+  expertise: {
+    eyebrow: "Expertise",
+    title: "Our areas of expertise in",
+    accent: "AI development.",
+    intro: "Since 2013 our specialists have built software in the core AI technologies that automate and optimize business processes.",
+    items: [
+      { title: "Machine learning solutions", text: "We build systems that process large datasets to support data-informed strategies and predictive insights for businesses." },
+      { title: "Natural language processing", text: "Our NLP platforms analyze speech patterns and customer sentiment across large data volumes, powering rapid insights and personalized interactions." },
+      { title: "Computer vision technology", text: "We deliver complete vision systems featuring text recognition, object identification, visual search and intelligent image processing." },
+      { title: "Deep learning systems", text: "Using neural networks, we develop tools for image analysis, anomaly detection, conversational AI and voice processing applications." },
+      { title: "Smart assistant technologies", text: "We build virtual assistants for workforce support, technical helpdesk automation, intelligent calendars, process streamlining and smart device integration." },
+    ],
+    quote: { title: "Have an AI use case in mind?", label: "Request a quote" },
+  },
+  benefits: {
+    eyebrow: "Benefits",
+    title: "Benefits of AI in",
+    accent: "business operations.",
+    intro: "Deployed well, AI and machine learning improve operations, raise customer satisfaction and drive revenue growth.",
+    items: [
+      { title: "Smarter business decisions", text: "AI gives companies data-backed insights to predict outcomes and guide strategic choices. It processes complex variables to reveal opportunities and risks ahead of time." },
+      { title: "Competitive innovation edge", text: "AI drives innovations that position businesses as market pioneers. From launching new offerings to improving customer support, AI unlocks lasting advantages." },
+      { title: "Streamlined operations", text: "AI removes repetitive tasks and optimizes how resources are allocated. Routine activities like manual data processing are automated to free up valuable time." },
+      { title: "Tailored customer journeys", text: "By analyzing user preferences and behavior patterns, AI delivers personalized experiences that build stronger customer relationships and loyalty." },
+      { title: "Reduced operating costs", text: "Automation, fewer errors and intelligent forecasting cut expenses. Accurate demand prediction minimizes inventory waste and overstocking." },
+      { title: "Early threat detection", text: "Continuous AI monitoring identifies irregularities and potential issues before they escalate, safeguarding finances and sensitive data." },
+    ],
+  },
+  solutions: {
+    eyebrow: "Solutions",
+    title: "Intelligent AI solutions",
+    accent: "for business growth.",
+    intro: "Our AI-powered platforms optimize workflows, boost operational efficiency and deliver precise insights. We turn raw data into strategic advantages, enabling smarter decisions and scalable growth.",
+    items: [
+      { title: "Generative AI platform", text: "Create visuals, marketing campaigns, blog content and personalized messaging, adapted to your brand voice and guidelines. Built for content teams that need scalable, high-quality creative output." },
+      { title: "Predictive analytics engine", text: "Forecast market trends, customer behavior and operational needs. Analyze historical patterns to inform inventory, pricing and expansion strategies, with real-time dashboards for leadership." },
+      { title: "Facial recognition system", text: "Secure biometric authentication for employee check-ins, facility access and user verification, with anti-spoofing technology. Privacy-compliant and integrated with your existing security infrastructure." },
+      { title: "AI content automation", text: "Generate SEO-optimized sales copy, email sequences, social posts and newsletters automatically, keeping brand consistency across every channel while scaling content production." },
+      { title: "Sentiment analysis platform", text: "Monitor brand perception across social media, reviews and support tickets in real time. Extract actionable insights from customer interactions and track campaigns and competitive positioning automatically." },
+      { title: "Personalized recommendation engine", text: "Lift eCommerce conversion with intelligent product suggestions, and power OTT content discovery and enterprise knowledge recommendations that adapt to each user while serving business objectives." },
+      { title: "Advanced threat detection", text: "Identify fraud patterns and cybersecurity risks with real-time anomaly detection across transactions, networks and user behavior, and fewer false positives through machine-learning pattern recognition." },
+      { title: "Computer vision processing", text: "Automate quality control, defect detection and inventory management visually, with object recognition that holds up across lighting conditions, for warehouse and manufacturing operations." },
+      { title: "Intelligent virtual assistants", text: "Deploy 24/7 conversational AI for customer service, sales and internal support. Handle complex queries across multiple channels, lowering support costs and improving response times." },
+      { title: "Financial intelligence suite", text: "AI-powered tools for cash-flow prediction, investment analysis and risk assessment, processing large volumes of financial data for treasury, compliance and planning teams." },
+      { title: "Smart demand forecasting", text: "Predict inventory needs to avoid stockouts and overstock. Factor in seasonality, market trends and external events automatically, and optimize supply chains across product categories." },
+      { title: "Voice recognition AI", text: "Accurate speech-to-text across many languages and accents, powering call-center analytics, voice authentication and transcription, even in noisy environments or with technical terminology." },
+      { title: "HR talent analytics", text: "Identify top candidates, predict employee turnover and optimize hiring pipelines. Analyze performance patterns to inform training and promotion decisions and shorten time-to-hire." },
+      { title: "Supply chain optimization", text: "Real-time route optimization, supplier risk assessment and delivery predictions. Cut logistics costs while meeting service levels, and handle disruptions with AI-driven scenario planning." },
+      { title: "Marketing personalization", text: "Dynamic campaign optimization based on real-time customer behavior signals. Improve ROI through audience segmentation and content variation testing, and scale personalized marketing to millions of users." },
+    ],
+  },
+  stack: {
+    eyebrow: "Tech stack",
+    title: "Our tech stack for",
+    accent: "AI development.",
+    intro: "We select the right technologies to build customized AI software for each client. Our stack helps us deliver scalable, flexible digital products.",
+    libraries: ["OpenAI", "Neuroph", "Sonnet", "LangGraph"],
+  },
+  challenges: {
+    eyebrow: "Challenges",
+    title: "Business challenges of",
+    accent: "AI implementation.",
+    intro: "AI implementation is a complex process that needs expert guidance and planned mitigation to reduce project risk.",
+    items: [
+      { title: "Data quality", text: "AI depends heavily on data quality. Bias or inaccuracy in the data can produce incorrect outputs. Sourcing, collecting and refining data remains a major challenge in AI implementation." },
+      { title: "Infrastructure requirements", text: "AI needs robust computing infrastructure, including high-end processors, storage and scalable systems. Small and mid-sized businesses often struggle with these costs." },
+      { title: "Integration complexity", text: "Integrating AI into legacy enterprise systems is complex. It takes real expertise to integrate cleanly and get the expected results." },
+      { title: "Ethical challenges", text: "Poorly implemented AI can produce biased or discriminatory results. Ethical concerns arise from flawed training data or badly designed algorithms." },
+    ],
+  },
+  competencies: {
+    eyebrow: "Competencies",
+    title: "What we bring",
+    accent: "to your AI project.",
+    intro: "We serve as a reliable AI implementation partner for enterprises and international companies. Our mix of technical expertise and collaborative approach delivers AI solutions tailored to client success.",
+    // TODO(Winapps): confirm "10+ years" (carried over from the old page).
+    items: [
+      { title: "Deep AI technical mastery", text: "We implement leading AI technologies, including machine learning, neural networks and natural language processing, to build intelligent solutions customized to your needs." },
+      { title: "Custom-tailored solutions", text: "Our specialists identify operational inefficiencies and design targeted solutions that deliver measurable productivity gains." },
+      { title: "Seasoned AI professionals", text: "Our team of AI specialists brings 10+ years of expertise across domains: AI architects, developers, data scientists and dedicated quality assurance experts." },
+      { title: "Complimentary AI consultation", text: "Businesses exploring AI get a free expert consultation. We clarify technology options, resource requirements, timelines, essential features and implementation strategy." },
+      { title: "Comprehensive support", text: "After deployment we provide ongoing maintenance: bug fixes, feature enhancements, performance optimization and regular security updates." },
+      { title: "Team collaboration model", text: "Our collaborative approach keeps stakeholders engaged throughout development. Regular milestone updates and continuous feedback keep the work aligned with project goals." },
+    ],
+  },
+  cta: { title: "Ready to put AI to work?" },
+} as const;
+
 export const NOT_FOUND = {
   meta: { title: "Page not found", description: "The page you were looking for doesn't exist or has moved." },
   eyebrow: "Error 404",

@@ -48,7 +48,7 @@ const newsSlugs = [
 export const LEGACY_REDIRECTS: Record<string, string> = {
   "/case-studies": "/work/",
   "/contact-us": "/contact/",
-  "/services/artificial-intelligence-development-company": "/services/ai-ml/",
+  "/services/artificial-intelligence-development-company": "/ai/",
   "/services/ai-center-of-excellence": "/services/ai-ml/",
   ...Object.fromEntries(Object.entries(sameCaseStudy).map(([from, to]) => [`/case-studies/${from}`, `/work/${to}/`])),
   ...Object.fromEntries(otherCaseStudies.map((s) => [`/case-studies/${s}`, "/work/"])),

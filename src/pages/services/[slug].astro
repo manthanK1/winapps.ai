@@ -4,6 +4,7 @@
 // The opening answer (for AI assistants and featured snippets) uses only V1
 // words: the Markdown body, the outcome and V1's "how to start" line; the
 // summary is already the hero lead. FAQPage JSON-LD = the FAQ shown here.
+import TechName from "../../components/TechName.astro";
 import type { GetStaticPaths, InferGetStaticPropsType } from "astro";
 import { getEntry, render, type CollectionEntry } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
@@ -114,7 +115,7 @@ const num = (i: number) => String(i + 1).padStart(2, "0");
       <div class:list={["related__tech veil", { "related__tech--full": !related }]}>
         <h2 class="eyebrow label-h">{SERVICE_DETAIL.tech}</h2>
         <ul class="chips" aria-label={`Technology for ${d.title}`}>
-          {d.tech.map((t) => <li class="chip">{t}</li>)}
+          {d.tech.map((t) => <li class="chip"><TechName name={t} /></li>)}
         </ul>
         <p class="small text-2 related__note">{SERVICE_DETAIL.techNote}</p>
       </div>

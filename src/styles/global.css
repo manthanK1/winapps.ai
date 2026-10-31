@@ -101,6 +101,9 @@
   --teal-sheen: #62adb4;
   --orange: #ed9d39;
   --yellow: #f5c120;
+  /* Hover language: logo yellow, a pale tint of it, and a lifted shadow. */
+  --yellow-tint: #fff6d6;
+  --lift-shadow: 0 12px 24px -12px rgb(15 20 22 / 0.35);
   /* Dark overlay (MENU) */
   --overlay: #0e2e31;
   --overlay-rule: #2b5357;
@@ -307,23 +310,23 @@ address { font-style: normal; }
   text-decoration: none;
   white-space: nowrap;
   cursor: pointer;
-  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s, transform 0.25s var(--ease), box-shadow 0.25s;
 }
 .btn .arrow { flex: none; transition: transform 0.25s var(--ease); }
 .btn:hover .arrow { transform: translateX(4px); }
 .btn--primary { background: var(--primary); color: #fff; }
-.btn--primary:hover { background: var(--primary-hover); color: #fff; }
+.btn--primary:hover { background: var(--yellow); border-color: var(--yellow); color: var(--ink); }
 .btn--accent { background: var(--accent); color: var(--ink); }
-.btn--accent:hover { background: var(--accent-hover); color: var(--ink); }
+.btn--accent:hover { background: var(--yellow); border-color: var(--yellow); color: var(--ink); }
 .btn--dark { background: var(--ink); color: #fff; }
-.btn--dark:hover { background: #263136; color: #fff; }
+.btn--dark:hover { background: var(--yellow); border-color: var(--yellow); color: var(--ink); }
 /* White fill, not transparent: the label stays readable when the ribbon passes behind. */
 .btn--outline { background: #fff; border-color: var(--ink); color: var(--ink); }
-.btn--outline:hover { background: var(--ink); color: #fff; }
+.btn--outline:hover { background: var(--yellow); border-color: var(--yellow); color: var(--ink); }
 .btn--light { background: #fff; color: var(--ink); }
-.btn--light:hover { background: #e7f0f1; color: var(--ink); }
+.btn--light:hover { background: var(--yellow); color: var(--ink); }
 .btn--ghost-light { background: transparent; border-color: rgb(255 255 255 / 0.7); color: #fff; }
-.btn--ghost-light:hover { background: #fff; color: var(--ink); }
+.btn--ghost-light:hover { background: var(--yellow); border-color: var(--yellow); color: var(--ink); }
 .btn--sm { min-height: 44px; padding: 0 16px; gap: 10px; font-size: 14px; }
 .btn--block { width: 100%; }
 .btn .wa-icon { flex: none; }
@@ -492,9 +495,10 @@ legend { padding: 0; }
   font-weight: 600;
   cursor: pointer;
   user-select: none;
-  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s, transform 0.25s var(--ease), box-shadow 0.25s;
 }
-.choice:hover span { border-color: var(--ink); }
+.choice:hover span { border-color: var(--yellow); background: var(--yellow-tint); box-shadow: var(--lift-shadow); }
+.choice:hover input:checked + span { background: var(--primary); border-color: var(--primary); }
 .choice input:checked + span { background: var(--primary); border-color: var(--primary); color: #fff; }
 .choice input:focus-visible + span { outline: 2px solid var(--primary); outline-offset: 2px; }
 
@@ -517,7 +521,6 @@ legend { padding: 0; }
   letter-spacing: -0.01em;
 }
 .faq summary::-webkit-details-marker { display: none; }
-.faq summary:hover { color: var(--primary); }
 .faq .faq__icon { flex: none; transition: transform 0.25s var(--ease); }
 .faq details[open] .faq__icon { transform: rotate(45deg); }
 .faq .faq__answer { padding: 0 48px 24px 0; max-width: 72ch; color: var(--ink-2); }
@@ -552,3 +555,22 @@ legend { padding: 0; }
 .prose th { color: var(--ink); font-weight: 600; border-bottom-color: var(--ink); }
 .table-wrap { overflow-x: auto; }
 .table-wrap:focus-visible { outline-offset: 2px; }
+
+/* ---- Hover lift ------------------------------------------------------------
+   Buttons, cards, chips and tiles rise slightly on hover and pick up the logo
+   yellow. Movement only on real pointers and when motion is welcome. */
+.btn:hover { box-shadow: var(--lift-shadow); }
+.card { transition: transform 0.3s var(--ease), box-shadow 0.3s, border-color 0.2s; }
+.card:hover { border-top-color: var(--yellow); box-shadow: 0 20px 40px -24px rgb(15 20 22 / 0.4); }
+.chip { transition: background-color 0.2s, border-color 0.2s, transform 0.25s var(--ease); }
+.chip:hover { border-color: var(--yellow); background: var(--yellow-tint); color: var(--ink); }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .btn:hover { transform: translateY(-2px); }
+  .card:hover { transform: translateY(-6px); }
+  .chip:hover { transform: translateY(-2px); }
+}
+.faq summary { transition: background-color 0.2s, box-shadow 0.2s, padding 0.25s var(--ease); }
+.faq summary:hover { padding-inline: 12px; background: var(--yellow-tint); box-shadow: inset 3px 0 0 var(--yellow); color: var(--ink); }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .choice:hover span { transform: translateY(-2px); }
+}

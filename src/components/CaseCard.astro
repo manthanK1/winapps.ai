@@ -2,6 +2,7 @@
 // Case study card (home, /work/, service and industry pages). The title is
 // the card's one link and stretches over the whole card; the "Read the case
 // study" line is visual only, so screen readers hear the title once.
+import TechName from "./TechName.astro";
 import type { CollectionEntry } from "astro:content";
 import { Picture } from "astro:assets";
 import Icon from "./Icon.astro";
@@ -50,8 +51,8 @@ const sizes = featured
         <dd>{d.delivered}</dd>
       </div>
     </dl>
-    <ul class="chips" aria-label="Technology">
-      {d.stack.map((t) => <li class="chip">{t}</li>)}
+    <ul class="chips above" aria-label="Technology">
+      {d.stack.map((t) => <li class="chip"><TechName name={t} /></li>)}
     </ul>
     <p class="card__more" aria-hidden="true">{WORK_PAGE.card.read} <Icon name="arrow" size={16} class="arrow" /></p>
   </div>

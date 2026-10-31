@@ -50,6 +50,17 @@ const { intro } = HOME;
     gap: 12px;
     padding: clamp(18px, 2vw, 24px) clamp(14px, 2vw, 32px) clamp(20px, 2vw, 28px);
     background: #fff;
+    transition: transform 0.3s var(--ease), box-shadow 0.3s, background-color 0.2s;
+  }
+  /* Hover: the cell lifts out of the row with a logo-yellow top edge. */
+  .strip__item:hover {
+    position: relative;
+    z-index: 1;
+    background: var(--yellow-tint);
+    box-shadow: inset 0 3px 0 var(--yellow), 0 20px 40px -24px rgb(15 20 22 / 0.4);
+  }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .strip__item:hover { transform: translateY(-6px); }
   }
   .strip__label {
     font-family: var(--font-display);

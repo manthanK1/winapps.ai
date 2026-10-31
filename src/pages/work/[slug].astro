@@ -2,6 +2,7 @@
 // Case study (V1 work/[slug].astro): facts → photo → challenge and approach
 // (Markdown) → architecture → results → stack → next case study → CTA.
 // Clients are under NDA, so the photo is an illustrative sector image.
+import TechName from "../../components/TechName.astro";
 import type { GetStaticPaths, InferGetStaticPropsType } from "astro";
 import { render, type CollectionEntry } from "astro:content";
 import { Picture } from "astro:assets";
@@ -126,7 +127,7 @@ const hasNext = next !== undefined && next.id !== entry.id;
 
         <h2 class="cs__h veil">{WORK_DETAIL.stack}</h2>
         <ul class="chips" aria-label={`${WORK_DETAIL.stack}: ${d.title}`}>
-          {d.stack.map((t) => <li class="chip">{t}</li>)}
+          {d.stack.map((t) => <li class="chip"><TechName name={t} /></li>)}
         </ul>
 
         {hasNext && (

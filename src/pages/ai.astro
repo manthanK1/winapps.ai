@@ -1,0 +1,223 @@
+---
+// AI development (/ai/): the pre-V1 "Artificial Intelligence Development
+// Company" page in the V2 design. Services, why us, expertise, benefits,
+// solutions, tech stack, challenges and competencies; all copy in AI_PAGE.
+// The old URL redirects here (src/lib/legacy-redirects.ts).
+import TechName from "../components/TechName.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageHero from "../components/PageHero.astro";
+import SectionHead from "../components/SectionHead.astro";
+import TechLogos from "../components/TechLogos.astro";
+import Icon from "../components/Icon.astro";
+import CtaBand from "../components/CtaBand.astro";
+import { AI_PAGE, headingText } from "../data/copy";
+import { contactFor } from "../data/site";
+import { href } from "../lib/url";
+
+const { meta, hero, services, why, expertise, benefits, solutions, stack, challenges, competencies, cta } = AI_PAGE;
+const crumbs = [{ name: "AI", path: "/ai/" }];
+const contact = href(contactFor("ai-ml"));
+const num = (i: number) => String(i + 1).padStart(2, "0");
+---
+<BaseLayout title={meta.title} description={meta.description} breadcrumbs={crumbs} markdownPath="/ai.md">
+  <PageHero breadcrumbs={crumbs} eyebrow={hero.eyebrow} title={hero.title} accent={hero.accent} lead={hero.lead}>
+    <div class="hero-cta">
+      <a href={contact} class="btn btn--primary">{hero.primary} <Icon name="arrow" size={18} class="arrow" /></a>
+      <a href={href("/services/ai-ml/")} class="link-u">{hero.secondary} <Icon name="arrow" size={16} /></a>
+    </div>
+  </PageHero>
+
+  <section class="section section--flush-top" aria-labelledby="ai-services-title">
+    <div class="container">
+      <SectionHead id="ai-services-title" eyebrow={services.eyebrow} title={services.title} accent={services.accent} intro={services.intro} />
+      <div class="svc">
+        <ol class="list-reset svc__list veil">
+          {services.items.map((s, i) => (
+            <li class="svc__item"><span class="num" aria-hidden="true">{num(i)}</span>{s}</li>
+          ))}
+        </ol>
+        <div class="panel panel--dark on-dark svc__featured">
+          <h3 class="h3">{services.featured.title}</h3>
+          <p class="lead">{services.featured.text}</p>
+          <a href={contact} class="btn btn--accent">{hero.primary} <Icon name="arrow" size={18} class="arrow" /></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="ai-why-title">
+    <div class="container why">
+      <SectionHead id="ai-why-title" eyebrow={why.eyebrow} title={why.title} accent={why.accent} intro={why.intro} />
+      <div class="why__body veil">
+        <ul class="ticks">
+          {why.points.map((p) => <li><Icon name="check" size={16} />{p}</li>)}
+        </ul>
+        <a href={contact} class="btn btn--primary">{why.cta} <Icon name="arrow" size={18} class="arrow" /></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="ai-expertise-title">
+    <div class="container">
+      <SectionHead id="ai-expertise-title" eyebrow={expertise.eyebrow} title={expertise.title} accent={expertise.accent} intro={expertise.intro} />
+      <ul class="list-reset grid3">
+        {expertise.items.map((e, i) => (
+          <li class="card">
+            <span class="card__num" aria-hidden="true">{num(i)}</span>
+            <h3 class="card__title">{e.title}</h3>
+            <p class="card__text">{e.text}</p>
+          </li>
+        ))}
+        <li class="panel panel--dark on-dark quote">
+          <h3 class="h3">{expertise.quote.title}</h3>
+          <a href={contact} class="btn btn--accent">{expertise.quote.label} <Icon name="arrow" size={18} class="arrow" /></a>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="ai-benefits-title">
+    <div class="container">
+      <SectionHead id="ai-benefits-title" eyebrow={benefits.eyebrow} title={benefits.title} accent={benefits.accent} intro={benefits.intro} />
+      <ul class="list-reset grid3">
+        {benefits.items.map((b, i) => (
+          <li class="card">
+            <span class="card__num" aria-hidden="true">{num(i)}</span>
+            <h3 class="card__title">{b.title}</h3>
+            <p class="card__text">{b.text}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="ai-solutions-title">
+    <div class="container">
+      <SectionHead
+        id="ai-solutions-title"
+        eyebrow={solutions.eyebrow}
+        title={solutions.title}
+        accent={solutions.accent}
+        intro={solutions.intro}
+        link={{ label: expertise.quote.label, href: contactFor("ai-ml") }}
+      />
+      <ul class="list-reset grid3">
+        {solutions.items.map((s) => (
+          <li class="card">
+            <h3 class="card__title">{s.title}</h3>
+            <p class="card__text">{s.text}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="ai-stack-title">
+    <div class="container">
+      <SectionHead id="ai-stack-title" eyebrow={stack.eyebrow} title={stack.title} accent={stack.accent} intro={stack.intro} />
+      <div class="stack veil">
+        <TechLogos logos={["python", "tensorflow", "pytorch", "scikitlearn", "pandas", "aws", "azure", "google", "docker", "kubernetes"]} />
+        <ul class="chips" aria-label="AI libraries and frameworks">
+          {stack.libraries.map((l) => <li class="chip"><TechName name={l} /></li>)}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="ai-challenges-title">
+    <div class="container">
+      <SectionHead id="ai-challenges-title" eyebrow={challenges.eyebrow} title={challenges.title} accent={challenges.accent} intro={challenges.intro} />
+      <ol class="list-reset grid4">
+        {challenges.items.map((c, i) => (
+          <li class="card">
+            <span class="card__num" aria-hidden="true">{num(i)}</span>
+            <h3 class="card__title">{c.title}</h3>
+            <p class="card__text">{c.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="ai-competencies-title">
+    <div class="container">
+      <div class="panel panel--dark on-dark comp">
+        <div class="comp__head">
+          <p class="eyebrow">{competencies.eyebrow}</p>
+          <h2 id="ai-competencies-title" class="h2">{headingText(competencies)}</h2>
+          <p class="lead">{competencies.intro}</p>
+        </div>
+        <ul class="list-reset comp__grid">
+          {competencies.items.map((c) => (
+            <li class="comp__item">
+              <h3 class="h4">{c.title}</h3>
+              <p class="text-2">{c.text}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand title={cta.title} />
+</BaseLayout>
+
+<style>
+  .hero-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; margin-top: 36px; }
+
+  /* Services: numbered list beside the featured service. */
+  .svc { display: grid; gap: 24px; }
+  .svc__list { border-top: 1px solid var(--rule); }
+  .svc__item {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--rule);
+    font: 600 clamp(17px, 0.4vw + 15px, 20px)/1.3 var(--font-display);
+    transition: background-color 0.2s, box-shadow 0.2s, padding 0.25s var(--ease);
+  }
+  .svc__item:hover { padding-left: 14px; background: var(--yellow-tint); box-shadow: inset 3px 0 0 var(--yellow); }
+  .svc__featured { display: flex; flex-direction: column; align-items: flex-start; gap: 20px; }
+  .svc__featured .btn { margin-top: auto; }
+  @media (min-width: 1024px) {
+    .svc { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(40px, 5vw, 80px); align-items: start; }
+    .svc__featured { position: sticky; top: calc(var(--header-h) + 24px); }
+  }
+
+  /* Why: heading left, ticks and button right. */
+  .why { display: grid; gap: 8px; }
+  .why__body { display: flex; flex-direction: column; align-items: flex-start; gap: 32px; }
+  .why .ticks li { font-size: 18px; }
+  @media (min-width: 1024px) {
+    .why { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: clamp(40px, 6vw, 112px); align-items: start; }
+    .why__body { padding-top: 48px; }
+  }
+
+  .grid3, .grid4 { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  @media (min-width: 700px) {
+    .grid3, .grid4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1024px) {
+    .grid3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1280px) {
+    .grid4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+  .quote { display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start; gap: 24px; }
+
+  .stack { display: grid; gap: 20px; width: fit-content; max-width: 100%; }
+
+  /* Competencies on the dark panel. */
+  .comp { display: grid; gap: clamp(40px, 5vw, 64px); padding: clamp(32px, 5vw, 72px); }
+  .comp__head { display: grid; gap: 20px; max-width: 760px; }
+  .comp__head .eyebrow { margin-bottom: 2px; }
+  .comp__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px 40px; }
+  .comp__item { display: grid; align-content: start; gap: 10px; padding-top: 20px; border-top: 1px solid var(--overlay-rule); }
+  @media (min-width: 700px) {
+    .comp__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1100px) {
+    .comp__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+</style>

@@ -40,6 +40,12 @@ export interface RibbonConfig {
   wWidth: number;
   /** Fold radius at each W point, × Lh (design: 0.075). */
   foldRadius: number;
+  /** Height of the W's middle top, × Lh above the W centre (design: 0.16; the outer tops are 0.42 and 0.5). */
+  wMiddle: number;
+  /** How far below its end the left wave starts, × Lh, easing up into the W (design: 0, a level wave). */
+  waveRise: number;
+  /** Left-wave undulation, × the design's amplitude (design: 1). */
+  waveAmp: number;
   /** Max control points for the descent rows (design: 60; V2 pages are far taller). */
   descentCap: number;
   /**
@@ -65,6 +71,9 @@ export const RIBBON_CONFIG: RibbonConfig = {
   showWordmark: true,
   wWidth: 0.22,
   foldRadius: 0.075,
+  wMiddle: 0.4,
+  waveRise: 0.24,
+  waveAmp: 0.6,
   descentCap: 200,
   headShare: 0.25,
   maxPixels: 5_300_000,
@@ -89,6 +98,8 @@ export interface RibbonOptions {
   variant: RibbonVariant;
   /** The #ribbon-word element (home hero only). */
   wordmark?: HTMLElement | null;
+  /** The home hero backdrop (#hero-depth): receives the W's page position, size and formed state as CSS custom properties, so its glow and shadow follow the W. */
+  depth?: HTMLElement | null;
   config?: Partial<RibbonConfig>;
 }
 
@@ -146,7 +157,8 @@ const W_START = NL;
 const N_WP = 11; // W = start + 3 folds × 3 points + end
 const D_START = W_START + N_WP - 1; // first point after the W
 const HEAD_END = D_START + 2; // segments before the descent rows (wave, W, flick)
-// The W's five points in Lh units around (cxW, cyW).
+// The W's five points in Lh units around (cxW, cyW). The middle top's height
+// (0.16 here, the design's) is replaced by RIBBON_CONFIG.wMiddle.
 const WP_UNIT = [-0.78, 0.42, -0.3, -0.48, 0.02, 0.16, 0.28, -0.48, 0.8, 0.5];
 // "the W as one object (rotation helpers kept at 0)"
 const ROT_Z = 0;
@@ -284,6 +296,8 @@ class Ribbon {
   private readonly canvas: HTMLCanvasElement;
   private readonly variant: RibbonVariant;
   private readonly wordmark: HTMLElement | null;
+  private readonly depth: HTMLElement | null;
+  private depthKey = "";
   private readonly cfg: RibbonConfig;
   private readonly MAXN: number;
   private readonly M: number;
@@ -318,6 +332,9 @@ class Ribbon {
   private tw = 0;
   private cyW = 0;
   private waveA = 0;
+  private waveDrop = 0;
+  private waveX0 = 0;
+  private waveX1 = 1;
 
   // pools
   private readonly P: Float64Array; // control points, xyz
@@ -339,10 +356,11 @@ class Ribbon {
   private wX = NaN;
   private wY = NaN;
 
-  constructor(canvas: HTMLCanvasElement, variant: RibbonVariant, wordmark: HTMLElement | null, cfg: RibbonConfig) {
+  constructor(canvas: HTMLCanvasElement, variant: RibbonVariant, wordmark: HTMLElement | null, depth: HTMLElement | null, cfg: RibbonConfig) {
     this.canvas = canvas;
     this.variant = variant;
     this.wordmark = wordmark;
+    this.depth = depth;
     this.cfg = cfg;
     const mobile = !!(media("(max-width: 768px)")?.matches || media("(pointer: coarse)")?.matches);
     const seg = mobile ? cfg.segments.mobile : cfg.segments.desktop;
@@ -493,7 +511,10 @@ class Ribbon {
 
   private waveY(x: number): number {
     const A = this.waveA, tw = this.tw;
-    return this.cyW + 0.05 + A * Math.sin(x * 1.5 - tw * 1.4) + A * 0.35 * Math.sin(x * 3.1 + tw * 0.9);
+    // Rise: the wave starts waveDrop below and eases up into the W's left top.
+    const s = Math.min(1, Math.max(0, (x - this.waveX0) / (this.waveX1 - this.waveX0 || 1)));
+    const rise = -this.waveDrop * Math.pow(1 - s, 1.5);
+    return this.cyW + 0.05 + rise + A * Math.sin(x * 1.5 - tw * 1.4) + A * 0.35 * Math.sin(x * 3.1 + tw * 0.9);
   }
 
   private waveZ(x: number): number {
@@ -614,10 +635,14 @@ class Ribbon {
       WP[i] = cxW + WP_UNIT[i] * Lh;
       WP[i + 1] = cyW + WP_UNIT[i + 1] * Lh;
     }
+    WP[5] = cyW + cfg.wMiddle * Lh; // middle top of the W
     const botY = cyW - 0.48 * Lh;
     this.tw = tw;
     this.cyW = cyW;
-    this.waveA = 0.22 * Lh;
+    this.waveA = 0.22 * Lh * cfg.waveAmp;
+    this.waveDrop = cfg.waveRise * Lh;
+    this.waveX0 = xStart;
+    this.waveX1 = cxW + (WP_UNIT[0] - 0.4) * Lh; // where the wave hands over to the W
 
     // intro head (in control-point units), then scroll takes over
     let introQ = (D_START + 1.6) * easeIO(t / 6.5);
@@ -934,6 +959,26 @@ class Ribbon {
       const fpx = Math.max(14, (Lh / (2 * halfH)) * ch * 0.15);
       this.writeWord(wd, Math.round(fpx * 10) / 10, Math.round(a * 1000) / 1000, Math.round(sxp * 10) / 10, Math.round((syp + (1 - a) * 12) * 10) / 10);
     }
+
+    // W centre, size and formed state for the hero backdrop (glow, shadow), in page px
+    const dp = this.depth;
+    if (dp && !inner) {
+      const cx4 = PV[0] * cxW + PV[4] * this.cyW + PV[12], cy4 = PV[1] * cxW + PV[5] * this.cyW + PV[13], cw4 = PV[3] * cxW + PV[7] * this.cyW + PV[15];
+      const x = ((cx4 / cw4) * 0.5 + 0.5) * cw, y = (1 - ((cy4 / cw4) * 0.5 + 0.5)) * ch + scrolled;
+      const formed = reduced ? 1 : this.formedAt !== null ? sstep(0, 1, (t - this.formedAt) / 1.1) : 0;
+      this.writeDepth(dp, x, y, (Lh / (2 * halfH)) * ch, formed);
+    }
+  }
+
+  /** Only touches the DOM when a rounded value changed. */
+  private writeDepth(dp: HTMLElement, x: number, y: number, size: number, formed: number): void {
+    const key = `${x.toFixed(1)}|${y.toFixed(1)}|${size.toFixed(1)}|${formed.toFixed(2)}`;
+    if (key === this.depthKey) return;
+    this.depthKey = key;
+    dp.style.setProperty("--w-x", x.toFixed(1) + "px");
+    dp.style.setProperty("--w-y", y.toFixed(1) + "px");
+    dp.style.setProperty("--w-size", size.toFixed(1) + "px");
+    dp.style.setProperty("--w-formed", formed.toFixed(2));
   }
 
   /** Same strings as the design; only touches the DOM when a value changed. */
@@ -960,7 +1005,7 @@ class Ribbon {
  */
 export function mountRibbon(canvas: HTMLCanvasElement, opts: RibbonOptions): RibbonHandle | null {
   try {
-    const ribbon = new Ribbon(canvas, opts.variant, opts.wordmark ?? null, mergeConfig(opts.config));
+    const ribbon = new Ribbon(canvas, opts.variant, opts.wordmark ?? null, opts.depth ?? null, mergeConfig(opts.config));
     if (!ribbon.init()) return null;
     return { destroy: () => ribbon.destroy() };
   } catch {

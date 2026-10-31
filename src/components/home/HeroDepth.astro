@@ -1,0 +1,223 @@
+---
+// Depth behind the home hero, painted under the ribbon canvas (BaseLayout's
+// "backdrop" slot), so the ribbon always stays in front and uncovered. Back
+// to front: soft teal/gold light around the W, a faint grid fading out from
+// it, floating glossy spheres and rings in three depth tiers, a soft shadow
+// under the W, and a whisper of grain. The ribbon script writes the W's page
+// position, size and formed state here (--w-x, --w-y, --w-size, --w-formed),
+// so the light and shadow follow the W through its intro and parallax.
+// Decoration only: aria-hidden, no pointer events, transform/opacity motion.
+//
+// Tune everything in the --depth-* variables at the top of the <style>.
+---
+<div id="hero-depth" class="hero-depth" aria-hidden="true">
+  <div class="depth__shadow"></div>
+  <!-- Everything but the shadow fades out before the hero text. -->
+  <div class="depth__fade">
+    <div class="depth__glow"></div>
+    <div class="depth__grid"></div>
+
+    <div class="depth__tier depth__tier--far">
+      <span class="shape orb orb--gold" style="--x: 12%; --y: 24%; --s: 16px; --d: 0s;"></span>
+      <span class="shape ring ring--teal wide-only" style="--x: 39%; --y: 13%; --s: 28px; --d: -4s;"></span>
+    </div>
+    <div class="depth__tier depth__tier--mid">
+      <span class="shape orb orb--teal" style="--x: 29%; --y: 21%; --x-narrow: 64%; --y-narrow: 12%; --s: 40px; --d: -2s;"></span>
+      <span class="shape ring ring--gold" style="--x: 90%; --y: 19%; --s: 62px; --d: -7s;"></span>
+    </div>
+    <div class="depth__tier depth__tier--near">
+      <span class="shape orb orb--gold orb--near wide-only" style="--x: calc(100% - 46px); --y: 48%; --s: 104px; --d: -5s;"></span>
+      <span class="shape ring ring--teal ring--near wide-only" style="--x: -26px; --y: 13%; --s: 130px; --d: -9s;"></span>
+    </div>
+
+    <div class="depth__grain"></div>
+  </div>
+</div>
+
+<script>
+  // Mouse parallax: nearer tiers move more (but less than the ribbon, which is
+  // the nearest layer). Fine pointers only, never under reduced motion, and
+  // the loop runs only while the hero is on screen and the motion unsettled.
+  const el = document.getElementById("hero-depth");
+  const fine = matchMedia("(hover: hover) and (pointer: fine)");
+  const calm = matchMedia("(prefers-reduced-motion: reduce)");
+  if (el && fine.matches && !calm.matches) {
+    let tx = 0, ty = 0, x = 0, y = 0, raf = 0, visible = true;
+    const tick = () => {
+      // Same easing family as the ribbon's own pointer smoothing.
+      x += (tx - x) * 0.06;
+      y += (ty - y) * 0.06;
+      el.style.setProperty("--mx", x.toFixed(4));
+      el.style.setProperty("--my", y.toFixed(4));
+      raf = visible && (Math.abs(tx - x) > 0.001 || Math.abs(ty - y) > 0.001) ? requestAnimationFrame(tick) : 0;
+    };
+    addEventListener(
+      "pointermove",
+      (e) => {
+        tx = (e.clientX / innerWidth) * 2 - 1;
+        ty = (e.clientY / innerHeight) * 2 - 1;
+        if (!raf && visible) raf = requestAnimationFrame(tick);
+      },
+      { passive: true }
+    );
+    new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      el.classList.toggle("is-offscreen", !visible);
+    }).observe(el);
+  }
+</script>
+
+<style>
+  .hero-depth {
+    /* ---- Tuning ------------------------------------------------------------ */
+    --depth-teal: 39 137 144;          /* --teal */
+    --depth-gold: 245 193 32;          /* --yellow */
+    --depth-amber: 237 157 57;         /* --accent */
+    --depth-glow-teal: 0.16;           /* light behind the W */
+    --depth-glow-gold: 0.18;
+    --depth-glow-corner: 0.1;          /* faint warm light, top right */
+    --depth-grid: 1;                   /* 0 turns the grid off */
+    --depth-grid-alpha: 0.07;
+    --depth-grid-size: 56px;
+    --depth-shadow: 0.24;              /* shadow under the W */
+    --depth-far-opacity: 0.45;
+    --depth-mid-opacity: 0.75;
+    --depth-near-opacity: 0.95;
+    --depth-par-far: 6px;              /* parallax travel per tier, at the screen edge */
+    --depth-par-mid: 14px;
+    --depth-par-near: 26px;
+    --depth-float: 10px;               /* idle float height */
+    --depth-grain: 0.05;
+    --depth-fade-start: 38%;           /* backdrop fades out from here... */
+    --depth-fade-end: 66%;             /* ...to here, before the hero text */
+    /* Written by the ribbon each frame; these are the first-paint fallbacks. */
+    --w-x: 63vw;
+    --w-y: 38vh;
+    --w-size: 340px;
+    --w-formed: 0;
+    --mx: 0;
+    --my: 0;
+    /* ------------------------------------------------------------------------ */
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    width: 100%;
+    height: max(640px, 100vh);
+    height: max(640px, 100svh);
+    overflow: clip;
+    pointer-events: none;
+  }
+  /* Every layer fills the backdrop; zero specificity so a layer can place itself. */
+  :where(.hero-depth, .depth__fade) > * { position: absolute; inset: 0; }
+  /* Fade out before the hero text (its white veils would show on a tint) and the next section. */
+  .depth__fade { mask-image: linear-gradient(#000 var(--depth-fade-start), transparent var(--depth-fade-end)); }
+
+  /* 1 · Light: wide, soft gradients (cheaper than blur filters over WebGL). */
+  .depth__glow {
+    background:
+      radial-gradient(
+        calc(var(--w-size) * 1.7) calc(var(--w-size) * 1.05) at calc(var(--w-x) - var(--w-size) * 0.45) var(--w-y),
+        rgb(var(--depth-teal) / var(--depth-glow-teal)),
+        rgb(var(--depth-teal) / calc(var(--depth-glow-teal) * 0.4)) 45%,
+        rgb(var(--depth-teal) / 0) 100%
+      ),
+      radial-gradient(
+        calc(var(--w-size) * 1.4) calc(var(--w-size) * 0.95) at calc(var(--w-x) + var(--w-size) * 0.55) calc(var(--w-y) - var(--w-size) * 0.2),
+        rgb(var(--depth-gold) / var(--depth-glow-gold)),
+        rgb(var(--depth-gold) / calc(var(--depth-glow-gold) * 0.4)) 45%,
+        rgb(var(--depth-gold) / 0) 100%
+      ),
+      radial-gradient(
+        40vw 30vw at 100% 0%,
+        rgb(var(--depth-amber) / var(--depth-glow-corner)),
+        rgb(var(--depth-amber) / 0) 100%
+      );
+  }
+
+  /* 2 · Grid: fine lines that fade out from behind the W. */
+  .depth__grid {
+    opacity: var(--depth-grid);
+    background-image:
+      linear-gradient(rgb(var(--depth-teal) / var(--depth-grid-alpha)) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(var(--depth-teal) / var(--depth-grid-alpha)) 1px, transparent 1px);
+    background-size: var(--depth-grid-size) var(--depth-grid-size);
+    background-position: calc(var(--w-x) - var(--depth-grid-size) / 2) calc(var(--w-y) - var(--depth-grid-size) / 2);
+    mask-image: radial-gradient(calc(var(--w-size) * 1.9) calc(var(--w-size) * 1.1) at var(--w-x) var(--w-y), #000 10%, transparent 100%);
+  }
+
+  /* 5 · Shadow under the floating W; fades in once the W has formed. */
+  .depth__shadow {
+    inset: auto;
+    left: var(--w-x);
+    top: calc(var(--w-y) + var(--w-size) * 0.62);
+    width: calc(var(--w-size) * 1.35);
+    height: calc(var(--w-size) * 0.16);
+    background: radial-gradient(closest-side, rgb(14 46 49 / var(--depth-shadow)), rgb(14 46 49 / 0));
+    opacity: var(--w-formed);
+    transform: translate(-50%, -50%);
+  }
+
+  /* 4 · Floating shapes, in three tiers that move by depth. */
+  .depth__tier--far { opacity: var(--depth-far-opacity); transform: translate3d(calc(var(--mx) * -1 * var(--depth-par-far)), calc(var(--my) * -1 * var(--depth-par-far)), 0); }
+  .depth__tier--mid { opacity: var(--depth-mid-opacity); transform: translate3d(calc(var(--mx) * -1 * var(--depth-par-mid)), calc(var(--my) * -1 * var(--depth-par-mid)), 0); }
+  .depth__tier--near { opacity: var(--depth-near-opacity); transform: translate3d(calc(var(--mx) * -1 * var(--depth-par-near)), calc(var(--my) * -1 * var(--depth-par-near)), 0); }
+  .depth__tier--far .shape { filter: blur(1.2px); }
+
+  .shape {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    --x-narrow: var(--x);
+    --y-narrow: var(--y);
+    width: var(--s);
+    height: var(--s);
+  }
+  .shape::before { content: ""; position: absolute; inset: 0; border-radius: 50%; }
+
+  /* Glossy spheres: a highlight, the body colour, a darker rim. */
+  .orb--gold::before {
+    background: radial-gradient(circle at 32% 28%, rgb(255 255 255 / 0.95), #f8d567 16%, var(--yellow) 44%, #c98a0e 100%);
+  }
+  .orb--teal::before {
+    background: radial-gradient(circle at 32% 28%, rgb(255 255 255 / 0.9), var(--teal-sheen) 16%, var(--teal) 46%, var(--teal-shadow) 100%);
+  }
+  .orb--near::before { box-shadow: 0 28px 40px -18px rgb(14 46 49 / 0.35); }
+
+  /* Rings: a tilted band with a satin sheen, cut from a disc with a mask. */
+  .ring::before {
+    -webkit-mask: radial-gradient(closest-side, transparent 64%, #000 66%, #000 97%, transparent 100%);
+    mask: radial-gradient(closest-side, transparent 64%, #000 66%, #000 97%, transparent 100%);
+    transform: rotateX(62deg) rotateZ(-24deg);
+  }
+  .ring--teal::before { background: linear-gradient(135deg, var(--teal-sheen), var(--teal) 45%, var(--teal-shadow)); }
+  .ring--gold::before { background: linear-gradient(135deg, #fbe08a, var(--yellow) 45%, #c98a0e); }
+  .ring--near { filter: drop-shadow(0 22px 18px rgb(14 46 49 / 0.22)); }
+
+  /* 6 · Grain: a tiny noise tile, barely there. */
+  .depth__grain {
+    opacity: var(--depth-grain);
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Idle float, staggered; paused off screen. */
+  @media (prefers-reduced-motion: no-preference) {
+    .shape { animation: depth-float 12s ease-in-out infinite; animation-delay: var(--d); }
+    .depth__tier--far .shape { animation-duration: 16s; }
+    .depth__tier--near .shape { animation-duration: 10s; }
+    .is-offscreen .shape { animation-play-state: paused; }
+  }
+  @keyframes depth-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(calc(var(--depth-float) * -1)); }
+  }
+
+  /* Portrait / phones: three shapes, no grain, softer grid. */
+  @media (max-aspect-ratio: 1/1), (max-width: 768px) {
+    .wide-only, .depth__grain { display: none; }
+    .hero-depth { --depth-grid-alpha: 0.05; --depth-fade-start: 46%; --depth-fade-end: 64%; --w-x: 50vw; --w-y: 40svh; --w-size: 220px; }
+    .shape { left: var(--x-narrow); top: var(--y-narrow); }
+  }
+</style>

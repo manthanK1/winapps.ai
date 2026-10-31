@@ -33,6 +33,11 @@ const size = small ? 20 : 28;
     height: 48px;
     border: 1px solid var(--rule-2);
     background: #fff;
+    transition: border-color 0.2s, background-color 0.2s, transform 0.25s var(--ease), box-shadow 0.25s;
+  }
+  .logos__tile:hover { border-color: var(--yellow); background: var(--yellow-tint); box-shadow: var(--lift-shadow); }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .logos__tile:hover { transform: translateY(-3px); }
   }
   .logos__tile img { width: 28px; height: 28px; object-fit: contain; }
   .logos--sm .logos__tile { width: 36px; height: 36px; }
