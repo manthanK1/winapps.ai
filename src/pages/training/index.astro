@@ -1,38 +1,40 @@
 ---
-// All training courses, grouped by track (V1 /training/). V1's anchors stay:
-// each track section has id=<track-id>, each course card id=<course-id>. Each
-// course also has its own page (/training/<course-id>/). No fees or batch
-// dates are published, so every course enquires on WhatsApp.
+// All training (V1 /training/, extended): the long-form programmes first,
+// grouped by audience (#professionals, #students), then the main technical
+// domains (#domains), then V1's short courses by track. V1's anchors stay:
+// each track section has id=<track-id>, each course card id=<course-id>.
+// Every programme and course also has its own page (/training/<id>/). No fees
+// or batch dates are published, so everything enquires on WhatsApp.
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import PageHero from "../../components/PageHero.astro";
 import Icon from "../../components/Icon.astro";
+import SectionHead from "../../components/SectionHead.astro";
 import TechLogos from "../../components/TechLogos.astro";
-import { TRAINING_ADVICE, TRAINING_PAGE } from "../../data/copy";
+import { TRAINING_ADVICE, TRAINING_DOMAINS, TRAINING_PAGE } from "../../data/copy";
 import { SITE, whatsappFor } from "../../data/site";
-import { getCourses, getTracks } from "../../lib/content";
+import { AUDIENCES, getCourses, getProgrammes, getTracks, programmeAsCourse, trainingCounts } from "../../lib/content";
 import { courseList, coursePath } from "../../lib/schema";
 import { href } from "../../lib/url";
 
-const [tracks, courses] = await Promise.all([getTracks(), getCourses()]);
+const [tracks, courses, programmes, counts] = await Promise.all([getTracks(), getCourses(), getProgrammes(), trainingCounts()]);
 const crumbs = [{ name: "Training", path: "/training/" }];
-const { hero, cta } = TRAINING_PAGE;
+const { hero, cta, audiences } = TRAINING_PAGE;
 const num = (i: number) => String(i + 1).padStart(2, "0");
+const jump = [
+  ...AUDIENCES.map((a) => ({ label: audiences[a].label, href: `#${a}` })),
+  { label: TRAINING_PAGE.domains.title, href: "#domains" },
+  { label: TRAINING_PAGE.shortCourses.title, href: "#short-courses" },
+];
 ---
 <BaseLayout
   title={TRAINING_PAGE.meta.title}
-  description={TRAINING_PAGE.meta.description(courses.length)}
+  description={TRAINING_PAGE.meta.description(counts)}
   breadcrumbs={crumbs}
-  jsonLd={[courseList(Astro.site, courses)]}
+  jsonLd={[courseList(Astro.site, [...programmes.map(programmeAsCourse), ...courses])]}
   pageType="CollectionPage"
   markdownPath="/training.md"
 >
-  <PageHero
-    breadcrumbs={crumbs}
-    eyebrow={hero.eyebrow}
-    title={hero.title}
-    accent={hero.accent}
-    lead={hero.lead(courses.length, tracks.length)}
-  >
+  <PageHero breadcrumbs={crumbs} eyebrow={hero.eyebrow} title={hero.title} accent={hero.accent} lead={hero.lead(counts)}>
     <div class="actions">
       <a href={whatsappFor(TRAINING_PAGE.askMessage)} target="_blank" rel="noopener" class="btn btn--primary wa-btn">
         <Icon name="whatsapp" size={20} class="wa-icon" /> {TRAINING_ADVICE.cta}
@@ -40,21 +42,111 @@ const num = (i: number) => String(i + 1).padStart(2, "0");
       <a href={SITE.phoneHref} class="btn btn--outline"><Icon name="phone" size={18} /> {SITE.phone}</a>
       <a href={`mailto:${SITE.emailTraining}`} class="btn btn--outline"><Icon name="mail" size={18} /> {SITE.emailTraining}</a>
     </div>
-    <nav aria-label="Training tracks" class="track-nav">
+    <nav aria-label="Training sections" class="track-nav">
       <ul class="list-reset">
-        {tracks.map((t) => (
-          <li><a href={`#${t.id}`} class="btn btn--outline btn--sm">{t.data.name}</a></li>
-        ))}
+        {jump.map((j) => <li><a href={j.href} class="btn btn--outline btn--sm">{j.label}</a></li>)}
       </ul>
     </nav>
   </PageHero>
+
+  {AUDIENCES.map((a) => (
+    <section id={a} class="section section--tight track" aria-labelledby={`${a}-title`}>
+      <div class="container">
+        <div class="track__head veil">
+          <p class="eyebrow">{TRAINING_PAGE.programmesEyebrow}</p>
+          <h2 id={`${a}-title`} class="h2">{audiences[a].label}</h2>
+        </div>
+        <ul class="list-reset courses">
+          {programmes.filter((p) => p.data.audience === a).map((p, j) => (
+            <li>
+              <article id={p.id} class="card course" aria-labelledby={`${p.id}-title`}>
+                <div class="course__top">
+                  <span class="card__num" aria-hidden="true">{num(j)}</span>
+                  <TechLogos logos={p.data.logos} small />
+                </div>
+                <h3 id={`${p.id}-title`} class="card__title">
+                  <a class="course__name" href={href(coursePath(p.id))}>{p.data.name}</a>
+                </h3>
+                <ul class="chips" aria-label={`${p.data.name}: facts`}>
+                  <li class="chip chip--strong">{TRAINING_PAGE.months(p.data.months)}</li>
+                  {p.data.internship && <li class="chip chip--strong">{TRAINING_PAGE.internship}</li>}
+                </ul>
+                <p class="card__text">{p.data.summary}</p>
+                <div class="course__learn">
+                  <p id={`${p.id}-learn`} class="eyebrow">{TRAINING_PAGE.learn}</p>
+                  <ul class="ticks" aria-labelledby={`${p.id}-learn`}>
+                    {p.data.topics.map((topic) => (
+                      <li><Icon name="check" size={16} /><span>{topic}</span></li>
+                    ))}
+                  </ul>
+                </div>
+                <div class="course__actions">
+                  <a href={whatsappFor(TRAINING_PAGE.courseMessage(p.data.name))} target="_blank" rel="noopener" class="btn btn--primary wa-btn">
+                    <Icon name="whatsapp" size={20} class="wa-icon" />
+                    <span>{TRAINING_PAGE.enquire}<span class="sr-only">: {p.data.name}</span></span>
+                  </a>
+                  <a class="link-u" href={href(coursePath(p.id))}>
+                    {TRAINING_PAGE.details}<span class="sr-only">: {p.data.name}</span> <Icon name="arrow" size={16} />
+                  </a>
+                </div>
+              </article>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  ))}
+
+  <section id="domains" class="section section--tight" aria-labelledby="domains-title">
+    <div class="container">
+      <SectionHead id="domains-title" eyebrow={TRAINING_PAGE.domains.eyebrow} title={TRAINING_PAGE.domains.title} />
+      <ul class="list-reset domains">
+        {TRAINING_DOMAINS.map((d, i) => {
+          const mine = programmes.filter((p) => p.data.domain === d.id);
+          return (
+            <li class="card domain">
+              <div class="course__top">
+                <span class="card__num" aria-hidden="true">{num(i)}</span>
+                <TechLogos logos={d.logos} small />
+              </div>
+              <h3 class="card__title">{d.name}</h3>
+              <p class="card__text">{d.tools}</p>
+              {mine.length > 0 && (
+                <ul class="list-reset domain__list" aria-label={`${d.name} programmes`}>
+                  {mine.map((p) => (
+                    <li>
+                      <a class="domain__link" href={href(coursePath(p.id))}>
+                        <span>{p.data.name}</span>
+                        <span class="domain__months">{TRAINING_PAGE.months(p.data.months)}</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  </section>
+
+  <section id="short-courses" class="section section--tight short-head" aria-labelledby="short-title">
+    <div class="container">
+      <SectionHead
+        id="short-title"
+        eyebrow={TRAINING_PAGE.shortCourses.eyebrow}
+        title={TRAINING_PAGE.shortCourses.title}
+        intro={TRAINING_PAGE.shortCourses.intro(counts.courses, counts.tracks)}
+      />
+    </div>
+  </section>
 
   {tracks.map((t, i) => (
     <section id={t.id} class="section section--tight track" aria-labelledby={`${t.id}-title`}>
       <div class="container">
         <div class="track__head veil">
           <p class="eyebrow">{TRAINING_PAGE.trackEyebrow(i + 1)}</p>
-          <h2 id={`${t.id}-title`} class="h2">{t.data.name}</h2>
+          <h2 id={`${t.id}-title`} class="h3">{t.data.name}</h2>
           <p class="lead">{t.data.intro}</p>
         </div>
         <ul class="list-reset courses">
@@ -144,10 +236,39 @@ const num = (i: number) => String(i + 1).padStart(2, "0");
     text-decoration: none;
   }
   .course__name:hover { color: var(--primary); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 5px; }
+  .chip--strong { font-weight: 600; color: var(--primary); border-color: var(--primary); }
   .course__learn { padding-top: 18px; border-top: 1px solid var(--rule-2); }
   .course__learn .eyebrow { margin-bottom: 14px; }
   .course__learn .ticks { gap: 10px; font-size: 15px; }
   .course__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; margin-top: auto; padding-top: 8px; }
+
+  .domains { display: grid; gap: 24px; }
+  @media (min-width: 768px) {
+    .domains { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1280px) {
+    .domains { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+  .domain__list { display: grid; margin-top: auto; border-top: 1px solid var(--rule-2); }
+  .domain__link {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    min-height: 44px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.2s, box-shadow 0.2s, padding 0.25s var(--ease);
+  }
+  .domain__link:hover { padding-inline: 10px; background: var(--yellow-tint); box-shadow: inset 3px 0 0 var(--yellow); }
+  .domain__months { flex: none; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--primary); }
+
+  /* The short-courses heading leads straight into the first track. */
+  .short-head { padding-bottom: 0; }
+  .short-head :global(.section-head) { margin-bottom: 0; }
 
   .closing { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 32px 40px; }
   .closing__text { max-width: 820px; }

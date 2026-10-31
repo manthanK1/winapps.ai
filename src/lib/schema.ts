@@ -164,7 +164,17 @@ export function service(site: Site, s: { name: string; description: string; path
   };
 }
 
-type CourseInput = { id: string; name: string; summary: string; topics: readonly string[]; track: { name: string } };
+type CourseInput = {
+  id: string;
+  name: string;
+  summary: string;
+  topics: readonly string[];
+  /** The subject area (a course's track, a programme's domain). */
+  track: { name: string };
+  /** Programmes: length in months, and who it is for. */
+  months?: number;
+  audience?: "professionals" | "students";
+};
 
 export const coursePath = (id: string) => `/training/${id}/`;
 
@@ -185,6 +195,10 @@ export function course(site: Site, c: CourseInput) {
     teaches: [...c.topics],
     // The training track is a subject area, not an educationalLevel (beginner, advanced…).
     about: { "@type": "Thing", name: c.track.name },
+    ...(c.months ? { timeRequired: `P${c.months}M` } : {}),
+    ...(c.audience
+      ? { audience: { "@type": "EducationalAudience", educationalRole: c.audience === "students" ? "student" : "professional" } }
+      : {}),
     provider: { "@type": "Organization", "@id": orgId(site), name: SITE.legalName, sameAs: absolute("/", site) },
     hasCourseInstance: {
       "@type": "CourseInstance",

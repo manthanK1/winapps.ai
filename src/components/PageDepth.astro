@@ -1,0 +1,240 @@
+---
+// The site-wide depth backdrop, painted under the ribbon canvas (it sits
+// before the canvas in BaseLayout, so the ribbon always stays in front):
+//  · one brand-teal grid with "+" markers across the whole page (no seams
+//    between sections);
+//  · a light zone per section: 1–2 soft teal/gold glows with the grid tinted
+//    inside them, placed by a small script from each section's position and
+//    varied from section to section;
+//  · on the home page, the hero: an animated 3D grid on a canvas
+//    (src/scripts/hero-grid.ts, tuned in HERO_GRID_CONFIG) and a soft shadow
+//    under the W. The ribbon writes --w-x, --w-y, --w-size and --w-formed
+//    onto #hero-depth; the canvas and the shadow follow them. Without canvas
+//    support the hero keeps the static grid and a CSS glow.
+// Levels: the page default comes from `level`; a section overrides it with
+// data-depth="strong|medium|subtle", or opts out with data-depth="none"
+// (the home hero uses "hero"). Text keeps its contrast through the veils.
+// Shared tokens live in global.css (--depth-*); hero tokens are below.
+// Decoration only: aria-hidden, no pointer events.
+
+interface Props {
+  level?: "strong" | "medium" | "subtle";
+  /** The home hero layers (animated grid, shadow). */
+  hero?: boolean;
+}
+const { level = "medium", hero = false } = Astro.props;
+---
+<div class="depth" data-level={level} aria-hidden="true">
+  <div class="depth__grid"></div>
+  <div class="depth__zones" data-depth-zones></div>
+  {hero && (
+    <div id="hero-depth" class="depth__hero">
+      <div class="depth__hero-glow"></div>
+      <canvas class="depth__hero-canvas" data-hero-grid></canvas>
+      <div class="depth__shadow"></div>
+    </div>
+  )}
+</div>
+
+<script>
+  // Light zones: one per top-level section of <main>, rebuilt when the layout
+  // changes. Glow spots rotate through SPOTS so neighbours never repeat.
+  type Spot = { x: number; y: number; tone: "teal" | "gold"; r: number };
+  const SPOTS: Spot[][] = [
+    [{ x: 84, y: 30, tone: "teal", r: 1 }, { x: 10, y: 80, tone: "gold", r: 0.75 }],
+    [{ x: 14, y: 35, tone: "gold", r: 0.9 }, { x: 92, y: 85, tone: "teal", r: 0.6 }],
+    [{ x: 70, y: 75, tone: "teal", r: 1 }, { x: 26, y: 15, tone: "gold", r: 0.7 }],
+    [{ x: 90, y: 50, tone: "gold", r: 0.85 }, { x: 6, y: 20, tone: "teal", r: 0.7 }],
+    [{ x: 22, y: 65, tone: "teal", r: 1 }, { x: 78, y: 18, tone: "gold", r: 0.65 }],
+  ];
+  const PAD = 160; // zones overlap their neighbours by this much, faded: no seams
+
+  const zones = document.querySelector<HTMLElement>("[data-depth-zones]");
+  const depth = zones?.closest<HTMLElement>(".depth");
+  if (zones && depth) {
+    const light = matchMedia("(max-width: 768px), (pointer: coarse)");
+    const build = () => {
+      const pageLevel = depth.dataset.level || "medium";
+      const vw = innerWidth;
+      const glowW = Math.min(1000, vw * 0.85);
+      const frag = document.createDocumentFragment();
+      let n = 0;
+      for (const el of document.querySelectorAll<HTMLElement>("main > *")) {
+        const lvl = el.dataset.depth || pageLevel;
+        const rect = el.getBoundingClientRect();
+        if (lvl === "none" || lvl === "hero" || rect.height < 80) continue;
+        const top = Math.round(rect.top + scrollY - PAD);
+        const height = Math.round(rect.height + PAD * 2);
+        const spots = SPOTS[n++ % SPOTS.length].slice(0, light.matches ? 1 : 2);
+        const zone = document.createElement("div");
+        zone.className = "depth__zone";
+        zone.dataset.level = lvl;
+        zone.style.cssText = `top:${top}px;height:${height}px;--pad:${PAD}px`;
+        for (const tone of ["teal", "gold"] as const) {
+          const mine = spots.filter((s) => s.tone === tone);
+          if (!mine.length) continue;
+          for (const s of mine) {
+            const g = document.createElement("div");
+            g.className = `depth__glow depth__glow--${tone}`;
+            g.style.cssText = `left:${s.x}%;top:${s.y}%;--r:${s.r}`;
+            zone.append(g);
+          }
+          // The grid, tinted in this tone, shows only inside its glows.
+          const lit = document.createElement("div");
+          lit.className = `depth__lit depth__lit--${tone}`;
+          lit.style.backgroundPosition = `center ${-top}px`;
+          const mask = mine
+            .map((s) => `radial-gradient(${Math.round(glowW * 0.55 * s.r)}px ${Math.round(glowW * 0.4 * s.r)}px at ${s.x}% ${s.y}%, #000, rgb(0 0 0 / 0.4) 50%, transparent)`)
+            .join(",");
+          lit.style.maskImage = mask;
+          lit.style.setProperty("-webkit-mask-image", mask);
+          zone.append(lit);
+        }
+        frag.append(zone);
+      }
+      zones.replaceChildren(frag);
+    };
+    let queued = 0;
+    const schedule = () => {
+      if (!queued) queued = requestAnimationFrame(() => ((queued = 0), build()));
+    };
+    new ResizeObserver(schedule).observe(document.body);
+    light.addEventListener("change", schedule);
+    build();
+  }
+
+  // Home hero: the animated grid. Loaded only where the canvas exists; the
+  // static grid stays until it is running (and if it never runs).
+  const heroCanvas = document.querySelector<HTMLCanvasElement>("canvas[data-hero-grid]");
+  const heroDepth = document.getElementById("hero-depth");
+  if (heroCanvas && heroDepth && depth) {
+    import("../scripts/hero-grid")
+      .then(({ mountHeroGrid }) => {
+        if (mountHeroGrid(heroCanvas, heroDepth, document.querySelector<HTMLElement>('[data-depth="hero"]'))) depth.classList.add("has-hero-grid");
+        else heroCanvas.remove();
+      })
+      .catch(() => heroCanvas.remove());
+  }
+</script>
+
+<style>
+  .depth {
+    /* ---- Hero tuning (the animated grid: HERO_GRID_CONFIG in src/scripts/hero-grid.ts) */
+    --depth-hero-glow-teal: 0.2;       /* light behind the W (under the canvas grid) */
+    --depth-hero-glow-gold: 0.22;
+    --depth-shadow: 0.24;              /* shadow under the W */
+    /* Written by the ribbon each frame; first-paint fallbacks. */
+    --w-x: 63vw;
+    --w-y: 38vh;
+    --w-size: 340px;
+    --w-formed: 0;
+    /* ------------------------------------------------------------------------ */
+
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: clip;
+    pointer-events: none;
+  }
+  .depth[data-level="strong"] { --depth-grid-alpha: 0.14; }
+  .depth[data-level="subtle"] { --depth-grid-alpha: 0.07; }
+
+  /* Page grid: aligned to the top of the page, so every layer shares it. */
+  .depth__grid, :global(.depth__lit) {
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: var(--depth-grid-cell) var(--depth-grid-cell);
+    background-position: center top;
+  }
+  .depth__grid { position: absolute; inset: 0; --line: rgb(var(--depth-grid-rgb) / var(--depth-grid-alpha)); }
+  /* "+" markers on every second intersection: a two-cell tile with one marker,
+     offset so it lands on a line crossing of the centred grid. */
+  .depth__grid::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: calc(var(--depth-grid-alpha) * var(--depth-marker-strength));
+    background-image: var(--depth-marker);
+    background-size: calc(var(--depth-grid-cell) * 2) calc(var(--depth-grid-cell) * 2);
+    background-position: calc(50% - var(--depth-grid-cell) / 2) top;
+  }
+  /* Home, once the animated grid runs: the static grid steps out of the hero
+     and fades back in below it. */
+  .depth.has-hero-grid .depth__grid {
+    --hero-h: max(640px, 100svh);
+    mask-image: linear-gradient(transparent, transparent calc(var(--hero-h) * 0.7), #000 calc(var(--hero-h) + 200px));
+  }
+
+  /* Light zones (built by the script), cross-faded at their padded edges. */
+  .depth__zones { position: absolute; inset: 0; }
+  :global(.depth__zone) {
+    --k: 0.75;
+    position: absolute;
+    left: 0;
+    width: 100%;
+    overflow: clip;
+    contain: layout paint;
+    mask-image: linear-gradient(transparent, #000 var(--pad), #000 calc(100% - var(--pad)), transparent);
+  }
+  :global(.depth__zone[data-level="strong"]) { --k: 1; }
+  :global(.depth__zone[data-level="subtle"]) { --k: 0.45; }
+  :global(.depth__glow) {
+    position: absolute;
+    width: calc(var(--depth-glow-size) * var(--r));
+    aspect-ratio: 4 / 3;
+    transform: translate(-50%, -50%);
+  }
+  :global(.depth__glow--teal) { background: radial-gradient(closest-side, rgb(var(--depth-grid-rgb) / calc(var(--depth-glow-teal) * var(--k))), rgb(var(--depth-grid-rgb) / calc(var(--depth-glow-teal) * var(--k) * 0.35)) 50%, transparent); }
+  :global(.depth__glow--gold) { background: radial-gradient(closest-side, rgb(var(--depth-gold-rgb) / calc(var(--depth-glow-gold) * var(--k))), rgb(var(--depth-gold-rgb) / calc(var(--depth-glow-gold) * var(--k) * 0.35)) 50%, transparent); }
+  :global(.depth__lit) { position: absolute; inset: 0; }
+  :global(.depth__lit--teal) { --line: rgb(var(--depth-grid-rgb) / calc(var(--depth-lit-alpha) * var(--k))); }
+  :global(.depth__lit--gold) { --line: rgb(204 150 18 / calc(var(--depth-lit-alpha) * var(--k))); }
+
+  /* ---- Home hero ----------------------------------------------------------- */
+  .depth__hero {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: max(640px, 100vh);
+    height: max(640px, 100svh);
+    overflow: clip;
+  }
+  .depth__hero > * { position: absolute; }
+  .depth__hero-canvas { inset: 0; width: 100%; height: 100%; display: block; }
+
+  /* Light around the W, behind the grid: the ribbon is the light source. */
+  .depth__hero-glow {
+    inset: 0;
+    background:
+      radial-gradient(
+        calc(var(--w-size) * 1.7) calc(var(--w-size) * 1.1) at calc(var(--w-x) - var(--w-size) * 0.45) var(--w-y),
+        rgb(var(--depth-grid-rgb) / var(--depth-hero-glow-teal)),
+        rgb(var(--depth-grid-rgb) / calc(var(--depth-hero-glow-teal) * 0.35)) 50%,
+        transparent
+      ),
+      radial-gradient(
+        calc(var(--w-size) * 1.4) calc(var(--w-size) * 1) at calc(var(--w-x) + var(--w-size) * 0.55) calc(var(--w-y) - var(--w-size) * 0.2),
+        rgb(var(--depth-gold-rgb) / var(--depth-hero-glow-gold)),
+        rgb(var(--depth-gold-rgb) / calc(var(--depth-hero-glow-gold) * 0.35)) 50%,
+        transparent
+      );
+  }
+
+  /* Shadow under the floating W (above the canvas); fades in once the W has formed. */
+  .depth__shadow {
+    left: var(--w-x);
+    top: calc(var(--w-y) + var(--w-size) * 0.62);
+    width: calc(var(--w-size) * 1.35);
+    height: calc(var(--w-size) * 0.16);
+    background: radial-gradient(closest-side, rgb(14 46 49 / var(--depth-shadow)), rgb(14 46 49 / 0));
+    opacity: var(--w-formed);
+    transform: translate(-50%, -50%);
+  }
+
+  /* Phones and tablets in portrait: the W sits centred. */
+  @media (max-aspect-ratio: 1/1), (max-width: 768px) {
+    .depth { --w-x: 50vw; --w-y: 40svh; --w-size: 220px; }
+  }
+</style>

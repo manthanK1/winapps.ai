@@ -8,6 +8,7 @@ import "../styles/global.css";
 import headingFont from "../assets/fonts/inter-tight-600.woff2?url";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import PageDepth from "../components/PageDepth.astro";
 import { SITE } from "../data/site";
 import { metaDescription, pageTitle } from "../lib/seo";
 import { absolute, href } from "../lib/url";
@@ -33,6 +34,8 @@ interface Props {
   noindex?: boolean;
   /** "home": the full W intro. "inner": the calm curtain. "none": no canvas. */
   ribbon?: "home" | "inner" | "none";
+  /** Background depth level for the page's sections (grid and light); sections may override with data-depth. */
+  depth?: "strong" | "medium" | "subtle";
 }
 
 const {
@@ -48,6 +51,7 @@ const {
   markdownPath,
   noindex = false,
   ribbon = "inner",
+  depth = "medium",
 } = Astro.props;
 
 const fullTitle = pageTitle(title);
@@ -115,8 +119,8 @@ const plausibleDomain = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN;
   </head>
   <body>
     <a href="#main" class="skip-link">Skip to content</a>
-    {/* Decoration painted under the ribbon canvas (home hero depth). */}
-    <slot name="backdrop" />
+    {/* Depth backdrop: painted under the ribbon canvas, so the ribbon stays in front. */}
+    <PageDepth level={depth} hero={ribbon === "home"} />
     {ribbon !== "none" && <canvas class="ribbon-canvas" data-ribbon={ribbon} aria-hidden="true"></canvas>}
     <Header />
     <main id="main" class="site-main" tabindex="-1">

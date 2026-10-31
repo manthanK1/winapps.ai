@@ -7,6 +7,7 @@
 // design sets both in ink; keep them as one sentence when quoting.
 
 import { SITE } from "./site";
+import type { TechLogo } from "../lib/tech-logos";
 
 export type Heading = { eyebrow?: string; title: string; accent?: string; intro?: string };
 export type PageMeta = { title: string; description: string };
@@ -58,9 +59,9 @@ export const HOME = {
     eyebrow: "Training",
     title: "Learn the skills",
     accent: "teams hire for.",
-    intro: (courseCount: number) =>
-      `${courseCount} hands-on courses, from Python and AI to cloud, mobile apps, testing and digital marketing.`,
-    allLink: "See all courses",
+    intro: (programmeCount: number, courseCount: number) =>
+      `${programmeCount} programmes for working professionals and college students, and ${courseCount} short courses, in software development, data analytics, AI and data science.`,
+    allLink: "See all training",
   },
   work: {
     eyebrow: "Selected work",
@@ -111,6 +112,17 @@ export const TRAINING_ADVICE = {
   cta: "Ask on WhatsApp",
   message: "Hi, I'd like help choosing a training course.",
 } as const;
+
+/**
+ * The four main technical domains, in Winapps' words. Programmes point to one
+ * with `domain` in src/content/programmes.yaml.
+ */
+export const TRAINING_DOMAINS = [
+  { id: "software", name: "Software Development", tools: "Full stack, programming, software engineering, GenAI", logos: ["javascript", "react", "nodejs", "python"] },
+  { id: "data-analytics", name: "Data Analytics", tools: "SQL, Excel, Power BI, Python, data visualization", logos: ["mysql", "excel", "powerbi", "python"] },
+  { id: "ai", name: "Artificial Intelligence", tools: "Generative AI, multi-agent systems, AI tools", logos: ["openai", "langchain", "python"] },
+  { id: "data-science", name: "Data Science", tools: "Python, machine learning, data science", logos: ["python", "scikitlearn", "pandas", "jupyter"] },
+] as const satisfies readonly { id: string; name: string; tools: string; logos: readonly TechLogo[] }[];
 
 /** Discovery → Build → Launch & scale (V1 ProcessTimeline). */
 export const PROCESS_STEPS = [
@@ -301,19 +313,36 @@ export const INDUSTRIES_PAGE = {
   cta: { title: "Working in a regulated or high-stakes domain?" },
 } as const;
 
+/** Counts behind the training headlines (computed from the content). */
+export type TrainingCounts = { programmes: number; minMonths: number; maxMonths: number; courses: number; tracks: number };
+
 export const TRAINING_PAGE = {
   meta: {
     title: "Training",
-    description: (courseCount: number) =>
-      `Hands-on training in ${courseCount} courses: AI & ML, Python, MERN, Java, .NET, PHP, Flutter, iOS & Android, Unity, cloud, AWS DevOps, QA testing and digital marketing.`,
+    description: (n: TrainingCounts) =>
+      `Training programmes for working professionals and college students in software development, data analytics, AI and data science, plus ${n.courses} short courses.`,
   },
   hero: {
     eyebrow: "Training",
     title: "Practical training",
     accent: "in the skills teams hire for.",
-    lead: (courseCount: number, trackCount: number) =>
-      `${courseCount} courses in ${trackCount} tracks, from Python and AI to cloud, mobile apps, testing and digital marketing. Pick a course and message us on WhatsApp for the next batch, timings and fees.`,
+    lead: (n: TrainingCounts) =>
+      `${n.programmes} programmes of ${n.minMonths} to ${n.maxMonths} months for working professionals and college students, and ${n.courses} short courses in ${n.tracks} tracks. Pick one and message us on WhatsApp for the next batch, timings and fees.`,
   },
+  audiences: {
+    professionals: { label: "For working professionals", short: "Professionals" },
+    students: { label: "For college students", short: "Students" },
+  },
+  programmesEyebrow: "Programmes",
+  months: (n: number) => `${n} months`,
+  internship: "Includes internship",
+  domains: { eyebrow: "Domains", title: "Main technical domains" },
+  shortCourses: {
+    eyebrow: "Short courses",
+    title: "Short courses",
+    intro: (courseCount: number, trackCount: number) => `${courseCount} focused courses in ${trackCount} tracks, one stack at a time.`,
+  },
+  details: "Programme details",
   askMessage: "Hi, I'd like to know about your training courses.",
   trackEyebrow: (n: number) => `Track 0${n}`,
   learn: "What you'll learn",

@@ -37,7 +37,7 @@ const schema = article(Astro.site, {
   imageUrl: absolute("/brand/og.png", Astro.site),
 });
 ---
-<BaseLayout
+<BaseLayout depth="subtle"
   title={d.title}
   description={d.description}
   breadcrumbs={crumbs}

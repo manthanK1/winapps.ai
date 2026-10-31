@@ -16,7 +16,7 @@ const [featured, ...rest] = await getBlog();
 const news = (await getNews()).slice(0, 3);
 const crumbs = [{ name: "Blog", path: "/blog/" }];
 ---
-<BaseLayout
+<BaseLayout depth="subtle"
   title={meta.title}
   description={meta.description}
   breadcrumbs={crumbs}

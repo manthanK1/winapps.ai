@@ -10,8 +10,10 @@
 // (text) · MENU; ≤400px MENU is icon-only. Every control stays ≥ 44×44.
 import Icon from "./Icon.astro";
 import { INSIGHTS, MENU_LINKS, NAV, SITE } from "../data/site";
-import { getCourses, getIndustries, getServices, getTracks } from "../lib/content";
+import { TRAINING_PAGE } from "../data/copy";
+import { AUDIENCES, getCourses, getIndustries, getProgrammes, getServices, getTracks } from "../lib/content";
 import { coursePath } from "../lib/schema";
+import { techLogo, type TechLogo } from "../lib/tech-logos";
 import { href, isActive } from "../lib/url";
 
 const current = Astro.url.pathname;
@@ -19,6 +21,9 @@ const services = await getServices();
 const industries = await getIndustries();
 const tracks = await getTracks();
 const courses = await getCourses();
+const programmes = await getProgrammes();
+/** The official logos beside each training item (decorative: the name is the label). */
+const logos = (keys: readonly TechLogo[]) => keys.slice(0, 4).map((k) => techLogo(k));
 const firstSentence = (s: string) => s.split(". ")[0].replace(/\.$/, "") + ".";
 
 const menuActive = (menu: string) =>
@@ -84,18 +89,45 @@ const menuActive = (menu: string) =>
                 {item.menu === "training" && (
                   <div>
                     <div class="mega__grid mega__grid--training">
-                      {tracks.map((t) => (
+                      {AUDIENCES.map((a) => (
                         <div>
-                          <p class="eyebrow"><a class="mega__track" href={href(`/training/#${t.id}`)}>{t.data.name}</a></p>
+                          <p class="eyebrow"><a class="mega__track" href={href(`/training/#${a}`)}>{TRAINING_PAGE.audiences[a].label}</a></p>
                           <ul class="list-reset mega__list mega__list--plain">
-                            {courses.filter((c) => c.track.id === t.id).map((c) => (
+                            {programmes.filter((p) => p.data.audience === a).map((p) => (
                               <li>
-                                <a class="mega__item mega__item--plain" href={href(coursePath(c.id))} aria-current={isActive(current, coursePath(c.id)) ? "page" : undefined}>{c.name}</a>
+                                <a class="mega__item mega__item--logo" href={href(coursePath(p.id))} aria-current={isActive(current, coursePath(p.id)) ? "page" : undefined}>
+                                  <span class="mega__name">{p.data.name}<span class="mega__months">{TRAINING_PAGE.months(p.data.months)}</span></span>
+                                  <span class="mega__logos" aria-hidden="true">
+                                    {logos(p.data.logos).map((l) => <img src={l.src} alt="" width="16" height="16" loading="lazy" decoding="async" />)}
+                                  </span>
+                                </a>
                               </li>
                             ))}
                           </ul>
                         </div>
                       ))}
+                      <div>
+                        <p class="eyebrow"><a class="mega__track" href={href("/training/#short-courses")}>{TRAINING_PAGE.shortCourses.title}</a></p>
+                        <div class="mega__tracks">
+                          {tracks.map((t) => (
+                            <div>
+                              <p class="mega__track-name"><a href={href(`/training/#${t.id}`)}>{t.data.name}</a></p>
+                              <ul class="list-reset mega__list mega__list--plain">
+                                {courses.filter((c) => c.track.id === t.id).map((c) => (
+                                  <li>
+                                    <a class="mega__item mega__item--logo mega__item--compact" href={href(coursePath(c.id))} aria-current={isActive(current, coursePath(c.id)) ? "page" : undefined}>
+                                      <span class="mega__name">{c.name}</span>
+                                      <span class="mega__logos" aria-hidden="true">
+                                        {logos(c.logos).map((l) => <img src={l.src} alt="" width="16" height="16" loading="lazy" decoding="async" />)}
+                                      </span>
+                                    </a>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                     <a class="link-u" href={href("/training/")}>All training <Icon name="arrow" size={16} /></a>
                   </div>
@@ -142,7 +174,7 @@ const menuActive = (menu: string) =>
 </header>
 
 <!-- MENU overlay: V1's expanded drawer. A modal <dialog> traps focus and closes on Escape. -->
-<dialog id="site-menu" class="menu-overlay on-dark" aria-label="Menu">
+<dialog id="site-menu" class="menu-overlay on-dark depth-dark" aria-label="Menu">
   <div class="menu-overlay__bar">
     <a href={href("/")} class="menu-overlay__mark" aria-label={`${SITE.name} home`}><span aria-hidden="true"></span>WINAPPS</a>
     <button type="button" class="menu-overlay__close" data-menu-close>
@@ -170,8 +202,9 @@ const menuActive = (menu: string) =>
       <details class="menu-group" open data-menu-group>
         <summary>Training <Icon name="plus" size={14} class="menu-group__icon" /></summary>
         <ul class="list-reset">
-          {tracks.map((t) => <li><a href={href(`/training/#${t.id}`)}>{t.data.name}</a></li>)}
-          <li><a href={href("/training/")} class="menu-group__all" aria-current={current === href("/training/") ? "page" : undefined}>All courses</a></li>
+          {AUDIENCES.map((a) => <li><a href={href(`/training/#${a}`)}>{TRAINING_PAGE.audiences[a].label}</a></li>)}
+          <li><a href={href("/training/#short-courses")}>{TRAINING_PAGE.shortCourses.title}</a></li>
+          <li><a href={href("/training/")} class="menu-group__all" aria-current={current === href("/training/") ? "page" : undefined}>All training</a></li>
         </ul>
       </details>
       <div class="menu-overlay__contact">
@@ -299,7 +332,19 @@ const menuActive = (menu: string) =>
   .mega__grid { display: grid; gap: 40px; margin-bottom: 20px; }
   .mega__grid--wwd { grid-template-columns: 1.6fr 1fr; }
   .mega__grid--wwd > div:first-child .mega__list { grid-template-columns: 1fr 1fr; }
-  .mega__grid--training { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 28px; }
+  .mega__grid--training { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 2.3fr); gap: 36px; }
+  /* Training items: the name (and a programme's length) beside its official logos. */
+  .mega__item.mega__item--logo { flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 0; font-size: 14px; font-weight: 500; text-align: left; }
+  .mega__item.mega__item--compact { min-height: 36px; padding: 6px 0; font-size: 13.5px; }
+  .mega__name { display: grid; gap: 2px; line-height: 1.3; }
+  .mega__months { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--primary); }
+  .mega__logos { display: flex; flex: none; gap: 5px; }
+  .mega__logos img { display: block; width: 16px; height: 16px; object-fit: contain; }
+  .mega__item--logo:hover .mega__name { color: var(--ink); }
+  .mega__tracks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px 24px; }
+  .mega__track-name { margin: 6px 0 2px; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+  .mega__track-name a { color: var(--muted); text-decoration: none; }
+  .mega__track-name a:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
   .mega__grid--insights { grid-template-columns: repeat(2, minmax(0, 360px)); margin-bottom: 0; }
   .mega .eyebrow { margin-bottom: 14px; }
   .mega__track { color: inherit; text-decoration: none; }
@@ -409,7 +454,7 @@ const menuActive = (menu: string) =>
     margin: 0;
     padding: 0 var(--gutter) 40px;
     border: 0;
-    background: var(--overlay);
+    background-color: var(--overlay);
     color: #fff;
     overflow: auto;
   }

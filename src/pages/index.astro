@@ -5,11 +5,10 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import Icon from "../components/Icon.astro";
 import SectionHead from "../components/SectionHead.astro";
 import Hero from "../components/home/Hero.astro";
-import HeroDepth from "../components/home/HeroDepth.astro";
 import TrustStrip from "../components/home/TrustStrip.astro";
 import Practices from "../components/home/Practices.astro";
 import BuildPrompt from "../components/BuildPrompt.astro";
-import TrainingTracks from "../components/TrainingTracks.astro";
+import TrainingDomains from "../components/TrainingDomains.astro";
 import CaseCard from "../components/CaseCard.astro";
 import ProcessSteps from "../components/ProcessSteps.astro";
 import TrustSection from "../components/TrustSection.astro";
@@ -20,7 +19,7 @@ import FaqList from "../components/FaqList.astro";
 import CtaBand from "../components/CtaBand.astro";
 import { HOME } from "../data/copy";
 import { SITE } from "../data/site";
-import { getBlog, getCourses, getFaq, getNews, getWork } from "../lib/content";
+import { getBlog, getFaq, getNews, getWork, trainingCounts } from "../lib/content";
 import { faqPage } from "../lib/schema";
 import { href } from "../lib/url";
 
@@ -28,7 +27,7 @@ const work = await getWork();
 const faq = await getFaq();
 const blog = (await getBlog()).slice(0, 3);
 const news = (await getNews()).slice(0, 2);
-const courseCount = (await getCourses()).length;
+const counts = await trainingCounts();
 // V1's layout: the first and fourth case studies are the wide ones.
 const isWide = (i: number) => i === 0 || i === 3;
 ---
@@ -39,7 +38,6 @@ const isWide = (i: number) => i === 0 || i === 3;
   jsonLd={[faqPage(faq)]}
   markdownPath="/index.md"
 >
-  <HeroDepth slot="backdrop" />
   <Hero />
 
   <TrustStrip />
@@ -61,9 +59,9 @@ const isWide = (i: number) => i === 0 || i === 3;
         eyebrow={HOME.training.eyebrow}
         title={HOME.training.title}
         accent={HOME.training.accent}
-        intro={HOME.training.intro(courseCount)}
+        intro={HOME.training.intro(counts.programmes, counts.courses)}
       />
-      <TrainingTracks />
+      <TrainingDomains />
       <div class="more">
         <a href={href("/training/")} class="btn btn--dark">{HOME.training.allLink} <Icon name="arrow" size={18} class="arrow" /></a>
       </div>

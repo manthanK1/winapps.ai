@@ -14,10 +14,11 @@ import {
   INDUSTRIES_PAGE,
   NEWS_PAGE,
   SERVICES_PAGE,
+  TRAINING_DOMAINS,
   TRAINING_PAGE,
   WORK_PAGE,
 } from "../data/copy";
-import { getBlog, getCourses, getIndustries, getNews, getServices, getTracks, getWork } from "../lib/content";
+import { getBlog, getCourses, getIndustries, getNews, getProgrammes, getServices, getTracks, getWork, trainingCounts } from "../lib/content";
 import { coursePath } from "../lib/schema";
 import { href } from "../lib/url";
 
@@ -28,12 +29,14 @@ const words = (...parts: (string | readonly string[] | undefined)[]) =>
   [...new Set(parts.flat().filter((p): p is string => Boolean(p)))].join(" ");
 
 export const GET: APIRoute = async () => {
-  const [services, work, industries, tracks, courses, blog, news] = await Promise.all([
+  const [services, work, industries, tracks, courses, programmes, counts, blog, news] = await Promise.all([
     getServices(),
     getWork(),
     getIndustries(),
     getTracks(),
     getCourses(),
+    getProgrammes(),
+    trainingCounts(),
     getBlog(),
     getNews(),
   ]);
@@ -52,10 +55,10 @@ export const GET: APIRoute = async () => {
     { title: INDUSTRIES_PAGE.meta.title, description: INDUSTRIES_PAGE.meta.description, url: href("/industries/"), kind: "Page" },
     {
       title: TRAINING_PAGE.meta.title,
-      description: TRAINING_PAGE.meta.description(courses.length),
+      description: TRAINING_PAGE.meta.description(counts),
       url: href("/training/"),
       kind: "Page",
-      keywords: "courses",
+      keywords: words("courses programmes", TRAINING_DOMAINS.map((d) => d.name)),
     },
     { title: HOW_PAGE.meta.title, description: HOW_PAGE.meta.description, url: href("/how-we-work/"), kind: "Page", keywords: "process engagement models FAQ" },
     { title: ABOUT_PAGE.meta.title, description: ABOUT_PAGE.meta.description, url: href("/about/"), kind: "Page", keywords: words(SITE.legalName, SITE.alternateName) },
@@ -95,6 +98,13 @@ export const GET: APIRoute = async () => {
       url: href(`/training/#${t.id}`),
       kind: "Training track",
       keywords: words(t.data.courses.map((c) => c.name)),
+    })),
+    ...programmes.map((p) => ({
+      title: p.data.name,
+      description: `${TRAINING_PAGE.months(p.data.months)}, ${TRAINING_PAGE.audiences[p.data.audience].label.toLowerCase()}. ${p.data.summary}`,
+      url: href(coursePath(p.id)),
+      kind: "Programme",
+      keywords: words("programme", p.data.topics),
     })),
     ...courses.map((c) => ({
       title: c.name,

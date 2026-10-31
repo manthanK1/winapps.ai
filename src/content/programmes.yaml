@@ -1,0 +1,162 @@
+# Long-form training programmes, shown first on /training/ and in the header
+# menu, grouped by audience. Names and durations are Winapps' own.
+#
+# - id: the page URL, /training/<id>/. Unique, lower-case, and different from
+#   every course id in training.yaml (the build checks).
+# - audience: professionals | students
+# - domain: software | data-analytics | ai | data-science (see TRAINING_DOMAINS
+#   in src/data/copy.ts); leave it out if none fits.
+# - logos: keys from src/lib/tech-logos.ts (the official logos).
+# - internship: true when the programme includes an internship.
+#
+# TODO(Winapps): the summaries and topics only restate the programme titles
+# and the domain tools Winapps listed. Replace them with the real curriculum,
+# and confirm the logos (DSA: which language? Forward Deployed Engineering:
+# which stack?). Fees, batch dates and mode are not listed: people enquire.
+
+# ---- For working professionals --------------------------------------------
+- id: data-analytics-genai
+  name: Data Analytics with GenAI
+  audience: professionals
+  order: 1
+  months: 6
+  domain: data-analytics
+  logos: [mysql, excel, powerbi, python, openai]
+  summary: Data analytics with SQL, Excel, Power BI, Python and data visualization, combined with generative AI.
+  topics:
+    - SQL
+    - Excel
+    - Power BI
+    - Python for data analysis
+    - Data visualization
+    - Generative AI for analytics
+
+- id: generative-ai-multi-agent
+  name: Advanced Generative AI & Multi-Agent Systems
+  audience: professionals
+  order: 2
+  months: 6
+  domain: ai
+  logos: [openai, langchain, python]
+  summary: Generative AI, multi-agent systems and AI tools, at an advanced level.
+  topics:
+    - Generative AI
+    - Multi-agent systems
+    - AI tools
+
+- id: software-development-genai
+  name: Software Development with GenAI
+  audience: professionals
+  order: 3
+  months: 6
+  domain: software
+  logos: [javascript, react, nodejs, python, openai]
+  summary: Full-stack software development and software engineering, with generative AI.
+  topics:
+    - Full-stack development
+    - Programming
+    - Software engineering
+    - Generative AI for developers
+
+- id: marketing-ai
+  name: Marketing & AI
+  audience: professionals
+  order: 4
+  months: 6
+  domain: ai
+  logos: [google, meta, openai]
+  summary: Marketing with AI tools and generative AI.
+  topics:
+    - Marketing
+    - AI tools
+    - Generative AI
+
+- id: forward-deployed-engineering
+  name: Forward Deployed Engineering with Multimodal AI
+  audience: professionals
+  order: 5
+  months: 8
+  domain: ai
+  logos: [python, openai]
+  summary: Forward deployed engineering with multimodal AI.
+  topics:
+    - Forward deployed engineering
+    - Multimodal AI
+    - Generative AI
+    - AI tools
+
+- id: data-science-genai
+  name: Data Science with GenAI
+  audience: professionals
+  order: 6
+  months: 9
+  domain: data-science
+  logos: [python, pandas, numpy, scikitlearn, jupyter, openai]
+  summary: Data science and machine learning with Python, combined with generative AI.
+  topics:
+    - Python
+    - Machine learning
+    - Data science
+    - Generative AI
+
+# ---- For college students -------------------------------------------------
+- id: dsa
+  name: Data Structures & Algorithms (DSA)
+  audience: students
+  order: 1
+  months: 4
+  domain: software
+  logos: [python, java]
+  summary: Data structures and algorithms, the foundation of programming interviews and software engineering.
+  topics:
+    - Data structures
+    - Algorithms
+    - Programming
+
+- id: advanced-data-analytics-genai
+  name: Advanced Data Analytics with GenAI
+  audience: students
+  order: 2
+  months: 6
+  domain: data-analytics
+  logos: [mysql, excel, powerbi, python, openai]
+  summary: Advanced data analytics with SQL, Excel, Power BI, Python and data visualization, combined with generative AI.
+  topics:
+    - SQL
+    - Excel
+    - Power BI
+    - Python for data analysis
+    - Data visualization
+    - Generative AI for analytics
+
+- id: data-analytics-internship
+  name: Data Analytics Training & Internship
+  audience: students
+  order: 3
+  months: 6
+  domain: data-analytics
+  internship: true
+  logos: [mysql, excel, powerbi, python]
+  summary: Data analytics training with SQL, Excel, Power BI, Python and data visualization, followed by an internship.
+  topics:
+    - SQL
+    - Excel
+    - Power BI
+    - Python for data analysis
+    - Data visualization
+    - Internship
+
+- id: software-development-genai-dsa
+  name: Software Development with GenAI & DSA
+  audience: students
+  order: 4
+  months: 9
+  domain: software
+  logos: [javascript, react, nodejs, python, openai]
+  summary: Full-stack software development with generative AI, plus data structures and algorithms.
+  topics:
+    - Full-stack development
+    - Programming
+    - Software engineering
+    - Generative AI
+    - Data structures & algorithms

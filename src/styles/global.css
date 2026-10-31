@@ -13,6 +13,7 @@
      surfaces   .card (2px ink top rule, near-white) .card__num .card__title
                 .card__text .card__more .stretched (whole-card link)
                 .panel .panel--dark (+ .on-dark text colours) .veil
+                .depth-dark (inverted grid on any dark surface)
      lists      .chips .chip .ticks (check list) .list-reset
      forms      .field .field-label .field-hint .field-error .choice
      content    .prose .table-wrap .faq
@@ -108,11 +109,30 @@
   --overlay: #0e2e31;
   --overlay-rule: #2b5357;
   --on-dark-2: #c9dcdd;
-  /* Surfaces over the ribbon */
-  --paper: #ffffff;
+  /* Surfaces over the ribbon. The page is a warm off-white; veils and the
+     header use the same tone so they never show as white patches. */
+  --paper: #faf8f3;
   --card: rgb(255 255 255 / 0.94);
-  --veil: rgb(255 255 255 / 0.86);
-  --header-bg: rgb(255 255 255 / 0.86);
+  --veil: rgb(250 248 243 / 0.86);
+  --header-bg: rgb(250 248 243 / 0.88);
+
+  /* Depth system (PageDepth.astro, .depth-dark): one brand grid + soft light.
+     Pages set a level (strong · medium · subtle); see PageDepth for the hero. */
+  --depth-grid-rgb: 39 137 144;      /* --teal */
+  --depth-gold-rgb: 245 193 32;      /* --yellow */
+  --depth-grid-cell: 56px;
+  --depth-grid-alpha: 0.12;          /* page grid lines (medium pages) */
+  --depth-lit-alpha: 0.24;           /* tinted grid inside the light */
+  --depth-glow-teal: 0.13;
+  --depth-glow-gold: 0.15;
+  --depth-glow-size: min(1000px, 85vw);
+  --depth-marker-strength: 2.8;      /* markers' opacity, × the grid alpha */
+  /* "+" marker tile (two cells, one marker); the SVG scales with --depth-grid-cell. */
+  --depth-marker: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 112 112'%3E%3Cpath d='M56 51.5v9M51.5 56h9' stroke='%23278990' stroke-width='1.5'/%3E%3C/svg%3E");
+  /* Dark surfaces: light mint grid on deep teal. */
+  --depth-dark-rgb: 159 225 203;     /* mint */
+  --depth-dark-grid-alpha: 0.1;
+  --depth-dark-marker: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 112 112'%3E%3Cpath d='M56 51.5v9M51.5 56h9' stroke='%239FE1CB' stroke-opacity='.45' stroke-width='1.5'/%3E%3C/svg%3E");
 
   --font-display: "Inter Tight", "Inter Tight Fallback", Inter, system-ui, sans-serif;
   --font-body: Inter, "Inter Fallback", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -141,6 +161,7 @@ html {
   html { scroll-behavior: smooth; }
 }
 body {
+  position: relative; /* containing block for the page-high depth backdrop */
   margin: 0;
   background: var(--paper);
   color: var(--ink);
@@ -397,7 +418,18 @@ address { font-style: normal; }
   background: var(--card);
   padding: clamp(24px, 3.2vw, 48px);
 }
-.panel--dark { background: var(--overlay); border-top-color: var(--accent); color: #fff; }
+.panel--dark { background-color: var(--overlay); border-top-color: var(--accent); color: #fff; }
+/* Dark surfaces: the inverted grid (light mint lines and "+" markers on deep
+   teal) under a teal light from one corner and a warm one from the other. */
+.panel--dark, .depth-dark {
+  background-image:
+    radial-gradient(70% 90% at 92% 0%, rgb(var(--depth-grid-rgb) / 0.55), transparent 70%),
+    radial-gradient(60% 70% at 4% 100%, rgb(var(--depth-gold-rgb) / 0.16), transparent 70%),
+    var(--depth-dark-marker),
+    linear-gradient(rgb(var(--depth-dark-rgb) / var(--depth-dark-grid-alpha)) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(var(--depth-dark-rgb) / var(--depth-dark-grid-alpha)) 1px, transparent 1px);
+  background-size: auto, auto, calc(var(--depth-grid-cell) * 2) calc(var(--depth-grid-cell) * 2), var(--depth-grid-cell) var(--depth-grid-cell), var(--depth-grid-cell) var(--depth-grid-cell);
+}
 .on-dark { color: #fff; }
 .on-dark h2, .on-dark h3, .on-dark h4 { color: #fff; }
 .on-dark .text-2, .on-dark .lead, .on-dark .muted { color: var(--on-dark-2); }

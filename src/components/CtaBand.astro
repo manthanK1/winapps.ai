@@ -1,7 +1,7 @@
 ---
-// Closing call to action on every page: the design's contact band (h2 left,
-// orange button right) with V1's copy and all four routes: call, email,
-// WhatsApp, phone.
+// Closing call to action on every page, as the site's one dark band (deep
+// teal, mint grid): h2 left, orange button right, with V1's copy and all four
+// routes: call, email, WhatsApp, phone.
 import Icon from "./Icon.astro";
 import { CTA } from "../data/copy";
 import { SITE } from "../data/site";
@@ -14,10 +14,10 @@ interface Props {
 }
 const { title = CTA.title, text = CTA.text, id = "cta-title" } = Astro.props;
 ---
-<section class="section cta-band" aria-labelledby={id}>
+<section class="section cta-band on-dark depth-dark" aria-labelledby={id} data-depth="none">
   <div class="container">
     <div class="cta-band__row">
-      <div class="cta-band__text veil">
+      <div class="cta-band__text">
         <h2 id={id} class="cta-band__title">{title}</h2>
         <p class="lead cta-band__lead">{text}</p>
       </div>
@@ -26,7 +26,7 @@ const { title = CTA.title, text = CTA.text, id = "cta-title" } = Astro.props;
         <a href={`mailto:${SITE.email}`} class="btn btn--outline">{CTA.email} <Icon name="arrow" size={18} class="arrow" /></a>
       </div>
     </div>
-    <p class="cta-band__alt veil">
+    <p class="cta-band__alt">
       {CTA.alt.before} <a class="link" href={SITE.whatsappHref} target="_blank" rel="noopener">{CTA.alt.whatsapp}</a>{CTA.alt.middle}{" "}
       <a class="link" href={SITE.phoneHref}>{SITE.phone}</a>{CTA.alt.after}
     </p>
@@ -34,6 +34,8 @@ const { title = CTA.title, text = CTA.text, id = "cta-title" } = Astro.props;
 </section>
 
 <style>
+  /* The site's one dark band: deep teal with the mint grid (.depth-dark), solid, so no veils. */
+  .cta-band { background-color: var(--overlay); }
   .cta-band__row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 32px 40px; }
   .cta-band__text { max-width: 820px; }
   .cta-band__title {
@@ -43,7 +45,7 @@ const { title = CTA.title, text = CTA.text, id = "cta-title" } = Astro.props;
   }
   .cta-band__lead { margin-top: 20px; max-width: 60ch; }
   .cta-band__actions { display: flex; flex-wrap: wrap; gap: 12px; }
-  .cta-band__alt { display: inline-block; margin-top: 28px; font-size: 15px; color: var(--ink-2); }
+  .cta-band__alt { display: inline-block; margin-top: 28px; font-size: 15px; color: var(--on-dark-2); }
   @media (max-width: 520px) {
     .cta-band__actions, .cta-band__actions .btn { width: 100%; }
   }
