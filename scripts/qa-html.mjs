@@ -141,6 +141,7 @@ for (const b of broken) fail("link", b);
 // ---- V1 URLs and the extra V2 routes ----------------------------------------
 const slugs = (dir) => readdirSync(join("src/content", dir)).filter((f) => f.endsWith(".md") && !f.startsWith("_")).map((f) => f.replace(/\.md$/, ""));
 const courseIds = [...readFileSync("src/content/training.yaml", "utf8").matchAll(/^[ \t]+- id:[ \t]*["']?([\w-]+)/gm)].map((m) => m[1]);
+const programmeIds = [...readFileSync("src/content/programmes.yaml", "utf8").matchAll(/^- id:[ \t]*["']?([\w-]+)/gm)].map((m) => m[1]);
 const required = [
   "/", "/services/", "/work/", "/ai/", "/how-we-work/", "/industries/", "/training/", "/blog/", "/news/", "/about/", "/contact/",
   "/privacy/", "/terms/", "/disclaimer/", "/404.html",
@@ -149,6 +150,7 @@ const required = [
   ...slugs("blog").map((s) => `/blog/${s}/`),
   ...slugs("news").map((s) => `/news/${s}/`),
   ...courseIds.map((c) => `/training/${c}/`),
+  ...programmeIds.flatMap((p) => [`/training/${p}/`, `/training/${p}.md`]),
   "/llms.txt", "/llms-full.txt", "/robots.txt", "/sitemap-index.xml", "/search.json", "/site.webmanifest",
   "/.well-known/security.txt", "/favicon.ico", "/brand/og.png", "/index.md", "/about.md", "/ai.md", "/services/ai-ml.md",
 ];

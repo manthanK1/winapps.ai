@@ -45,7 +45,7 @@ function sourcesFor(path) {
   if (detail) {
     const [, dir, slug] = detail;
     const page = `src/pages/${dir}/[slug].astro`;
-    return dir === "training" ? [page, "src/content/training.yaml"] : [page, `src/content/${dir}/${slug}.md`];
+    return dir === "training" ? [page, "src/content/training.yaml", "src/content/programmes.yaml"] : [page, `src/content/${dir}/${slug}.md`];
   }
   const name = path.replace(/^\/|\/$/g, "");
   const index = `src/pages/${name}/index.astro`;
@@ -53,7 +53,7 @@ function sourcesFor(path) {
   const content = {
     services: ["src/content/services"],
     work: ["src/content/work"],
-    training: ["src/content/training.yaml"],
+    training: ["src/content/training.yaml", "src/content/programmes.yaml"],
     industries: ["src/content/industries.yaml"],
     "how-we-work": ["src/content/faq.yaml"],
     blog: ["src/content/blog"],

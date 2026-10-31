@@ -1,0 +1,102 @@
+---
+// The main technical domains as numbered cards (home page): each with its
+// tools, its official logos and chips for its programmes (each chip links to
+// the programme page). The last card points anyone undecided to WhatsApp.
+import Icon from "./Icon.astro";
+import TechLogos from "./TechLogos.astro";
+import { TRAINING_ADVICE, TRAINING_DOMAINS, TRAINING_PAGE } from "../data/copy";
+import { whatsappFor } from "../data/site";
+import { getProgrammes } from "../lib/content";
+import { coursePath } from "../lib/schema";
+import { href } from "../lib/url";
+
+const programmes = await getProgrammes();
+---
+<ul class="domains">
+  {TRAINING_DOMAINS.map((d, i) => {
+    const mine = programmes.filter((p) => p.data.domain === d.id);
+    return (
+      <li class="card domain">
+        <div class="domain__top">
+          <span class="card__num" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+          <TechLogos logos={d.logos} small />
+        </div>
+        <h3 class="card__title">{d.name}</h3>
+        <p class="card__text">{d.tools}</p>
+        {mine.length > 0 && (
+          <ul class="chips domain__programmes" aria-label={`${d.name} programmes`}>
+            {mine.map((p) => (
+              <li>
+                <a class="domain__programme" href={href(coursePath(p.id))}>
+                  {p.data.name}
+                  <span class="domain__months">{TRAINING_PAGE.months(p.data.months)}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </li>
+    );
+  })}
+  <li class="card domain domain--advice on-dark depth-dark">
+    <span class="domain__wa" aria-hidden="true"><Icon name="whatsapp" size={26} /></span>
+    <h3 class="card__title">{TRAINING_ADVICE.title}</h3>
+    <p class="card__text">{TRAINING_ADVICE.text}</p>
+    <div class="domain__ask">
+      <a href={whatsappFor(TRAINING_ADVICE.message)} target="_blank" rel="noopener" class="btn btn--light">
+        <Icon name="whatsapp" size={20} class="wa-icon" /> {TRAINING_ADVICE.cta}
+      </a>
+    </div>
+  </li>
+</ul>
+
+<style>
+  .domains {
+    display: grid;
+    gap: 24px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 768px) {
+    .domains { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1100px) {
+    .domains { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .domain--advice { grid-column: span 2; }
+  }
+  .domain__top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  .domain__programmes { margin-top: auto; padding-top: 6px; }
+  /* Programme links: square chips, tall enough to tap (44px). */
+  .domain__programme {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding: 6px 12px;
+    border: 1px solid var(--rule-2);
+    background: #fff;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.25;
+    text-decoration: none;
+    transition: border-color 0.2s, background-color 0.2s, color 0.2s, transform 0.25s var(--ease), box-shadow 0.25s;
+  }
+  .domain__programme:hover { border-color: var(--yellow); background: var(--yellow-tint); color: var(--ink); box-shadow: var(--lift-shadow); }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .domain__programme:hover { transform: translateY(-2px); }
+  }
+  .domain__months { flex: none; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--primary); }
+
+  .domain--advice { background-color: var(--overlay); border-top-color: var(--accent); }
+  .domain--advice .card__text { color: var(--on-dark-2); }
+  .domain__wa {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    background: #fff;
+  }
+  .domain__ask { margin-top: auto; padding-top: 6px; }
+</style>

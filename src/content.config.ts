@@ -158,4 +158,20 @@ const news = defineCollection({
   }),
 });
 
-export const collections = { services, work, faq, industries, training, testimonials, clients, team, blog, news };
+// Long-form programmes (/training/<id>/), grouped by audience on /training/.
+const programmes = defineCollection({
+  loader: file("src/content/programmes.yaml"),
+  schema: z.object({
+    name: z.string(),
+    audience: z.enum(["professionals", "students"]),
+    order: z.number(),
+    months: z.number().int().positive(),
+    domain: z.enum(["software", "data-analytics", "ai", "data-science"]).optional(),
+    internship: z.boolean().default(false),
+    logos: z.array(techLogo).min(1),
+    summary: z.string(),
+    topics: z.array(z.string()).min(3),
+  }),
+});
+
+export const collections = { services, work, faq, industries, training, programmes, testimonials, clients, team, blog, news };

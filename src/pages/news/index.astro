@@ -14,7 +14,7 @@ const { meta, hero } = NEWS_PAGE;
 const news = await getNews();
 const crumbs = [{ name: "News", path: "/news/" }];
 ---
-<BaseLayout
+<BaseLayout depth="subtle"
   title={meta.title}
   description={meta.description}
   breadcrumbs={crumbs}

@@ -25,6 +25,7 @@ import {
   SERVICES_PAGE,
   SERVICE_DETAIL,
   TRAINING_ADVICE,
+  TRAINING_DOMAINS,
   TRAINING_PAGE,
   TRUST,
   WORK_DETAIL,
@@ -32,17 +33,20 @@ import {
   headingText,
 } from "../data/copy";
 import {
+  AUDIENCES,
   getBlog,
   getCourses,
   getFaq,
   getIndustries,
   getNews,
+  getProgrammes,
   getServices,
   getTracks,
   getWork,
   stripComments,
+  trainingCounts,
   type Course,
-  type Track,
+  type Programme,
 } from "./content";
 import { coursePath } from "./schema";
 import { absolute } from "./url";
@@ -197,16 +201,20 @@ function postSummary(p: BlogPost) {
   return p.data.description.endsWith("…") ? splitLead(body(p.body)).lead || p.data.description : p.data.description;
 }
 
-const courseCount = (tracks: readonly Track[]) => tracks.reduce((n, t) => n + t.data.courses.length, 0);
+/** A programme line: linked name, duration and audience, then its summary. */
+const programmeLine = (L: Links, p: Programme) =>
+  `${L.page(p.data.name, coursePath(p.id))} (${TRAINING_PAGE.months(p.data.months)}${p.data.internship ? `, ${TRAINING_PAGE.internship.toLowerCase()}` : ""}): ${p.data.summary}`;
 
 // ------------------------------------------------------------------ Home ----
 
 export async function homeMd(site: Site) {
   const L = linker(site);
-  const [services, work, tracks, faq, blog, news] = await Promise.all([
+  const [services, work, tracks, programmes, counts, faq, blog, news] = await Promise.all([
     getServices(),
     getWork(),
     getTracks(),
+    getProgrammes(),
+    trainingCounts(),
     getFaq(),
     getBlog(),
     getNews(),
@@ -233,13 +241,14 @@ export async function homeMd(site: Site) {
       L.link(HOME.practices.allLink, "/services/"),
 
       `## ${headingText(HOME.training)}`,
-      HOME.training.intro(courseCount(tracks)),
+      HOME.training.intro(counts.programmes, counts.courses),
       bullets(
-        tracks.map(
-          (t) =>
-            `${L.link(t.data.name, `/training/#${t.id}`)}: ${t.data.courses.map((c) => L.link(c.name, coursePath(c.id))).join(", ")}`
-        )
+        TRAINING_DOMAINS.map((d) => {
+          const mine = programmes.filter((p) => p.data.domain === d.id);
+          return `**${d.name}** (${d.tools})${mine.length ? `: ${mine.map((p) => L.link(p.data.name, coursePath(p.id))).join(", ")}` : ""}`;
+        })
       ),
+      `${TRAINING_PAGE.shortCourses.title}: ${tracks.map((t) => L.link(t.data.name, `/training/#${t.id}`)).join(", ")}`,
       L.link(HOME.training.allLink, "/training/"),
       `### ${TRAINING_ADVICE.title}`,
       TRAINING_ADVICE.text,
@@ -466,19 +475,29 @@ export async function aiMd(site: Site) {
 
 export async function trainingMd(site: Site) {
   const L = linker(site);
-  const tracks = await getTracks();
+  const [tracks, programmes, counts] = await Promise.all([getTracks(), getProgrammes(), trainingCounts()]);
   return finish(
     join(
       `# ${headingText(TRAINING_PAGE.hero)}`,
-      TRAINING_PAGE.hero.lead(courseCount(tracks), tracks.length),
+      TRAINING_PAGE.hero.lead(counts),
       bullets([waLink(TRAINING_ADVICE.cta, TRAINING_PAGE.askMessage), telLink(), trainingMail()]),
+      ...AUDIENCES.map((a) =>
+        join(
+          `## ${L.link(TRAINING_PAGE.audiences[a].label, `/training/#${a}`)}`,
+          bullets(programmes.filter((p) => p.data.audience === a).map((p) => programmeLine(L, p)))
+        )
+      ),
+      `## ${TRAINING_PAGE.domains.title}`,
+      bullets(TRAINING_DOMAINS.map((d) => `**${d.name}**: ${d.tools}`)),
+      `## ${TRAINING_PAGE.shortCourses.title}`,
+      TRAINING_PAGE.shortCourses.intro(counts.courses, counts.tracks),
       ...tracks.map((t, n) =>
         join(
-          `## ${TRAINING_PAGE.trackEyebrow(n + 1)}: ${L.link(t.data.name, `/training/#${t.id}`)}`,
+          `### ${TRAINING_PAGE.trackEyebrow(n + 1)}: ${L.link(t.data.name, `/training/#${t.id}`)}`,
           t.data.intro,
           ...t.data.courses.map((c) =>
             join(
-              `### ${L.link(c.name, coursePath(c.id))}`,
+              `#### ${L.link(c.name, coursePath(c.id))}`,
               c.summary,
               `${TRAINING_PAGE.learn}:`,
               bullets(c.topics),
@@ -494,17 +513,46 @@ export async function trainingMd(site: Site) {
   );
 }
 
+/** The training lead's closing sentence: how to get batch dates, timings and fees. */
+const howToJoin = async () => TRAINING_PAGE.hero.lead(await trainingCounts()).replace(/^.*\.\s+(?=[A-Z])/, "");
+
+export async function programmeMd(site: Site, p: Programme) {
+  const L = linker(site);
+  const programmes = await getProgrammes();
+  const domain = TRAINING_DOMAINS.find((d) => d.id === p.data.domain);
+  const audience = TRAINING_PAGE.audiences[p.data.audience].label;
+  const siblings = programmes.filter((o) => o.data.audience === p.data.audience && o.id !== p.id);
+  return finish(
+    join(
+      `# ${p.data.name}`,
+      `${p.data.summary} ${await howToJoin()}`,
+      bullets([
+        TRAINING_PAGE.months(p.data.months),
+        L.link(audience, `/training/#${p.data.audience}`),
+        domain && `${TRAINING_PAGE.domains.title}: ${domain.name}`,
+        p.data.internship && TRAINING_PAGE.internship,
+      ].filter((x): x is string => Boolean(x))),
+      `## ${TRAINING_PAGE.learn}`,
+      bullets(p.data.topics),
+      `${waLink(TRAINING_PAGE.enquire, TRAINING_PAGE.courseMessage(p.data.name))} · ${telLink()} · ${trainingMail()}`,
+      siblings.length > 0 && join(`## ${audience}`, bullets(siblings.map((o) => programmeLine(L, o)))),
+      L.link(HOME.training.allLink, "/training/"),
+      `## ${TRAINING_ADVICE.title}`,
+      TRAINING_ADVICE.text,
+      waLink(TRAINING_ADVICE.cta, TRAINING_ADVICE.message)
+    )
+  );
+}
+
 export async function courseMd(site: Site, course: Course) {
   const L = linker(site);
   const tracks = await getTracks();
   const n = tracks.findIndex((t) => t.id === course.track.id);
-  // The training lead's closing sentence: how to get batch dates, timings and fees.
-  const howToJoin = TRAINING_PAGE.hero.lead(courseCount(tracks), tracks.length).replace(/^.*\.\s+(?=[A-Z])/, "");
   const siblings = tracks[n]?.data.courses.filter((c) => c.id !== course.id) ?? [];
   return finish(
     join(
       `# ${course.name}`,
-      `${course.summary} ${howToJoin}`,
+      `${course.summary} ${await howToJoin()}`,
       `${TRAINING_PAGE.trackEyebrow(n + 1)}: ${L.link(course.track.name, `/training/#${course.track.id}`)}. ${course.track.intro}`,
       `## ${TRAINING_PAGE.learn}`,
       bullets(course.topics),
@@ -690,7 +738,7 @@ export async function newsPostMd(site: Site, entry: NewsPost) {
 
 /** Every page with a Markdown twin, in reading order (llms-full.txt, links). */
 export async function markdownPages(site: Site): Promise<{ path: string; title: string; md: string }[]> {
-  const [services, work, courses, blog, news] = await Promise.all([getServices(), getWork(), getCourses(), getBlog(), getNews()]);
+  const [services, work, courses, programmes, blog, news] = await Promise.all([getServices(), getWork(), getCourses(), getProgrammes(), getBlog(), getNews()]);
   const pages: { path: string; title: string; build: () => Promise<string> }[] = [
     { path: "/", title: "Home", build: () => homeMd(site) },
     { path: "/services/", title: SERVICES_PAGE.meta.title, build: () => servicesMd(site) },
@@ -701,6 +749,7 @@ export async function markdownPages(site: Site): Promise<{ path: string; title: 
     { path: "/contact/", title: CONTACT_PAGE.meta.title, build: () => contactMd(site) },
     { path: "/industries/", title: INDUSTRIES_PAGE.meta.title, build: () => industriesMd(site) },
     { path: "/training/", title: TRAINING_PAGE.meta.title, build: () => trainingMd(site) },
+    ...programmes.map((p) => ({ path: coursePath(p.id), title: p.data.name, build: () => programmeMd(site, p) })),
     ...courses.map((c) => ({ path: coursePath(c.id), title: c.name, build: () => courseMd(site, c) })),
     { path: "/work/", title: WORK_PAGE.meta.title, build: () => workMd(site) },
     ...work.map((w) => ({ path: workPath(w.id), title: w.data.title, build: () => caseStudyMd(site, w) })),
@@ -725,10 +774,12 @@ function llmsHeader(site: Site) {
 /** /llms.txt in the llmstxt.org format. */
 export async function llmsTxt(site: Site) {
   const L = linker(site);
-  const [services, industries, tracks, work, blog, news] = await Promise.all([
+  const [services, industries, tracks, programmes, counts, work, blog, news] = await Promise.all([
     getServices(),
     getIndustries(),
     getTracks(),
+    getProgrammes(),
+    trainingCounts(),
     getWork(),
     getBlog(),
     getNews(),
@@ -759,10 +810,18 @@ export async function llmsTxt(site: Site) {
       ]),
 
       `## Training`,
-      `${L.page(TRAINING_PAGE.meta.title, "/training/")}: ${TRAINING_PAGE.meta.description(courseCount(tracks))}`,
+      `${L.page(TRAINING_PAGE.meta.title, "/training/")}: ${TRAINING_PAGE.meta.description(counts)}`,
+      ...AUDIENCES.map((a) =>
+        join(
+          `### ${L.link(TRAINING_PAGE.audiences[a].label, `/training/#${a}`)}`,
+          bullets(programmes.filter((p) => p.data.audience === a).map((p) => programmeLine(L, p)))
+        )
+      ),
+      `### ${TRAINING_PAGE.domains.title}`,
+      bullets(TRAINING_DOMAINS.map((d) => `**${d.name}**: ${d.tools}`)),
       ...tracks.map((t) =>
         join(
-          `### ${L.link(t.data.name, `/training/#${t.id}`)}`,
+          `### ${TRAINING_PAGE.shortCourses.title}: ${L.link(t.data.name, `/training/#${t.id}`)}`,
           t.data.intro,
           bullets(t.data.courses.map((c) => `${L.page(c.name, coursePath(c.id))}: ${c.summary}`))
         )

@@ -1,58 +1,104 @@
 ---
-// One page per course (new in V2): /training/<course-id>/. Everything on it
-// is V1 training copy: the course's summary, topics and logos, its track's
-// name and intro, and the training page's "how to join" line. V1 publishes
-// no fees, batch dates or duration, so none appear here; people enquire on
-// WhatsApp or by phone, as on /training/.
+// One page per training item: /training/<id>/. Two kinds share the route:
+//  · programmes (src/content/programmes.yaml): long-form, for working
+//    professionals or college students, with a duration in months;
+//  · short courses (src/content/training.yaml): V1's courses, grouped in tracks.
+// No fees or batch dates are published, so people enquire on WhatsApp, by
+// phone or by email. The build stops if a programme and a course share an id.
 import type { GetStaticPaths, InferGetStaticPropsType } from "astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import PageHero from "../../components/PageHero.astro";
 import Icon from "../../components/Icon.astro";
 import SectionHead from "../../components/SectionHead.astro";
 import TechLogos from "../../components/TechLogos.astro";
-import { HOME, TRAINING_ADVICE, TRAINING_PAGE } from "../../data/copy";
+import { HOME, TRAINING_ADVICE, TRAINING_DOMAINS, TRAINING_PAGE } from "../../data/copy";
 import { SITE, whatsappFor } from "../../data/site";
-import { getCourses, getTracks } from "../../lib/content";
+import type { TechLogo } from "../../lib/tech-logos";
+import { getCourses, getProgrammes, getTracks, programmeAsCourse, trainingCounts } from "../../lib/content";
 import { course as courseSchema, coursePath } from "../../lib/schema";
 import { href } from "../../lib/url";
 
+type Item = { id: string; name: string; summary: string; logos: readonly TechLogo[] };
+
 export const getStaticPaths = (async () => {
-  const [tracks, courses] = await Promise.all([getTracks(), getCourses()]);
-  // The training lead's closing sentence: "Pick a course and message us on
+  const [tracks, courses, programmes, counts] = await Promise.all([getTracks(), getCourses(), getProgrammes(), trainingCounts()]);
+  const clash = programmes.find((p) => courses.some((c) => c.id === p.id));
+  if (clash) throw new Error(`Training id "${clash.id}" is used by both a programme and a course; ids must be unique.`);
+  // The training lead's closing sentence: "Pick one and message us on
   // WhatsApp for the next batch, timings and fees."
-  const howToJoin = TRAINING_PAGE.hero.lead(courses.length, tracks.length).replace(/^.*\.\s+(?=[A-Z])/, "");
-  return courses.map((course) => ({
-    params: { slug: course.id },
-    props: {
-      course,
-      howToJoin,
-      trackNum: tracks.findIndex((t) => t.id === course.track.id) + 1,
-      siblings: courses.filter((c) => c.track.id === course.track.id && c.id !== course.id),
-    },
-  }));
+  const howToJoin = TRAINING_PAGE.hero.lead(counts).replace(/^.*\.\s+(?=[A-Z])/, "");
+  const asItem = (x: { id: string; name: string; summary: string; logos: readonly TechLogo[] }): Item => ({ id: x.id, name: x.name, summary: x.summary, logos: x.logos });
+  return [
+    ...programmes.map((p) => ({
+      params: { slug: p.id },
+      props: {
+        kind: "programme" as const,
+        item: { ...asItem({ id: p.id, ...p.data }), topics: p.data.topics },
+        schema: programmeAsCourse(p),
+        programme: p.data,
+        howToJoin,
+        group: TRAINING_PAGE.audiences[p.data.audience].label,
+        groupHref: `/training/#${p.data.audience}`,
+        groupNum: 0,
+        siblings: programmes.filter((o) => o.data.audience === p.data.audience && o.id !== p.id).map((o) => ({ ...asItem({ id: o.id, ...o.data }), months: o.data.months })),
+      },
+    })),
+    ...courses.map((c) => ({
+      params: { slug: c.id },
+      props: {
+        kind: "course" as const,
+        item: { ...asItem(c), topics: c.topics },
+        schema: c,
+        programme: null,
+        howToJoin,
+        group: c.track.name,
+        groupHref: `/training/#${c.track.id}`,
+        groupNum: tracks.findIndex((t) => t.id === c.track.id) + 1,
+        trackIntro: c.track.intro,
+        siblings: courses.filter((o) => o.track.id === c.track.id && o.id !== c.id).map((o) => ({ ...asItem(o), months: 0 })),
+      },
+    })),
+  ];
 }) satisfies GetStaticPaths;
 
 type Props = InferGetStaticPropsType<typeof getStaticPaths>;
 
-const { course: c, howToJoin, trackNum, siblings } = Astro.props;
+const props = Astro.props;
+const { kind, item: c, schema, programme: p, howToJoin, group, groupHref, groupNum, siblings } = props;
 const path = coursePath(c.id);
-const trackHref = `/training/#${c.track.id}`;
 const crumbs = [
   { name: "Training", path: "/training/" },
   { name: c.name, path },
 ];
+const domain = p ? TRAINING_DOMAINS.find((d) => d.id === p.domain) : undefined;
+const description =
+  kind === "programme" && p
+    ? `${c.summary} ${TRAINING_PAGE.months(p.months)}, ${TRAINING_PAGE.audiences[p.audience].label.toLowerCase()}.`
+    : `${c.summary} Part of our ${group} track.`;
 const num = (i: number) => String(i + 1).padStart(2, "0");
 ---
 <BaseLayout
   title={c.name}
-  description={`${c.summary} Part of our ${c.track.name} track.`}
+  description={description}
   breadcrumbs={crumbs}
-  jsonLd={[courseSchema(Astro.site, c)]}
+  jsonLd={[courseSchema(Astro.site, schema)]}
   pageType="ItemPage"
   markdownPath={`/training/${c.id}.md`}
 >
-  <PageHero breadcrumbs={crumbs} eyebrow={c.track.name} title={c.name} lead={c.summary}>
-    <p class="answer text-2">Part of our {c.track.name} track: {c.track.intro} {howToJoin}</p>
+  <PageHero breadcrumbs={crumbs} eyebrow={group} title={c.name} lead={c.summary}>
+    {kind === "programme" && p ? (
+      <>
+        <ul class="chips facts" aria-label="Programme facts">
+          <li class="chip">{TRAINING_PAGE.months(p.months)}</li>
+          <li class="chip">{TRAINING_PAGE.audiences[p.audience].label}</li>
+          {domain && <li class="chip">{domain.name}</li>}
+          {p.internship && <li class="chip">{TRAINING_PAGE.internship}</li>}
+        </ul>
+        <p class="answer text-2">{howToJoin}</p>
+      </>
+    ) : (
+      <p class="answer text-2">Part of our {group} track: {"trackIntro" in props ? props.trackIntro : ""} {howToJoin}</p>
+    )}
   </PageHero>
 
   <section class="section section--flush-top" aria-labelledby="learn-title">
@@ -88,9 +134,9 @@ const num = (i: number) => String(i + 1).padStart(2, "0");
       <div class="container">
         <SectionHead
           id="more-title"
-          eyebrow={TRAINING_PAGE.trackEyebrow(trackNum)}
-          title={`Other courses in ${c.track.name}`}
-          link={{ label: HOME.training.allLink, href: trackHref }}
+          eyebrow={kind === "programme" ? TRAINING_PAGE.programmesEyebrow : TRAINING_PAGE.trackEyebrow(groupNum)}
+          title={kind === "programme" ? `More programmes ${group.toLowerCase()}` : `Other courses in ${group}`}
+          link={{ label: HOME.training.allLink, href: groupHref }}
         />
         <ul class="list-reset siblings">
           {siblings.map((s, i) => (
@@ -102,6 +148,7 @@ const num = (i: number) => String(i + 1).padStart(2, "0");
               <h3 class="card__title sibling__title">
                 <a class="stretched" href={href(coursePath(s.id))}>{s.name}</a>
               </h3>
+              {s.months > 0 && <p class="sibling__months">{TRAINING_PAGE.months(s.months)}</p>}
               <p class="card__text">{s.summary}</p>
               <p class="card__more" aria-hidden="true"><Icon name="arrow" size={16} class="arrow" /></p>
             </li>
@@ -111,7 +158,7 @@ const num = (i: number) => String(i + 1).padStart(2, "0");
     </section>
   ) : (
     <div class="container back">
-      <a class="link-u veil" href={href(trackHref)}>{HOME.training.allLink} <Icon name="arrow" size={16} /></a>
+      <a class="link-u veil" href={href(groupHref)}>{HOME.training.allLink} <Icon name="arrow" size={16} /></a>
     </div>
   )}
 
@@ -132,6 +179,8 @@ const num = (i: number) => String(i + 1).padStart(2, "0");
 
 <style>
   .answer { margin-top: 16px; max-width: 64ch; }
+  .facts { margin-top: 24px; }
+  .facts .chip { font-weight: 600; color: var(--ink); }
 
   .learn { display: grid; gap: 24px; }
   @media (min-width: 1024px) {
@@ -154,6 +203,7 @@ const num = (i: number) => String(i + 1).padStart(2, "0");
   }
   .sibling__top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
   .sibling__title { font-size: clamp(20px, 0.6vw + 14px, 24px); }
+  .sibling__months { margin-top: -8px; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--primary); }
 
   .advice { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 28px 40px; }
   .advice__text { max-width: 720px; }
