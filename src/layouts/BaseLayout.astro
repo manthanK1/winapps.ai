@@ -54,7 +54,7 @@ const {
   depth = "medium",
 } = Astro.props;
 
-const fullTitle = pageTitle(title);
+const fullTitle = title;
 const metaDesc = metaDescription(description);
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
 const ogImage = absolute("/brand/og.png", Astro.site);

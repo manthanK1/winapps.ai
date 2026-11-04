@@ -3,6 +3,7 @@
 // meta row) carrying all of V1's columns: Services, Training, Explore,
 // Company, Legal, Social, then every contact route as one strip of equal
 // cells (so the brand column and the link columns come out the same height).
+---
 import Icon from "./Icon.astro";
 import { EMAILS, FOOTER, SITE, SOCIAL } from "../data/site";
 import { TRAINING_PAGE } from "../data/copy";
@@ -74,10 +75,9 @@ const contacts = [
     <address class="site-footer__contact">
       {contacts.map((c) => (
         <a class="site-footer__route" href={c.href} {...(c.external ? { target: "_blank", rel: "noopener" } : {})}>
-          <Icon name={c.icon} size={20} />
+          <Icon name={c.icon} size={16} />
           <span class="site-footer__route-text">
             <span class="site-footer__route-label">{c.label}</span>
-            {/* An address may wrap at "@" if it must, never mid-word. */}
             <span>{c.icon === "mail" ? <>{c.value.split("@")[0]}<wbr />@{c.value.split("@")[1]}</> : c.value}</span>
           </span>
         </a>
@@ -98,7 +98,6 @@ const contacts = [
     margin-top: clamp(48px, 8vw, 120px);
     border-top: 1px solid var(--ink);
     background-color: var(--paper);
-    /* The site grid, subtle, with one soft glow: the footer is opaque, so it carries its own. */
     background-image:
       radial-gradient(45% 90% at 90% 100%, rgb(var(--depth-gold-rgb) / 0.1), transparent 70%),
       radial-gradient(40% 80% at 5% 0%, rgb(var(--depth-grid-rgb) / 0.07), transparent 70%),
@@ -107,11 +106,20 @@ const contacts = [
     background-size: auto, auto, var(--depth-grid-cell) var(--depth-grid-cell), var(--depth-grid-cell) var(--depth-grid-cell);
     background-position: 0 0, 0 0, center top, center top;
     color: var(--ink);
+    /* Mobile ke liye fixed content ke niche space */
+    padding-bottom: 240px; 
   }
+  @media (min-width: 560px) {
+    .site-footer { padding-bottom: 180px; }
+  }
+  @media (min-width: 1024px) {
+    .site-footer { padding-bottom: 130px; }
+  }
+
   .site-footer__grid {
     display: grid;
     gap: 48px;
-    padding-block: clamp(48px, 6vw, 80px) 48px;
+    padding-block: clamp(48px, 6vw, 80px) 32px;
   }
   @media (min-width: 1100px) {
     .site-footer__grid { grid-template-columns: minmax(260px, 1fr) 2.6fr; gap: 64px; }
@@ -120,46 +128,76 @@ const contacts = [
   .site-footer__logo img { height: 72px; width: auto; max-width: none; }
   .site-footer__legal { margin-top: 12px; font: 600 18px/1.25 var(--font-display); letter-spacing: -0.01em; }
   .site-footer__blurb { margin-top: 10px; max-width: 34ch; font-size: 14px; color: var(--ink-2); }
-  /* Contact strip: equal cells split by 1px rules (the list colour shows
-     through the gaps), like the home commitments row. */
+  
+  /* --- MOBILE & DESKTOP DONO PAR FIXED BOTTOM DOCK (COMPACT HEIGHT) --- */
+  .site-footer__bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 9999;
+    background-color: var(--paper);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 4px 12px;
+    padding: 8px 16px calc(8px + env(safe-area-inset-bottom)) 16px;
+    border-top: 1px solid var(--ink);
+    font-size: 11px;
+    color: var(--ink-2);
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
+  }
+  .site-footer__bar a { color: inherit; }
+
   .site-footer__contact {
+    position: fixed;
+    /* Bar ki height ke barabar exact upar fixed rahega */
+    bottom: calc(36px + env(safe-area-inset-bottom));
+    left: 0;
+    width: 100%;
+    z-index: 9998;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: 1px;
-    margin-bottom: 48px;
+    margin-bottom: 0;
     border-block: 1px solid var(--rule-2);
     background: var(--rule-2);
     font-style: normal;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
+    /* Mobile ke liye max-height taaki screen ke andar scrollable rahe aur kate nahi */
+    max-height: 38vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
-  /* Mid widths: the three emails on one row, phone and WhatsApp on the next. */
   @media (min-width: 560px) and (max-width: 1279px) {
-    .site-footer__contact { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+    .site-footer__contact { grid-template-columns: repeat(6, minmax(0, 1fr)); max-height: none; overflow-y: visible; }
     .site-footer__route { grid-column: span 2; }
     .site-footer__route:nth-child(n + 4) { grid-column: span 3; }
   }
   @media (min-width: 1280px) {
-    .site-footer__contact { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    .site-footer__contact { grid-template-columns: repeat(5, minmax(0, 1fr)); max-height: none; overflow-y: visible; }
   }
+
   .site-footer__route {
     display: flex;
     align-items: center;
-    gap: 14px;
-    min-height: 76px;
-    padding: 14px clamp(14px, 1.6vw, 24px);
+    gap: 10px;
+    min-height: 44px; /* Mobile par height compact ki gayi hai taaki kate nahi */
+    padding: 8px 14px;
     background: #fff;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 600;
     text-decoration: none;
     transition: background-color 0.2s, box-shadow 0.2s;
   }
-  /* Narrow cells: the icon sits above the text to leave the address room. */
   @media (min-width: 560px) and (max-width: 899px) {
-    .site-footer__route { flex-direction: column; align-items: flex-start; gap: 8px; padding-block: 16px; }
+    .site-footer__route { flex-direction: column; align-items: flex-start; gap: 2px; padding-block: 8px; min-height: 52px; }
   }
   .site-footer__route:hover { background: var(--yellow-tint); box-shadow: inset 0 3px 0 var(--yellow); }
   .site-footer__route :global(svg) { flex: none; color: var(--primary); }
-  .site-footer__route-text { display: grid; gap: 2px; line-height: 1.3; }
-  .site-footer__route-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .site-footer__route-text { display: grid; gap: 1px; line-height: 1.1; }
+  .site-footer__route-label { font-size: 9px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  
   .site-footer__cols {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -188,15 +226,4 @@ const contacts = [
     .site-footer__cols a { min-height: 36px; }
   }
   .site-footer__cols a:hover { color: var(--primary); text-decoration: underline; text-underline-offset: 4px; }
-  .site-footer__bar {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 8px 24px;
-    padding: 20px 0 28px;
-    border-top: 1px solid var(--ink);
-    font-size: 13px;
-    color: var(--ink-2);
-  }
-  .site-footer__bar a { color: inherit; }
 </style>
