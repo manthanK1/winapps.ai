@@ -1,11 +1,11 @@
 ---
 // Home hero, as in the design: a full-height stage for the WebGL W, with the
-// text block bottom-left. The header (absolute, outside <main>) overlays the
-// top. #ribbon-word is the WINAPPS wordmark the ribbon places under its W.
+// text block bottom-left, clear of the footer's fixed strip. The header (fixed,
+// outside <main>) overlays the top. #ribbon-word is the WINAPPS wordmark the ribbon places under its W.
 //
 // Wide screens (landscape): the W fills the upper middle and its left wave
 // dips to ~48% of the height, and the wordmark spans ~69–78% from 50vw. V1's
-// copy is taller than the design's, so the headline, CTAs and WhatsApp line
+// copy is taller than the design's, so the headline and CTAs
 // stay bottom-left (headline sized by height as well as width, like the W) and
 // the lead moves to the right column, under the wordmark. DOM order is kept.
 // Narrow screens (portrait phones and tablets): the ribbon draws the W centred
@@ -31,9 +31,6 @@ const { hero } = HOME;
       <a href={href(SITE.bookingPath)} class="btn btn--primary">{hero.primary.label} <Icon name="arrow" size={18} class="arrow" /></a>
       <a href={href(hero.secondary.href)} class="link-u">{hero.secondary.label}</a>
     </div>
-    <p class="hero__wa veil">
-      {hero.whatsappNote} <a class="hero__wa-link" href={SITE.whatsappHref} target="_blank" rel="noopener">WhatsApp</a>
-    </p>
   </div>
   <div class="hero__scroll" aria-hidden="true">SCROLL<span></span></div>
 </section>
@@ -48,29 +45,18 @@ const { hero } = HOME;
     min-height: 640px;
     min-height: max(640px, 100vh);
     min-height: max(640px, 100svh);
-    padding: calc(var(--header-h) + 32px) var(--gutter) clamp(32px, 7vh, 72px);
+    padding: calc(var(--header-h) + 32px) var(--gutter) calc(clamp(32px, 7vh, 72px) + var(--footer-fixed-h));
     overflow: clip;
   }
   .hero__text { max-width: min(680px, 44vw); }
   .hero__text > .eyebrow { margin-bottom: 22px; }
   .hero__lead { margin-top: 24px; max-width: 54ch; }
   .hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px; margin-top: 36px; }
-  .hero__wa { margin-top: 12px; font-size: 14px; color: var(--ink-2); }
-  .hero__wa-link {
-    display: inline-flex;
-    align-items: center;
-    min-height: 44px;
-    font-weight: 600;
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 4px;
-  }
-  .hero__wa-link:hover { text-decoration-thickness: 2px; }
 
   .hero__scroll {
     position: absolute;
     right: var(--gutter);
-    bottom: clamp(32px, 7vh, 72px);
+    bottom: calc(clamp(32px, 7vh, 72px) + var(--footer-fixed-h));
     display: flex;
     align-items: center;
     gap: 12px;
@@ -105,7 +91,7 @@ const { hero } = HOME;
       min-height: 100svh;
       padding-top: 60vh;
       padding-top: 60svh;
-      padding-bottom: clamp(48px, 8vw, 72px);
+      padding-bottom: calc(clamp(48px, 8vw, 72px) + var(--footer-fixed-h));
     }
     .hero__text { max-width: 680px; }
     .hero__scroll { display: none; }

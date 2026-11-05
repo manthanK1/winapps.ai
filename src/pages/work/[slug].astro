@@ -151,7 +151,7 @@ const hasNext = next !== undefined && next.id !== entry.id;
   .cs { display: grid; gap: 48px; }
   @media (min-width: 1024px) {
     .cs { grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); gap: clamp(40px, 6vw, 112px); align-items: start; }
-    .cs__aside { grid-column: 2; grid-row: 1; position: sticky; top: 32px; }
+    .cs__aside { grid-column: 2; grid-row: 1; position: sticky; top: calc(var(--header-h) + 24px); }
     .cs__main { grid-column: 1; grid-row: 1; }
   }
 

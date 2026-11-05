@@ -5,7 +5,7 @@
 // "# <H1>", then a short plain answer taken from the page's own lead, then the
 // content. Links are absolute on the production origin (Astro `site`).
 import type { CollectionEntry } from "astro:content";
-import { EMAILS, PROMISES, SITE, SOCIAL, STACK, BUDGETS, NEEDS, contactFor, whatsappFor } from "../data/site";
+import { EMAILS, PROMISES, SITE, SOCIAL, STACK, BUDGETS, NEEDS, contactFor, trainingEmailFor } from "../data/site";
 import {
   ABOUT_PAGE,
   AI_PAGE,
@@ -78,12 +78,10 @@ const bullets = (items: readonly string[]) => items.map((i) => `- ${i}`).join("\
 const numbered = (items: readonly string[]) => items.map((i, n) => `${n + 1}. ${i}`).join("\n");
 /** Square brackets would break a link label. */
 const label = (text: string) => text.replace(/([[\]])/g, "\\$1");
-/** Parentheses would end a Markdown link early (WhatsApp messages, course names). */
+/** Parentheses would end a Markdown link early (enquiry messages, course names). */
 const safeUrl = (url: string) => url.replace(/\(/g, "%28").replace(/\)/g, "%29");
-/** WhatsApp chat link, optionally with the first message typed. */
-const waLink = (text: string, message?: string) =>
-  `[${label(text)}](${safeUrl(message ? whatsappFor(message) : SITE.whatsappHref)})`;
-const telLink = () => `[${SITE.phone}](${SITE.phoneHref})`;
+/** Training enquiry email link with the message already typed. */
+const askLink = (text: string, message: string) => `[${label(text)}](${safeUrl(trainingEmailFor(message))})`;
 const mailLink = () => `[${SITE.email}](mailto:${SITE.email})`;
 const trainingMail = () => `[${SITE.emailTraining}](mailto:${SITE.emailTraining})`;
 /** A collection entry's Markdown body: LF line endings, no HTML comments (V1's TODO notes). */
@@ -91,7 +89,7 @@ const body = (md: string | undefined) => stripComments((md ?? "").replace(/\r\n?
 
 /**
  * Last pass over every document: plain spaces instead of the non-breaking
- * ones the HTML uses (phone number), no runs of blank lines, one final newline.
+ * ones the HTML uses, no runs of blank lines, one final newline.
  */
 const NBSP = String.fromCharCode(0xa0);
 export const finish = (md: string) =>
@@ -133,8 +131,6 @@ function splitLead(md: string, min = 2): { lead: string; rest: string } {
 function contactList(L: Links) {
   return bullets([
     ...EMAILS.map((e) => `${e.label}: [${e.address}](mailto:${e.address})`),
-    `Phone: ${telLink()}`,
-    `WhatsApp: ${SITE.whatsappHref}`,
     `${CTA.primary}: ${L.url(SITE.bookingPath)}`,
   ]);
 }
@@ -147,7 +143,6 @@ function ctaBlock(L: Links, title: string = CTA.title, text: string = CTA.text) 
     bullets([
       L.link(CTA.primary, SITE.bookingPath),
       `${CTA.email}: ${mailLink()}`,
-      `${CTA.alt.before} ${waLink(CTA.alt.whatsapp)}${CTA.alt.middle} ${telLink()}${CTA.alt.after}`,
     ])
   );
 }
@@ -230,7 +225,6 @@ export async function homeMd(site: Site) {
       bullets([
         L.link(HOME.hero.primary.label, SITE.bookingPath),
         L.link(HOME.hero.secondary.label, HOME.hero.secondary.href),
-        `${CTA.alt.before} ${waLink(CTA.alt.whatsapp)}`,
       ]),
       // V1's label for the promise tiles under the hero.
       `## Our commitments`,
@@ -253,7 +247,7 @@ export async function homeMd(site: Site) {
       L.link(HOME.training.allLink, "/training/"),
       `### ${TRAINING_ADVICE.title}`,
       TRAINING_ADVICE.text,
-      waLink(TRAINING_ADVICE.cta, TRAINING_ADVICE.message),
+      askLink(TRAINING_ADVICE.cta, TRAINING_ADVICE.message),
 
       `## ${headingText(HOME.work)}`,
       HOME.work.intro,
@@ -483,7 +477,7 @@ export async function trainingMd(site: Site) {
     join(
       `# ${headingText(TRAINING_PAGE.hero)}`,
       TRAINING_PAGE.hero.lead(counts),
-      bullets([waLink(TRAINING_ADVICE.cta, TRAINING_PAGE.askMessage), telLink(), trainingMail()]),
+      bullets([askLink(TRAINING_ADVICE.cta, TRAINING_PAGE.askMessage), trainingMail()]),
       ...AUDIENCES.map((a) =>
         join(
           `## ${L.link(TRAINING_PAGE.audiences[a].label, `/training/#${a}`)}`,
@@ -504,14 +498,14 @@ export async function trainingMd(site: Site) {
               c.summary,
               `${TRAINING_PAGE.learn}:`,
               bullets(c.topics),
-              `${waLink(TRAINING_PAGE.enquire, TRAINING_PAGE.courseMessage(c.name))} · [Markdown](${L.url(mdPath(coursePath(c.id)))})`
+              `${askLink(TRAINING_PAGE.enquire, TRAINING_PAGE.courseMessage(c.name))} · [Markdown](${L.url(mdPath(coursePath(c.id)))})`
             )
           )
         )
       ),
       `## ${TRAINING_PAGE.cta.title}`,
       TRAINING_PAGE.cta.text,
-      bullets([waLink(TRAINING_ADVICE.cta, TRAINING_ADVICE.message), telLink(), trainingMail()])
+      bullets([askLink(TRAINING_ADVICE.cta, TRAINING_ADVICE.message), trainingMail()])
     )
   );
 }
@@ -537,12 +531,12 @@ export async function programmeMd(site: Site, p: Programme) {
       ].filter((x): x is string => Boolean(x))),
       `## ${TRAINING_PAGE.learn}`,
       bullets(p.data.topics),
-      `${waLink(TRAINING_PAGE.enquire, TRAINING_PAGE.courseMessage(p.data.name))} · ${telLink()} · ${trainingMail()}`,
+      `${askLink(TRAINING_PAGE.enquire, TRAINING_PAGE.courseMessage(p.data.name))} · ${trainingMail()}`,
       siblings.length > 0 && join(`## ${audience}`, bullets(siblings.map((o) => programmeLine(L, o)))),
       L.link(HOME.training.allLink, "/training/"),
       `## ${TRAINING_ADVICE.title}`,
       TRAINING_ADVICE.text,
-      waLink(TRAINING_ADVICE.cta, TRAINING_ADVICE.message)
+      askLink(TRAINING_ADVICE.cta, TRAINING_ADVICE.message)
     )
   );
 }
@@ -559,12 +553,12 @@ export async function courseMd(site: Site, course: Course) {
       `${TRAINING_PAGE.trackEyebrow(n + 1)}: ${L.link(course.track.name, `/training/#${course.track.id}`)}. ${course.track.intro}`,
       `## ${TRAINING_PAGE.learn}`,
       bullets(course.topics),
-      `${waLink(TRAINING_PAGE.enquire, TRAINING_PAGE.courseMessage(course.name))} · ${telLink()} · ${trainingMail()}`,
+      `${askLink(TRAINING_PAGE.enquire, TRAINING_PAGE.courseMessage(course.name))} · ${trainingMail()}`,
       siblings.length > 0 && join(`## ${course.track.name}`, bullets(siblings.map((c) => `${L.page(c.name, coursePath(c.id))}: ${c.summary}`))),
       L.link(HOME.training.allLink, "/training/"),
       `## ${TRAINING_ADVICE.title}`,
       TRAINING_ADVICE.text,
-      waLink(TRAINING_ADVICE.cta, TRAINING_ADVICE.message)
+      askLink(TRAINING_ADVICE.cta, TRAINING_ADVICE.message)
     )
   );
 }
@@ -601,8 +595,6 @@ function factsList() {
     ...PROMISES.map((p) => p.label),
     CONTACT_PAGE.basedIn,
     ...EMAILS.map((e) => `${e.label}: ${e.address}`),
-    `Phone: ${SITE.phone}`,
-    `WhatsApp: ${SITE.whatsappHref}`,
     ...SOCIAL.map((s) => `${s.label}: ${s.href}`),
   ]);
 }
@@ -853,8 +845,6 @@ export async function llmsTxt(site: Site) {
       `## How to contact`,
       bullets([
         ...EMAILS.map((e) => `${e.label}: [${e.address}](mailto:${e.address})`),
-        `Phone: ${SITE.phoneIntl}`,
-        `WhatsApp: ${SITE.whatsappHref}`,
         `${CTA.primary}: ${L.url(SITE.bookingPath)}`,
         `${L.page(CONTACT_PAGE.meta.title, "/contact/")}: ${CONTACT_PAGE.meta.description}`,
       ]),

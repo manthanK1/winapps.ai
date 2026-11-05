@@ -35,7 +35,7 @@ Edit content here; pages, JSON-LD, `llms.txt`, the Markdown page versions and th
 
 | What | Where |
 | --- | --- |
-| Company facts (name, legal name, phone, email, WhatsApp, founding year, regions), navigation, footer, contact-form options, promises, tech stack | `src/data/site.ts` |
+| Company facts (name, legal name, email, founding year, regions), navigation, footer, contact-form options, promises, tech stack | `src/data/site.ts` |
 | Page-level copy from V1, word for word (hero text, section headings, process, trust, engagement models, CTAs, labels) | `src/data/copy.ts` |
 | The six services | `src/content/services/*.md` |
 | Case studies | `src/content/work/*.md` |

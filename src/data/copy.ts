@@ -29,7 +29,15 @@ export const HOME = {
     lead: "We design, build and scale AI systems, web and mobile products and cloud platforms for companies in India, the US, the UK and Europe.",
     primary: { label: "Book a 30-min intro call", href: "/contact/" },
     secondary: { label: "See our work", href: "/work/" },
-    whatsappNote: "or message us on",
+  },
+  journey: {
+    title: "Our Journey",
+    lead: "Driven by innovation and excellence, our work has earned industry recognition. We build solutions that stand out for quality, performance, and reliability. Every award motivates us to raise the bar even higher.",
+    cta: "Free Consultation",
+    stats: [
+      { number: "1,300+", label: "Projects executed successfully" },
+      { number: "100+", label: "Industry sectors covered" },
+    ],
   },
   // V1's intro panel heading, above the trust strip.
   intro: {
@@ -109,7 +117,7 @@ export const HOME = {
 export const TRAINING_ADVICE = {
   title: "Not sure where to start?",
   text: "Tell us what you know today and where you want to get to. We'll suggest a course and share batch dates, timings and fees.",
-  cta: "Ask on WhatsApp",
+  cta: "Ask by email",
   message: "Hi, I'd like help choosing a training course.",
 } as const;
 
@@ -212,14 +220,23 @@ export const ENGAGEMENT_MODELS = [
 export const ENGAGEMENT_BADGE = "Most chosen";
 export const ENGAGEMENT_REPLY = "Reply within 1 business day";
 
+/** Short enquiry form at the top of the footer, on every page. */
+export const FOOTER_FORM = {
+  title: "Start a Project With Us",
+  text: "Get in touch with Winapps Software Solutions Pvt. Ltd. Fill out the form below and our team will get back to you shortly.",
+  name: "Full Name",
+  email: "Work Email",
+  message: "Message",
+  messagePlaceholder: "Tell us about your project or inquiry...",
+  submit: "Send Message",
+} as const;
+
 /** Closing call to action on every page (V1 CtaBand). */
 export const CTA = {
   title: "Tell us what you're building.",
   text: "A senior engineer, not a salesperson, replies within one business day. NDA available before any detailed discussion.",
   primary: "Book a 30-min intro call",
   email: "Email us",
-  // "Or message us on WhatsApp, or call +91 70157 96830."
-  alt: { before: "Or message us on", whatsapp: "WhatsApp", middle: ", or call", after: "." },
 } as const;
 
 // ---------------------------------------------------------- Inner pages ----
@@ -347,7 +364,7 @@ export const TRAINING_PAGE = {
     title: "Practical training",
     accent: "in the skills teams hire for.",
     lead: (n: TrainingCounts) =>
-      `${n.programmes} programmes of ${n.minMonths} to ${n.maxMonths} months for working professionals and college students, and ${n.courses} short courses in ${n.tracks} tracks. Pick one and message us on WhatsApp for the next batch, timings and fees.`,
+      `${n.programmes} programmes of ${n.minMonths} to ${n.maxMonths} months for working professionals and college students, and ${n.courses} short courses in ${n.tracks} tracks. Pick one and email us for the next batch, timings and fees.`,
   },
   audiences: {
     professionals: { label: "For working professionals", short: "Professionals" },
@@ -366,7 +383,7 @@ export const TRAINING_PAGE = {
   askMessage: "Hi, I'd like to know about your training courses.",
   trackEyebrow: (n: number) => `Track 0${n}`,
   learn: "What you'll learn",
-  enquire: "Enquire on WhatsApp",
+  enquire: "Enquire by email",
   courseMessage: (name: string) => `Hi, I'm interested in the ${name} training. Could you share the next batch, timings and fees?`,
   cta: {
     title: "Not sure which course fits?",
@@ -457,7 +474,7 @@ export const CONTACT_PAGE = {
   meta: {
     title: "Contact",
     description:
-      "Tell us what you're building. A senior engineer replies within one business day. Email sales@winapps.co.in or call +91 70157 96830.",
+      "Tell us what you're building. A senior engineer replies within one business day. Email sales@winapps.co.in.",
   },
   hero: {
     eyebrow: "Contact",

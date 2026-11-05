@@ -21,12 +21,6 @@ export const SITE = {
   emailInfo: "info@winapps.co.in",
   /** Training courses: batches, timings and fees. */
   emailTraining: "training@winapps.co.in",
-  // Non-breaking spaces keep the number on one line.
-  phone: "+91 70157 96830",
-  /** schema.org / llms.txt form */
-  phoneIntl: "+91-70157-96830",
-  phoneHref: "tel:+917015796830",
-  whatsappHref: "https://wa.me/917015796830",
   /** Where every "Book a call" button goes (V1 had no external booking tool). */
   bookingPath: "/contact/",
   linkedin: "https://www.linkedin.com/company/winapps.co.in/",
@@ -115,9 +109,9 @@ export const BUDGETS = ["Not sure yet", "$5,000 – $10,000", "$10,000 – $25,0
 
 export const COUNTRIES = ["United States", "United Kingdom", "Germany", "Netherlands", "Sweden", "France", "Other in Europe", "India", "Other"] as const;
 
-/** WhatsApp chat link with the first message already typed. */
-export function whatsappFor(message: string): string {
-  return `${SITE.whatsappHref}?text=${encodeURIComponent(message)}`;
+/** Email to the training team with the message already typed. */
+export function trainingEmailFor(message: string): string {
+  return `mailto:${SITE.emailTraining}?subject=${encodeURIComponent("Training enquiry")}&body=${encodeURIComponent(message)}`;
 }
 
 /** Contact page link that pre-selects the need for a practice. */

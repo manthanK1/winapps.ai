@@ -1,7 +1,7 @@
 ---
 // Closing call to action on every page, as the site's one dark band (deep
-// teal, mint grid): h2 left, orange button right, with V1's copy and all four
-// routes: call, email, WhatsApp, phone.
+// teal, mint grid): h2 left, orange button right, with V1's copy and both
+// routes: call and email.
 import Icon from "./Icon.astro";
 import { CTA } from "../data/copy";
 import { SITE } from "../data/site";
@@ -26,10 +26,6 @@ const { title = CTA.title, text = CTA.text, id = "cta-title" } = Astro.props;
         <a href={`mailto:${SITE.email}`} class="btn btn--outline">{CTA.email} <Icon name="arrow" size={18} class="arrow" /></a>
       </div>
     </div>
-    <p class="cta-band__alt">
-      {CTA.alt.before} <a class="link" href={SITE.whatsappHref} target="_blank" rel="noopener">{CTA.alt.whatsapp}</a>{CTA.alt.middle}{" "}
-      <a class="link" href={SITE.phoneHref}>{SITE.phone}</a>{CTA.alt.after}
-    </p>
   </div>
 </section>
 
@@ -45,7 +41,6 @@ const { title = CTA.title, text = CTA.text, id = "cta-title" } = Astro.props;
   }
   .cta-band__lead { margin-top: 20px; max-width: 60ch; }
   .cta-band__actions { display: flex; flex-wrap: wrap; gap: 12px; }
-  .cta-band__alt { display: inline-block; margin-top: 28px; font-size: 15px; color: var(--on-dark-2); }
   @media (max-width: 520px) {
     .cta-band__actions, .cta-band__actions .btn { width: 100%; }
   }

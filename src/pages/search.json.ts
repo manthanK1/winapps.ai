@@ -62,7 +62,7 @@ export const GET: APIRoute = async () => {
     },
     { title: HOW_PAGE.meta.title, description: HOW_PAGE.meta.description, url: href("/how-we-work/"), kind: "Page", keywords: "process engagement models FAQ" },
     { title: ABOUT_PAGE.meta.title, description: ABOUT_PAGE.meta.description, url: href("/about/"), kind: "Page", keywords: words(SITE.legalName, SITE.alternateName) },
-    { title: CONTACT_PAGE.meta.title, description: CONTACT_PAGE.meta.description, url: href("/contact/"), kind: "Page", keywords: "book a call WhatsApp email phone" },
+    { title: CONTACT_PAGE.meta.title, description: CONTACT_PAGE.meta.description, url: href("/contact/"), kind: "Page", keywords: "book a call email" },
     { title: BLOG_PAGE.meta.title, description: BLOG_PAGE.meta.description, url: href("/blog/"), kind: "Page", keywords: "insights guides" },
     { title: NEWS_PAGE.meta.title, description: NEWS_PAGE.meta.description, url: href("/news/"), kind: "Page", keywords: "insights" },
     // Legal pages carry no summary of their own; the title is enough to find them.
