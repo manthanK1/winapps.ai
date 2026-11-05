@@ -229,6 +229,8 @@ export const FOOTER_FORM = {
   message: "Message",
   messagePlaceholder: "Tell us about your project or inquiry...",
   submit: "Send Message",
+  privacy: "We use your details only to reply to this inquiry.",
+  privacyLink: "Privacy notice",
 } as const;
 
 /** Closing call to action on every page (V1 CtaBand). */
@@ -511,6 +513,8 @@ export const CONTACT_PAGE = {
     privacy: "We use your details only to reply to this inquiry. NDA available before any detailed discussion.",
     preferEmail: "Prefer email? Write to",
     checkFields: "Please check the highlighted fields.",
+    captcha: "Please complete the security check, then send again.",
+    noScript: "This form needs JavaScript. Please email us instead:",
     opening: "Opening your email app. If nothing happens, write to",
     sending: "Sending…",
     thanks: "Thanks, your inquiry is in.",

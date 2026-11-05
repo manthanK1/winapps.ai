@@ -1,8 +1,7 @@
 ---
 // Contact form (V1 ContactForm, restyled). With PUBLIC_WEB3FORMS_KEY set it
-// posts to Web3Forms (works without JS too: Web3Forms redirects back to
-// /contact/?sent=1). Without a key it falls back to composing an email. A
-// honeypot field blocks simple bots.
+// posts to Web3Forms, protected by hCaptcha, which needs JavaScript. Without a
+// key it falls back to composing an email. A honeypot field also blocks simple bots.
 // Links can pre-fill it: ?interest=<need> (repeatable) and ?message=<text>.
 // Service pages and the home "What do you want to build?" box use this.
 import Icon from "./Icon.astro";
@@ -30,6 +29,7 @@ const redirect = absolute("/contact/?sent=1", Astro.site);
       <input type="hidden" name="subject" value="New project inquiry from winapps website" />
       <input type="hidden" name="from_name" value="Winapps website" />
       <input type="hidden" name="redirect" value={redirect} />
+      <input type="hidden" name="source" value="Contact page form" />
     </>
   )}
   <!-- Honeypot: humans never see or fill this. -->
@@ -95,6 +95,9 @@ const redirect = absolute("/contact/?sent=1", Astro.site);
     <p class="field-error" id="cf-message-error" hidden>{f.messageError}</p>
   </div>
 
+  {key && <div class="cf__captcha" data-captcha-box></div>}
+  {key && <noscript><p class="cf__note">{f.noScript} <a class="link" href={`mailto:${SITE.email}`}>{SITE.email}</a></p></noscript>}
+
   <div class="cf__actions">
     <button type="submit" class="btn btn--primary cf__submit" data-submit>
       {f.submit} <Icon name="arrow" size={18} class="arrow" />
@@ -110,6 +113,7 @@ const redirect = absolute("/contact/?sent=1", Astro.site);
 <style>
   .cf { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; }
   .cf__hp { display: none; }
+  .cf__captcha:empty { display: none; }
   .cf__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
   @media (min-width: 640px) {
     .cf__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -136,6 +140,7 @@ const redirect = absolute("/contact/?sent=1", Astro.site);
 <script>
   import { CONTACT_PAGE } from "../data/copy";
   import { SITE } from "../data/site";
+  import { attachCaptcha, sendLead } from "../scripts/lead-form";
 
   const T = CONTACT_PAGE.form;
   type Field = HTMLInputElement | HTMLTextAreaElement;
@@ -184,6 +189,7 @@ const redirect = absolute("/contact/?sent=1", Astro.site);
       status.replaceChildren(...parts);
     };
     const thanks = () => setStatus("ok", strong(T.thanks), ` ${T.thanksText}`);
+    const captcha = form.dataset.mode === "web3forms" ? attachCaptcha(form) : undefined;
 
     for (const el of fields) {
       el.addEventListener("blur", () => {
@@ -231,13 +237,19 @@ const redirect = absolute("/contact/?sent=1", Astro.site);
       if (submit) submit.disabled = true;
       setStatus("info", T.sending);
       try {
+        if (!(await captcha?.solved())) {
+          setStatus("error", T.captcha);
+          return;
+        }
         data.set("needs", needs);
-        const res = await fetch(form.action, { method: "POST", headers: { Accept: "application/json" }, body: data });
-        const json: { success?: boolean } = await res.json().catch(() => ({}));
-        if (!res.ok || !json.success) throw new Error("Request failed");
+        // The token is added here: hCaptcha may have rendered after `data` was read.
+        data.set("h-captcha-response", String(new FormData(form).get("h-captcha-response") ?? ""));
+        await sendLead(form, data);
         form.reset();
+        captcha?.reset();
         thanks();
       } catch {
+        captcha?.reset();
         setStatus(
           "error",
           `${T.failed} `,

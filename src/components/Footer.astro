@@ -6,13 +6,14 @@
 // posts to Web3Forms when PUBLIC_WEB3FORMS_KEY is set and otherwise composes an email.
 import Icon from "./Icon.astro";
 import { EMAILS, FOOTER, SITE, SOCIAL } from "../data/site";
-import { FOOTER_FORM, TRAINING_PAGE } from "../data/copy";
+import { CONTACT_PAGE, FOOTER_FORM, TRAINING_PAGE } from "../data/copy";
 import { AUDIENCES, getServices } from "../lib/content";
 import { absolute, href } from "../lib/url";
 
 const services = await getServices();
 const year = new Date().getFullYear();
 const key = import.meta.env.PUBLIC_WEB3FORMS_KEY as string | undefined;
+const t = CONTACT_PAGE.form;
 ---
 <footer class="site-footer" id="contact">
   <div class="container">
@@ -35,6 +36,7 @@ const key = import.meta.env.PUBLIC_WEB3FORMS_KEY as string | undefined;
             <input type="hidden" name="subject" value="New project inquiry from winapps website" />
             <input type="hidden" name="from_name" value="Winapps website" />
             <input type="hidden" name="redirect" value={absolute("/contact/?sent=1", Astro.site)} />
+            <input type="hidden" name="source" value="Footer form" />
             <!-- Honeypot: humans never see or fill this. -->
             <input type="checkbox" name="botcheck" class="sr-only" tabindex="-1" aria-hidden="true" />
           </>
@@ -51,9 +53,24 @@ const key = import.meta.env.PUBLIC_WEB3FORMS_KEY as string | undefined;
           <label for="footer-message" class="sr-only">{FOOTER_FORM.message}</label>
           <textarea id="footer-message" name="message" placeholder={FOOTER_FORM.messagePlaceholder} rows="3" required class="footer-input footer-textarea"></textarea>
         </div>
+        {key && <div class="footer-form__wide footer-form__captcha" data-captcha-box></div>}
+        {key && <noscript><p class="footer-form__wide footer-form__note">{t.noScript} <a href={`mailto:${SITE.email}`}>{SITE.email}</a></p></noscript>}
         <div class="footer-form__wide">
-          <button type="submit" class="btn btn--primary">{FOOTER_FORM.submit} <Icon name="arrow" size={18} class="arrow" /></button>
+          <button type="submit" class="btn btn--primary" data-submit>{FOOTER_FORM.submit} <Icon name="arrow" size={18} class="arrow" /></button>
         </div>
+        <p class="footer-form__wide footer-form__note">{FOOTER_FORM.privacy} <a href={href("/privacy/")}>{FOOTER_FORM.privacyLink}</a>.</p>
+        <div
+          role="status"
+          aria-live="polite"
+          class="footer-form__wide footer-form__status"
+          data-form-status
+          data-sending={t.sending}
+          data-captcha={t.captcha}
+          data-thanks={`${t.thanks} ${t.thanksText}`}
+          data-failed={t.failed}
+          data-failed-link={t.failedLink}
+          data-failed-or={t.failedOr}
+        ></div>
       </form>
     </div>
 
@@ -168,6 +185,16 @@ const key = import.meta.env.PUBLIC_WEB3FORMS_KEY as string | undefined;
   }
   .footer-input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgb(0 0 0 / 0.05); }
   .footer-textarea { display: block; min-height: 90px; resize: vertical; }
+  .footer-form__captcha:empty { display: none; }
+  .footer-form__note { font-size: 13px; color: var(--muted); }
+  .footer-form__note a { color: inherit; }
+  .footer-form__status { font-size: 15px; line-height: 1.5; color: var(--ink); }
+  .footer-form__status:empty { display: none; }
+  .footer-form__status:not(:empty) { padding: 16px 18px; border-left: 2px solid var(--rule-2); }
+  .footer-form__status[data-kind="ok"] { border-left-color: var(--primary); background: #e7f0f1; }
+  .footer-form__status[data-kind="error"] { border-left-color: var(--accent); background: #fdf1e2; }
+  .footer-form__status[data-kind="info"] { color: var(--ink-2); background: #fff; }
+  .footer-form__status a { text-decoration: underline; }
   .site-footer__grid {
     display: grid;
     gap: 48px;
@@ -271,14 +298,62 @@ const key = import.meta.env.PUBLIC_WEB3FORMS_KEY as string | undefined;
 
 <script>
   import { SITE } from "../data/site";
+  import { attachCaptcha, sendLead } from "../scripts/lead-form";
 
-  // Without a Web3Forms key there is nowhere to post to, so compose an email.
-  const form = document.querySelector<HTMLFormElement>('[data-footer-form][data-mode="mailto"]');
-  form?.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const data = new FormData(form);
-    const summary = [`Name: ${data.get("name")}`, `Email: ${data.get("email")}`, "", String(data.get("message"))].join("\n");
-    const subject = `Project inquiry from ${data.get("name")}`;
-    window.location.href = `mailto:${SITE.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(summary)}`;
-  });
+  const form = document.querySelector<HTMLFormElement>("[data-footer-form]");
+  if (form) {
+    const web3forms = form.dataset.mode === "web3forms";
+    const captcha = web3forms ? attachCaptcha(form) : undefined;
+    const status = form.querySelector<HTMLElement>("[data-form-status]");
+    const submit = form.querySelector<HTMLButtonElement>("[data-submit]");
+    const T = status?.dataset ?? {};
+
+    // Messages are built as DOM nodes, so nothing typed can end up as markup.
+    const setStatus = (kind: "ok" | "error" | "info", ...parts: (string | Node)[]) => {
+      if (!status) return;
+      status.dataset.kind = kind;
+      status.replaceChildren(...parts);
+    };
+    const link = (url: string, text: string) => {
+      const a = document.createElement("a");
+      a.href = url;
+      a.textContent = text;
+      return a;
+    };
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = new FormData(form);
+      const summary = [`Name: ${data.get("name")}`, `Email: ${data.get("email")}`, "", String(data.get("message"))].join("\n");
+      const subject = `Project inquiry from ${data.get("name")}`;
+      const mailto = `mailto:${SITE.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(summary)}`;
+
+      // Without a Web3Forms key there is nowhere to post to, so compose an email.
+      if (!web3forms) {
+        window.location.href = mailto;
+        return;
+      }
+      if (data.get("botcheck")) return;
+
+      if (submit) submit.disabled = true;
+      setStatus("info", T.sending ?? "");
+      try {
+        if (!(await captcha?.solved())) {
+          setStatus("error", T.captcha ?? "");
+          return;
+        }
+        // The token is added here: hCaptcha may have rendered after `data` was read.
+        data.set("h-captcha-response", String(new FormData(form).get("h-captcha-response") ?? ""));
+        await sendLead(form, data);
+        form.reset();
+        captcha?.reset();
+        setStatus("ok", T.thanks ?? "");
+      } catch {
+        captcha?.reset();
+        setStatus("error", `${T.failed} `, link(mailto, T.failedLink ?? ""), ` ${T.failedOr} `, link(`mailto:${SITE.email}`, SITE.email), ".");
+      } finally {
+        if (submit) submit.disabled = false;
+      }
+    });
+  }
 </script>
