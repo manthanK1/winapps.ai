@@ -1,6 +1,6 @@
 ---
-// Contact: the inquiry form beside the direct routes (email, phone,
-// WhatsApp, social) and what happens after you write. The ContactPage
+// Contact: the inquiry form beside the direct routes (email, social)
+// and what happens after you write. The ContactPage
 // JSON-LD node replaces the generic WebPage node.
 import BaseLayout from "../layouts/BaseLayout.astro";
 import PageHero from "../components/PageHero.astro";
@@ -51,12 +51,6 @@ const schema = contactPage(Astro.site, {
                 </a>
               </li>
             ))}
-            <li>
-              <a class="direct__link" href={SITE.phoneHref}><Icon name="phone" size={20} />{SITE.phone}</a>
-            </li>
-            <li>
-              <a class="direct__link" href={SITE.whatsappHref} target="_blank" rel="noopener"><Icon name="whatsapp" size={20} />WhatsApp</a>
-            </li>
           </ul>
           <p class="contact__row contact__social">
             {CONTACT_PAGE.alsoOn} <a class="link" href={SITE.linkedin} target="_blank" rel="noopener">LinkedIn</a> and <a class="link" href={SITE.instagram} target="_blank" rel="noopener">Instagram</a>.

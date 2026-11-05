@@ -1,32 +1,64 @@
 ---
-// Footer in the design's language (1px ink rule, near-white panel, 13px
-// meta row) carrying all of V1's columns: Services, Training, Explore,
-// Company, Legal, Social, then every contact route as one strip of equal
-// cells (so the brand column and the link columns come out the same height).
+// Footer in the design's language (1px ink rule, near-white panel): a short
+// enquiry form (#contact), then all of V1's columns: Services, Training,
+// Explore, Company, Legal, Social. The email strip and the meta row stay fixed
+// to the bottom of the screen on every page. Like the contact form, the form
+// posts to Web3Forms when PUBLIC_WEB3FORMS_KEY is set and otherwise composes an email.
 import Icon from "./Icon.astro";
 import { EMAILS, FOOTER, SITE, SOCIAL } from "../data/site";
-import { TRAINING_PAGE } from "../data/copy";
+import { FOOTER_FORM, TRAINING_PAGE } from "../data/copy";
 import { AUDIENCES, getServices } from "../lib/content";
-import { href } from "../lib/url";
+import { absolute, href } from "../lib/url";
 
 const services = await getServices();
 const year = new Date().getFullYear();
-const contacts = [
-  ...EMAILS.map((e) => ({ icon: "mail" as const, label: e.label, value: e.address, href: `mailto:${e.address}`, external: false })),
-  { icon: "phone" as const, label: "Phone", value: SITE.phone, href: SITE.phoneHref, external: false },
-  { icon: "whatsapp" as const, label: "WhatsApp", value: "Chat with us", href: SITE.whatsappHref, external: true },
-];
+const key = import.meta.env.PUBLIC_WEB3FORMS_KEY as string | undefined;
 ---
-<footer class="site-footer">
+<footer class="site-footer" id="contact">
   <div class="container">
+    <div class="footer-form-section">
+      <div class="footer-form-header">
+        <h2 class="footer-form-title">{FOOTER_FORM.title}</h2>
+        <p class="footer-form-subtitle">{FOOTER_FORM.text}</p>
+      </div>
+      <form
+        class="footer-form"
+        method="post"
+        action={key ? "https://api.web3forms.com/submit" : `mailto:${SITE.email}`}
+        enctype={key ? undefined : "text/plain"}
+        data-footer-form
+        data-mode={key ? "web3forms" : "mailto"}
+      >
+        {key && (
+          <>
+            <input type="hidden" name="access_key" value={key} />
+            <input type="hidden" name="subject" value="New project inquiry from winapps website" />
+            <input type="hidden" name="from_name" value="Winapps website" />
+            <input type="hidden" name="redirect" value={absolute("/contact/?sent=1", Astro.site)} />
+            <!-- Honeypot: humans never see or fill this. -->
+            <input type="checkbox" name="botcheck" class="sr-only" tabindex="-1" aria-hidden="true" />
+          </>
+        )}
+        <div>
+          <label for="footer-name" class="sr-only">{FOOTER_FORM.name}</label>
+          <input type="text" id="footer-name" name="name" placeholder={FOOTER_FORM.name} autocomplete="name" required class="footer-input" />
+        </div>
+        <div>
+          <label for="footer-email" class="sr-only">{FOOTER_FORM.email}</label>
+          <input type="email" id="footer-email" name="email" placeholder={FOOTER_FORM.email} autocomplete="email" required class="footer-input" />
+        </div>
+        <div class="footer-form__wide">
+          <label for="footer-message" class="sr-only">{FOOTER_FORM.message}</label>
+          <textarea id="footer-message" name="message" placeholder={FOOTER_FORM.messagePlaceholder} rows="3" required class="footer-input footer-textarea"></textarea>
+        </div>
+        <div class="footer-form__wide">
+          <button type="submit" class="btn btn--primary">{FOOTER_FORM.submit} <Icon name="arrow" size={18} class="arrow" /></button>
+        </div>
+      </form>
+    </div>
+
     <div class="site-footer__grid">
       <div class="site-footer__brand">
-        <a href={href("/")} class="site-footer__logo" aria-label={`${SITE.name} home`}>
-          <picture>
-            <source srcset={href("/brand/winapps-logo-still.webp")} type="image/webp" media="(prefers-reduced-motion: reduce)" />
-            <img src={href("/brand/winapps-logo.gif")} alt={SITE.name} width="257" height="287" loading="lazy" decoding="async" />
-          </picture>
-        </a>
         <p class="site-footer__legal">{SITE.legalName}</p>
         <p class="site-footer__blurb">{FOOTER.blurb}</p>
       </div>
@@ -72,13 +104,13 @@ const contacts = [
     </div>
 
     <address class="site-footer__contact">
-      {contacts.map((c) => (
-        <a class="site-footer__route" href={c.href} {...(c.external ? { target: "_blank", rel: "noopener" } : {})}>
-          <Icon name={c.icon} size={20} />
+      {EMAILS.map((e) => (
+        <a class="site-footer__route" href={`mailto:${e.address}`}>
+          <Icon name="mail" size={16} />
           <span class="site-footer__route-text">
-            <span class="site-footer__route-label">{c.label}</span>
+            <span class="site-footer__route-label">{e.label}</span>
             {/* An address may wrap at "@" if it must, never mid-word. */}
-            <span>{c.icon === "mail" ? <>{c.value.split("@")[0]}<wbr />@{c.value.split("@")[1]}</> : c.value}</span>
+            <span>{e.address.split("@")[0]}<wbr />@{e.address.split("@")[1]}</span>
           </span>
         </a>
       ))}
@@ -86,7 +118,7 @@ const contacts = [
 
     <div class="site-footer__bar">
       <p>© {SITE.founded}–{year} {SITE.name}®. All rights reserved.</p>
-      <p>{SITE.legalName} · <a href={`mailto:${SITE.email}`}>{SITE.email}</a> · <a href={SITE.phoneHref}>{SITE.phone}</a></p>
+      <p>{SITE.legalName} · <a href={`mailto:${SITE.email}`}>{SITE.email}</a></p>
     </div>
   </div>
 </footer>
@@ -107,59 +139,88 @@ const contacts = [
     background-size: auto, auto, var(--depth-grid-cell) var(--depth-grid-cell), var(--depth-grid-cell) var(--depth-grid-cell);
     background-position: 0 0, 0 0, center top, center top;
     color: var(--ink);
+    /* Room to scroll the last links clear of the fixed strip and meta row. */
+    padding-bottom: calc(var(--footer-fixed-h) + 24px);
   }
+  .footer-form-section {
+    padding-block: clamp(40px, 6vw, 60px) 40px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .footer-form-header { max-width: 600px; margin-bottom: 24px; }
+  .footer-form-title { margin-bottom: 8px; font: 600 clamp(1.5rem, 2.5vw, 2rem)/1.2 var(--font-display); letter-spacing: -0.02em; }
+  .footer-form-subtitle { font-size: 0.95rem; color: var(--ink-2); }
+  .footer-form { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  @media (min-width: 768px) {
+    .footer-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .footer-form__wide { grid-column: span 2; }
+  }
+  .footer-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--rule-2);
+    border-radius: 8px;
+    outline: none;
+    background: #fff;
+    font-size: 14px;
+    color: var(--ink);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .footer-input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgb(0 0 0 / 0.05); }
+  .footer-textarea { display: block; min-height: 90px; resize: vertical; }
   .site-footer__grid {
     display: grid;
     gap: 48px;
-    padding-block: clamp(48px, 6vw, 80px) 48px;
+    padding-block: clamp(32px, 5vw, 60px) 32px;
   }
   @media (min-width: 1100px) {
     .site-footer__grid { grid-template-columns: minmax(260px, 1fr) 2.6fr; gap: 64px; }
   }
-  .site-footer__logo { display: inline-flex; height: 64px; overflow: hidden; }
-  .site-footer__logo img { height: 72px; width: auto; max-width: none; }
-  .site-footer__legal { margin-top: 12px; font: 600 18px/1.25 var(--font-display); letter-spacing: -0.01em; }
+  .site-footer__legal { font: 600 18px/1.25 var(--font-display); letter-spacing: -0.01em; }
   .site-footer__blurb { margin-top: 10px; max-width: 34ch; font-size: 14px; color: var(--ink-2); }
   /* Contact strip: equal cells split by 1px rules (the list colour shows
-     through the gaps), like the home commitments row. */
+     through the gaps), like the home commitments row. Fixed just above the
+     meta row; --footer-fixed-h (global.css) is the height of the pair. */
   .site-footer__contact {
+    position: fixed;
+    left: 0;
+    bottom: calc(56px + env(safe-area-inset-bottom));
+    z-index: 9998;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: 1px;
-    margin-bottom: 48px;
+    width: 100%;
     border-block: 1px solid var(--rule-2);
     background: var(--rule-2);
+    box-shadow: 0 -4px 12px rgb(0 0 0 / 0.08);
     font-style: normal;
   }
-  /* Mid widths: the three emails on one row, phone and WhatsApp on the next. */
-  @media (min-width: 560px) and (max-width: 1279px) {
-    .site-footer__contact { grid-template-columns: repeat(6, minmax(0, 1fr)); }
-    .site-footer__route { grid-column: span 2; }
-    .site-footer__route:nth-child(n + 4) { grid-column: span 3; }
+  @media (min-width: 560px) {
+    .site-footer__contact { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   }
-  @media (min-width: 1280px) {
-    .site-footer__contact { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  @media (min-width: 640px) {
+    .site-footer__contact { bottom: calc(36px + env(safe-area-inset-bottom)); }
   }
   .site-footer__route {
     display: flex;
     align-items: center;
-    gap: 14px;
-    min-height: 76px;
-    padding: 14px clamp(14px, 1.6vw, 24px);
+    gap: 10px;
+    min-height: 44px;
+    padding: 8px 14px;
     background: #fff;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 600;
     text-decoration: none;
     transition: background-color 0.2s, box-shadow 0.2s;
   }
   /* Narrow cells: the icon sits above the text to leave the address room. */
   @media (min-width: 560px) and (max-width: 899px) {
-    .site-footer__route { flex-direction: column; align-items: flex-start; gap: 8px; padding-block: 16px; }
+    .site-footer__route { flex-direction: column; align-items: flex-start; gap: 2px; min-height: 52px; padding-block: 8px; }
   }
   .site-footer__route:hover { background: var(--yellow-tint); box-shadow: inset 0 3px 0 var(--yellow); }
   .site-footer__route :global(svg) { flex: none; color: var(--primary); }
-  .site-footer__route-text { display: grid; gap: 2px; line-height: 1.3; }
-  .site-footer__route-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .site-footer__route-text { display: grid; gap: 1px; line-height: 1.1; }
+  .site-footer__route-label { font-size: 9px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
   .site-footer__cols {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -189,14 +250,35 @@ const contacts = [
   }
   .site-footer__cols a:hover { color: var(--primary); text-decoration: underline; text-underline-offset: 4px; }
   .site-footer__bar {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    z-index: 9999;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    gap: 8px 24px;
-    padding: 20px 0 28px;
+    gap: 4px 12px;
+    width: 100%;
+    padding: 8px 16px calc(8px + env(safe-area-inset-bottom));
     border-top: 1px solid var(--ink);
-    font-size: 13px;
+    background-color: var(--paper);
+    box-shadow: 0 -4px 12px rgb(0 0 0 / 0.08);
+    font-size: 11px;
     color: var(--ink-2);
   }
   .site-footer__bar a { color: inherit; }
 </style>
+
+<script>
+  import { SITE } from "../data/site";
+
+  // Without a Web3Forms key there is nowhere to post to, so compose an email.
+  const form = document.querySelector<HTMLFormElement>('[data-footer-form][data-mode="mailto"]');
+  form?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const data = new FormData(form);
+    const summary = [`Name: ${data.get("name")}`, `Email: ${data.get("email")}`, "", String(data.get("message"))].join("\n");
+    const subject = `Project inquiry from ${data.get("name")}`;
+    window.location.href = `mailto:${SITE.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(summary)}`;
+  });
+</script>

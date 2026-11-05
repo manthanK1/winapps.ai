@@ -140,8 +140,19 @@
   --gutter: clamp(16px, 3vw, 40px);
   --maxw: 1520px;
   --header-h: 76px;
+  /* Height of the footer's fixed email strip and meta row together. */
+  --footer-fixed-h: 192px;
   --section-y: clamp(64px, 8vw, 128px);
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (min-width: 560px) {
+  :root { --footer-fixed-h: 112px; }
+}
+@media (min-width: 640px) {
+  :root { --footer-fixed-h: 96px; }
+}
+@media (min-width: 900px) {
+  :root { --footer-fixed-h: 84px; }
 }
 @media (max-width: 640px) {
   :root { --header-h: 64px; }
@@ -155,7 +166,8 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  scroll-padding-top: 24px;
+  /* Anchors land below the fixed header. */
+  scroll-padding-top: calc(var(--header-h) + 24px);
 }
 @media (prefers-reduced-motion: no-preference) {
   html { scroll-behavior: smooth; }
@@ -350,8 +362,6 @@ address { font-style: normal; }
 .btn--ghost-light:hover { background: var(--yellow); border-color: var(--yellow); color: var(--ink); }
 .btn--sm { min-height: 44px; padding: 0 16px; gap: 10px; font-size: 14px; }
 .btn--block { width: 100%; }
-.btn .wa-icon { flex: none; }
-.btn--outline:hover .wa-icon path { fill: currentColor; }
 
 .link-u {
   display: inline-flex;

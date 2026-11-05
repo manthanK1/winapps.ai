@@ -39,6 +39,8 @@ export interface RibbonConfig {
   /** WINAPPS wordmark size, × the design's (1): landscape screens, then portrait (phones), where the hero text starts close below it. */
   wordmarkScale: number;
   wordmarkScaleNarrow: number;
+  /** Landscape only: how far the W and wordmark sit above the design's place, in CSS px, so they keep their gap to the hero text, which clears the footer's fixed strip (--footer-fixed-h). */
+  landscapeLiftPx: number;
   /** W ribbon width, × Lh (design: 0.22). */
   wWidth: number;
   /** Fold radius at each W point, × Lh (design: 0.075). */
@@ -74,6 +76,7 @@ export const RIBBON_CONFIG: RibbonConfig = {
   showWordmark: true,
   wordmarkScale: 2,
   wordmarkScaleNarrow: 1.25,
+  landscapeLiftPx: 84,
   wWidth: 0.22,
   foldRadius: 0.075,
   wMiddle: 0.4,
@@ -632,7 +635,7 @@ class Ribbon {
     const Lh = Math.min(1.35, halfW * (narrow ? 0.62 : 0.5));
     const cxW = narrow ? 0 : halfW * 0.26;
     // Inner pages: the W sits above the top edge, only the flick and descent show.
-    const cyW = inner ? halfH + cfg.inner.wAbove * Lh + cfg.inner.wAboveOffset : narrow ? 0.55 : 0.32;
+    const cyW = inner ? halfH + cfg.inner.wAbove * Lh + cfg.inner.wAboveOffset : narrow ? 0.55 : 0.32 + cfg.landscapeLiftPx * pxToWorld;
     const xStart = -halfW * 1.35;
 
     const WP = this.WP;

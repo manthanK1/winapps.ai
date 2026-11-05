@@ -1,13 +1,12 @@
 ---
-// Site header, as in the design: animated logo, nav links, WhatsApp (square
-// outline), Book a call (solid #134F53), search, and the black MENU button
-// that opens the full-screen dark-teal overlay. Every menu and submenu link
-// is a plain <a href> in the HTML, so crawlers see them all.
+// Site header, as in the design: animated logo, nav links, Book a call (solid
+// #134F53), search, and the black MENU button that opens the full-screen
+// dark-teal overlay. Every menu and submenu link is a plain <a href> in the
+// HTML, so crawlers see them all.
 //
-// Widths: nav links show from 900px (MENU still holds everything); all labels
-// show from 1140px, and 900–1139 sheds the WhatsApp label (then, below 1000,
-// the MENU label). ≤640px is one row: logo · WhatsApp (icon) · Book a call
-// (text) · MENU; ≤400px MENU is icon-only. Every control stays ≥ 44×44.
+// Widths: nav links show from 900px (MENU still holds everything); below 1000
+// the MENU label goes. ≤640px is one row: logo · Book a call (text) · MENU;
+// ≤400px MENU is icon-only. Every control stays ≥ 44×44.
 import Icon from "./Icon.astro";
 import { INSIGHTS, MENU_LINKS, NAV, SITE } from "../data/site";
 import { TRAINING_PAGE } from "../data/copy";
@@ -157,9 +156,6 @@ const menuActive = (menu: string) =>
   </nav>
 
   <div class="site-actions">
-    <a href={SITE.whatsappHref} target="_blank" rel="noopener" class="btn btn--outline btn--sm hdr-wa" aria-label="Chat on WhatsApp">
-      <Icon name="whatsapp" size={18} class="wa-icon" /><span class="hdr-wa__label">WhatsApp</span>
-    </a>
     <a href={href(SITE.bookingPath)} class="btn btn--primary btn--sm hdr-book">
       Book a call <Icon name="arrow" size={14} class="arrow hdr-book__arrow" />
     </a>
@@ -210,12 +206,10 @@ const menuActive = (menu: string) =>
       <div class="menu-overlay__contact">
         <div class="menu-overlay__ctas">
           <a href={href(SITE.bookingPath)} class="btn btn--accent">Book a 30-min intro call <Icon name="arrow" size={16} class="arrow" /></a>
-          <a href={SITE.whatsappHref} target="_blank" rel="noopener" class="btn btn--ghost-light"><Icon name="whatsapp" size={18} class="wa-icon" /> WhatsApp</a>
         </div>
         <p class="menu-overlay__note">Reply within 1 business day · NDA before the first call</p>
         <p class="menu-overlay__direct">
           <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
-          <a href={SITE.phoneHref}>{SITE.phone}</a>
         </p>
       </div>
     </div>
@@ -237,7 +231,7 @@ const menuActive = (menu: string) =>
 <style>
   /* ---- Bar --------------------------------------------------------------- */
   .site-header {
-    position: absolute;
+    position: fixed;
     inset: 0 0 auto 0;
     z-index: 20;
     display: flex;
@@ -371,7 +365,6 @@ const menuActive = (menu: string) =>
 
   /* ---- Actions ----------------------------------------------------------- */
   .site-actions { display: flex; align-items: center; gap: 10px; flex: none; }
-  .hdr-wa { color: var(--ink); font-weight: 600; }
   .hdr-book { white-space: nowrap; }
   .hdr-icon {
     display: flex;
@@ -409,12 +402,6 @@ const menuActive = (menu: string) =>
     .hdr-menu:hover { transform: translateY(-2px); }
   }
 
-  /* 900–1139: nav links and every label need ~1100px on one row (1140 leaves
-     slack for font metrics), so shed the least-needed labels first. */
-  @media (min-width: 900px) and (max-width: 1139px) {
-    .hdr-wa { width: 44px; padding: 0; }
-    .hdr-wa__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-  }
   @media (min-width: 900px) and (max-width: 999px) {
     .site-actions { gap: 6px; }
     .hdr-book { padding: 0 14px; }
@@ -429,8 +416,6 @@ const menuActive = (menu: string) =>
     .site-logo { padding-top: 4px; }
     .site-logo img { height: 66px; }
     .site-actions { gap: 8px; }
-    .hdr-wa { width: 44px; padding: 0; }
-    .hdr-wa__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
     .hdr-book { padding: 0 12px; font-size: 13px; }
     .hdr-book :global(.hdr-book__arrow) { display: none; }
     .hdr-search { display: none; }

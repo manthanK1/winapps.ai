@@ -204,6 +204,6 @@ const num = (i: number) => String(i + 1).padStart(2, "0");
   .faq-row__head :global(.section-head) { margin-bottom: 32px; }
   @media (min-width: 1024px) {
     .faq-row { grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: clamp(40px, 6vw, 112px); align-items: start; }
-    .faq-row__head { position: sticky; top: 32px; }
+    .faq-row__head { position: sticky; top: calc(var(--header-h) + 24px); }
   }
 </style>

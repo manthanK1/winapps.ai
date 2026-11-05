@@ -154,7 +154,7 @@ if (d.faq.length) schemas.push(faqPage(d.faq));
   @media (min-width: 1024px) {
     .post { grid-template-columns: minmax(0, 3fr) minmax(0, 8fr); gap: clamp(32px, 4vw, 72px); align-items: start; }
     /* The grid item itself sticks (align-items: start keeps it short). */
-    .post__toc { position: sticky; top: 32px; }
+    .post__toc { position: sticky; top: calc(var(--header-h) + 24px); }
   }
   .post__toc-box { padding: 24px; }
   .toc { margin-top: 12px; border-top: 1px solid var(--rule); }

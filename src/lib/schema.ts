@@ -23,16 +23,7 @@ export function contactPoints() {
       "@type": "ContactPoint",
       contactType: "sales",
       email: SITE.email,
-      telephone: SITE.phoneIntl,
       areaServed: ["IN", "US", "GB", "EU"],
-      availableLanguage: ["English"],
-    },
-    {
-      "@type": "ContactPoint",
-      contactType: "sales",
-      name: "WhatsApp",
-      url: SITE.whatsappHref,
-      telephone: SITE.phoneIntl,
       availableLanguage: ["English"],
     },
     {
@@ -45,7 +36,6 @@ export function contactPoints() {
       "@type": "ContactPoint",
       contactType: "training enquiries",
       email: SITE.emailTraining,
-      telephone: SITE.phoneIntl,
       availableLanguage: ["English"],
     },
   ];
@@ -67,7 +57,6 @@ export function organization(site: Site, logoUrl: string, imageUrl: string) {
     foundingDate: String(SITE.founded),
     foundingLocation: { "@type": "Country", name: SITE.country },
     email: SITE.email,
-    telephone: SITE.phoneIntl,
     address: SITE.address
       ? { "@type": "PostalAddress", ...SITE.address }
       : { "@type": "PostalAddress", addressCountry: "IN" },
@@ -180,7 +169,7 @@ export const coursePath = (id: string) => `/training/${id}/`;
 
 /**
  * Course + CourseInstance. No price, schedule or course mode: V1 publishes
- * none (people enquire on WhatsApp). TODO(Winapps): add courseMode and
+ * none (people enquire by email). TODO(Winapps): add courseMode and
  * schedule once confirmed, then they can go here.
  */
 export function course(site: Site, c: CourseInput) {
@@ -254,7 +243,7 @@ export function article(
   };
 }
 
-/** ContactPage with the organisation's contact points (sales, WhatsApp). */
+/** ContactPage with the organisation's contact points (sales, general, training). */
 export function contactPage(site: Site, p: { name: string; description: string; path: string }) {
   return webPage(site, {
     type: "ContactPage",
