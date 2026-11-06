@@ -9,16 +9,20 @@ Local builds (`npm run build`) default to the production domain.
 
 ## Uploading to cPanel
 
-1. Put the Web3Forms key in a `.env` file in the project root (git ignores it): `PUBLIC_WEB3FORMS_KEY=...`. Astro bakes it into the HTML, as Web3Forms intends for browser forms. It is not read from GitHub, so a build without this file ships forms that only open the visitor's email app.
+1. Put the Web3Forms keys in a `.env` file in the project root (git ignores it): `PUBLIC_WEB3FORMS_KEY=...` and `PUBLIC_WEB3FORMS_HR_KEY=...`. Astro bakes them into the HTML, as Web3Forms intends for browser forms. They are not read from GitHub, so a build without this file ships forms that only open the visitor's email app.
 2. In PowerShell, run `Remove-Item Env:SITE_URL, Env:BASE_PATH -ErrorAction SilentlyContinue`, then `npm run build` and `npm run qa`.
 3. Check that the canonical link in `dist/index.html` shows `www.winapps.co.in` and `dist/contact/index.html` contains `data-mode="web3forms"`. A build made for the preview has the wrong URLs, so never upload one.
 4. Download a backup of `public_html`.
 5. Over FTPS, upload the contents of `dist/`, not the folder itself, into `public_html`: `_astro` first, then the rest. Delete nothing: leave `.htaccess`, `.well-known`, `cgi-bin` and any mail folders in place.
-6. Send a test enquiry from the contact form and the footer form, and check it reaches sales@winapps.co.in.
+6. Send a test enquiry from the contact form and the footer form, and check it reaches sales@winapps.co.in. Send a test application with a resume from a page under `/careers/`, and check it reaches hr@winapps.co.in with the file attached.
 
 ### Contact forms
 
 Both lead forms post from the visitor's browser to Web3Forms, so the server does no form processing. Enquiries go to the address the access key was created with. hCaptcha uses Web3Forms' shared free-plan site key (`src/scripts/lead-form.ts`) and must be enabled in the Web3Forms dashboard for the form.
+
+### Job application form
+
+The form on each `/careers/<id>/` page takes a resume (PDF, DOC or DOCX, up to 5 MB). File attachments need a paid Web3Forms Pro plan, and the file only reaches HR if the key was created with hr@winapps.co.in, so this form uses its own key, `PUBLIC_WEB3FORMS_HR_KEY`. Enable hCaptcha for it in the dashboard as well. Without the key, the form opens the applicant's email app addressed to HR and asks them to attach the resume there. To change the roles, edit `src/content/careers.yaml`.
 
 ## Build settings
 
@@ -29,6 +33,7 @@ All are read at build time. In GitHub, set them as repository **variables** (Set
 | `SITE_URL` | `SITE_URL` | CI: `https://manthank1.github.io` · local: `https://www.winapps.co.in` | Origin for canonicals, sitemap, Open Graph, JSON-LD, llms.txt and the .md pages |
 | `BASE_PATH` | `BASE_PATH` | CI: `/winapps.ai/` · local: `/` | Sub-path the site is served from. `/` on the custom domain |
 | `WEB3FORMS_KEY` | `PUBLIC_WEB3FORMS_KEY` | _(empty)_ | Web3Forms access key for the contact and footer forms (created with sales@winapps.co.in). Without it the forms open the visitor's email app. Local builds read it from `.env` |
+| `WEB3FORMS_HR_KEY` | `PUBLIC_WEB3FORMS_HR_KEY` | _(empty)_ | Web3Forms Pro access key for the job application form (created with hr@winapps.co.in). Without it the form opens the applicant's email app. Local builds read it from `.env` |
 | `PLAUSIBLE_DOMAIN` | `PUBLIC_PLAUSIBLE_DOMAIN` | _(empty)_ | Turns on cookieless Plausible analytics, e.g. `www.winapps.co.in` |
 
 ## GitHub Pages setup (once)

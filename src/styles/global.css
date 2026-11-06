@@ -141,14 +141,14 @@
   --maxw: 1520px;
   --header-h: 76px;
   /* Height of the footer's fixed email strip and meta row together. */
-  --footer-fixed-h: 192px;
+  --footer-fixed-h: 108px;
   --section-y: clamp(64px, 8vw, 128px);
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
-@media (min-width: 560px) {
-  :root { --footer-fixed-h: 112px; }
-}
 @media (min-width: 640px) {
+  :root { --footer-fixed-h: 88px; }
+}
+@media (min-width: 720px) {
   :root { --footer-fixed-h: 96px; }
 }
 @media (min-width: 900px) {

@@ -177,4 +177,24 @@ const programmes = defineCollection({
   }),
 });
 
-export const collections = { services, work, faq, industries, training, programmes, testimonials, clients, team, blog, news };
+// Open roles: /careers/ and /careers/<id>/.
+const careers = defineCollection({
+  loader: file("src/content/careers.yaml"),
+  schema: z.object({
+    title: z.string(),
+    order: z.number(),
+    department: z.string().optional(),
+    location: z.string(),
+    jobType: z.string(),
+    experience: z.string(),
+    summary: z.string(),
+    seoDescription: z.string().max(170),
+    about: z.string(),
+    responsibilities: z.array(z.object({ heading: z.string().optional(), items: z.array(z.string()).min(1) })).min(1),
+    sections: z.array(z.object({ title: z.string(), items: z.array(z.string()).min(1) })).min(1),
+    offer: z.array(z.string()).min(1),
+    apply: z.string(),
+  }),
+});
+
+export const collections = { services, work, faq, industries, training, programmes, careers, testimonials, clients, team, blog, news };

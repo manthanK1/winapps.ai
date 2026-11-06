@@ -9,6 +9,9 @@ export const getServices = async () => (await getCollection("services")).sort(by
 export const getWork = async () => (await getCollection("work")).sort(byOrder);
 export const getIndustries = async () => (await getCollection("industries")).sort(byOrder);
 export const getTracks = async () => (await getCollection("training")).sort(byOrder);
+export type Career = CollectionEntry<"careers">;
+export const getCareers = async () => (await getCollection("careers")).sort(byOrder);
+export const careerPath = (id: string) => `/careers/${id}/`;
 export const getFaq = async () => (await getCollection("faq")).sort(byOrder).map((f) => f.data);
 export const getBlog = async () =>
   (await getCollection("blog")).sort((a, b) => b.data.updated.valueOf() - a.data.updated.valueOf());

@@ -525,6 +525,63 @@ export const CONTACT_PAGE = {
   },
 } as const;
 
+export const CAREERS_PAGE = {
+  meta: {
+    title: "Careers",
+    description:
+      "Open roles at Winapps in Karnal, Haryana: developers, QA, design, marketing, business analysis and business development. Upload your resume on each role's page.",
+  },
+  hero: {
+    eyebrow: "Careers",
+    title: "Build software",
+    accent: "with us.",
+    lead: "We're hiring in Karnal, Haryana. Every role is full-time and works from our office. Pick a role, read what it involves and upload your resume on its page.",
+  },
+  listTitle: "Open roles",
+  listEyebrow: "Now hiring",
+  viewRole: "View role and apply",
+  apply: "Apply now",
+  allRoles: "All open roles",
+  aboutTitle: "About the role",
+  responsibilitiesTitle: "Key responsibilities",
+  offerTitle: "What we offer",
+  moreEyebrow: "Careers",
+  moreTitle: "Other open roles",
+  questions: {
+    title: "Questions about a role?",
+    text: "Write to our HR team and we'll help.",
+  },
+  form: {
+    title: "Apply for this role",
+    name: "Full name",
+    nameError: "Please enter your name.",
+    email: "Email",
+    emailError: "Please enter a valid email address.",
+    phone: "Phone",
+    phoneError: "Please enter a phone number.",
+    portfolio: "Portfolio or LinkedIn link",
+    message: "Anything you'd like to add",
+    optional: "(optional)",
+    resume: "Resume / CV",
+    resumeHint: "PDF, DOC or DOCX, up to 5 MB",
+    resumeMissing: "Please upload your resume.",
+    resumeType: "Please upload a PDF, DOC or DOCX file.",
+    resumeSize: "This file is over 5 MB. Please upload a smaller one.",
+    submit: "Submit application",
+    privacy: "We use your details and resume only to consider you for this role.",
+    privacyLink: "Privacy notice",
+    checkFields: "Please check the highlighted fields.",
+    captcha: "Please complete the security check, then submit again.",
+    noScript: "This form needs JavaScript. Please email your resume to",
+    sending: "Sending your application…",
+    thanks: "Thanks, your application is in.",
+    thanksText: "Our HR team will review it and contact you if there's a fit.",
+    opening: "Opening your email app. Attach your resume to that email before you send it. If nothing happens, email it to",
+    attachNote: "Resume: please attach it to this email before sending.",
+    failed: "Your application couldn't be sent. Please email your resume to",
+  },
+} as const;
+
 export const BLOG_PAGE = {
   meta: {
     title: "Blog",

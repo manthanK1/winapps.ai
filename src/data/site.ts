@@ -21,6 +21,8 @@ export const SITE = {
   emailInfo: "info@winapps.co.in",
   /** Training courses: batches, timings and fees. */
   emailTraining: "training@winapps.co.in",
+  /** Jobs and people questions. */
+  emailHr: "hr@winapps.co.in",
   /** Where every "Book a call" button goes (V1 had no external booking tool). */
   bookingPath: "/contact/",
   linkedin: "https://www.linkedin.com/company/winapps.co.in/",
@@ -36,12 +38,13 @@ export const EMAILS = [
   { label: "New projects", address: SITE.email },
   { label: "General enquiries", address: SITE.emailInfo },
   { label: "Training", address: SITE.emailTraining },
+  { label: "HR", address: SITE.emailHr },
 ] as const;
 
 export const SOCIAL = [
-  { label: "LinkedIn", href: SITE.linkedin },
-  { label: "Instagram", href: SITE.instagram },
-  { label: "Facebook", href: SITE.facebook },
+  { label: "LinkedIn", href: SITE.linkedin, icon: "linkedin" },
+  { label: "Instagram", href: SITE.instagram, icon: "instagram" },
+  { label: "Facebook", href: SITE.facebook, icon: "facebook" },
 ] as const;
 
 // Primary navigation (header). Items with `menu` open a dropdown built from
@@ -54,6 +57,7 @@ export const NAV = [
   { label: "Insights", href: "/blog/", menu: "insights" },
   { label: "About", href: "/about/" },
   { label: "Training", href: "/training/", menu: "training" },
+  { label: "Careers", href: "/careers/" },
 ] as const;
 
 export const INSIGHTS = [
@@ -70,6 +74,7 @@ export const MENU_LINKS = [
   { label: "Blog", href: "/blog/" },
   { label: "News", href: "/news/" },
   { label: "About", href: "/about/" },
+  { label: "Careers", href: "/careers/" },
   { label: "Contact", href: "/contact/" },
 ] as const;
 
@@ -84,6 +89,7 @@ export const FOOTER = {
   ],
   company: [
     { label: "About", href: "/about/" },
+    { label: "Careers", href: "/careers/" },
     { label: "Contact", href: "/contact/" },
   ],
   legal: [

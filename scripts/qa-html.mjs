@@ -142,8 +142,9 @@ for (const b of broken) fail("link", b);
 const slugs = (dir) => readdirSync(join("src/content", dir)).filter((f) => f.endsWith(".md") && !f.startsWith("_")).map((f) => f.replace(/\.md$/, ""));
 const courseIds = [...readFileSync("src/content/training.yaml", "utf8").matchAll(/^[ \t]+- id:[ \t]*["']?([\w-]+)/gm)].map((m) => m[1]);
 const programmeIds = [...readFileSync("src/content/programmes.yaml", "utf8").matchAll(/^- id:[ \t]*["']?([\w-]+)/gm)].map((m) => m[1]);
+const careerIds = [...readFileSync("src/content/careers.yaml", "utf8").matchAll(/^- id:[ \t]*["']?([\w-]+)/gm)].map((m) => m[1]);
 const required = [
-  "/", "/services/", "/work/", "/ai/", "/how-we-work/", "/industries/", "/training/", "/blog/", "/news/", "/about/", "/contact/",
+  "/", "/services/", "/work/", "/ai/", "/how-we-work/", "/industries/", "/training/", "/blog/", "/news/", "/about/", "/contact/", "/careers/", "/careers.md",
   "/privacy/", "/terms/", "/disclaimer/", "/404.html",
   ...slugs("services").map((s) => `/services/${s}/`),
   ...slugs("work").map((s) => `/work/${s}/`),
@@ -151,6 +152,7 @@ const required = [
   ...slugs("news").map((s) => `/news/${s}/`),
   ...courseIds.map((c) => `/training/${c}/`),
   ...programmeIds.flatMap((p) => [`/training/${p}/`, `/training/${p}.md`]),
+  ...careerIds.flatMap((c) => [`/careers/${c}/`, `/careers/${c}.md`]),
   "/llms.txt", "/llms-full.txt", "/robots.txt", "/sitemap-index.xml", "/search.json", "/site.webmanifest",
   "/.well-known/security.txt", "/favicon.ico", "/brand/og.png", "/index.md", "/about.md", "/ai.md", "/services/ai-ml.md",
 ];
