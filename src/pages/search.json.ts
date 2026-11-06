@@ -8,6 +8,7 @@ import {
   ABOUT_PAGE,
   AI_PAGE,
   BLOG_PAGE,
+  CAREERS_PAGE,
   CONTACT_PAGE,
   HOME,
   HOW_PAGE,
@@ -18,7 +19,7 @@ import {
   TRAINING_PAGE,
   WORK_PAGE,
 } from "../data/copy";
-import { getBlog, getCourses, getIndustries, getNews, getProgrammes, getServices, getTracks, getWork, trainingCounts } from "../lib/content";
+import { careerPath, getBlog, getCareers, getCourses, getIndustries, getNews, getProgrammes, getServices, getTracks, getWork, trainingCounts } from "../lib/content";
 import { coursePath } from "../lib/schema";
 import { href } from "../lib/url";
 
@@ -29,7 +30,7 @@ const words = (...parts: (string | readonly string[] | undefined)[]) =>
   [...new Set(parts.flat().filter((p): p is string => Boolean(p)))].join(" ");
 
 export const GET: APIRoute = async () => {
-  const [services, work, industries, tracks, courses, programmes, counts, blog, news] = await Promise.all([
+  const [services, work, industries, tracks, courses, programmes, counts, careers, blog, news] = await Promise.all([
     getServices(),
     getWork(),
     getIndustries(),
@@ -37,6 +38,7 @@ export const GET: APIRoute = async () => {
     getCourses(),
     getProgrammes(),
     trainingCounts(),
+    getCareers(),
     getBlog(),
     getNews(),
   ]);
@@ -63,6 +65,7 @@ export const GET: APIRoute = async () => {
     { title: HOW_PAGE.meta.title, description: HOW_PAGE.meta.description, url: href("/how-we-work/"), kind: "Page", keywords: "process engagement models FAQ" },
     { title: ABOUT_PAGE.meta.title, description: ABOUT_PAGE.meta.description, url: href("/about/"), kind: "Page", keywords: words(SITE.legalName, SITE.alternateName) },
     { title: CONTACT_PAGE.meta.title, description: CONTACT_PAGE.meta.description, url: href("/contact/"), kind: "Page", keywords: "book a call email" },
+    { title: CAREERS_PAGE.meta.title, description: CAREERS_PAGE.meta.description, url: href("/careers/"), kind: "Page", keywords: "jobs hiring open roles vacancies apply resume" },
     { title: BLOG_PAGE.meta.title, description: BLOG_PAGE.meta.description, url: href("/blog/"), kind: "Page", keywords: "insights guides" },
     { title: NEWS_PAGE.meta.title, description: NEWS_PAGE.meta.description, url: href("/news/"), kind: "Page", keywords: "insights" },
     // Legal pages carry no summary of their own; the title is enough to find them.
@@ -112,6 +115,13 @@ export const GET: APIRoute = async () => {
       url: href(coursePath(c.id)),
       kind: "Course",
       keywords: words(c.track.name, c.topics),
+    })),
+    ...careers.map((r) => ({
+      title: r.data.title,
+      description: r.data.summary,
+      url: href(careerPath(r.id)),
+      kind: "Job",
+      keywords: words("job career hiring", r.data.location, r.data.experience),
     })),
     ...blog.map((p) => ({
       title: p.data.title,

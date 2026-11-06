@@ -41,10 +41,11 @@ function frontmatterDate(file, key) {
 function sourcesFor(path) {
   const shared = ["src/data/site.ts", "src/data/copy.ts"];
   if (path === "/") return ["src/pages/index.astro", "src/content", ...shared];
-  const detail = path.match(/^\/(services|work|training)\/([^/]+)\/$/);
+  const detail = path.match(/^\/(services|work|training|careers)\/([^/]+)\/$/);
   if (detail) {
     const [, dir, slug] = detail;
     const page = `src/pages/${dir}/[slug].astro`;
+    if (dir === "careers") return [page, "src/content/careers.yaml"];
     return dir === "training" ? [page, "src/content/training.yaml", "src/content/programmes.yaml"] : [page, `src/content/${dir}/${slug}.md`];
   }
   const name = path.replace(/^\/|\/$/g, "");
@@ -54,6 +55,7 @@ function sourcesFor(path) {
     services: ["src/content/services"],
     work: ["src/content/work"],
     training: ["src/content/training.yaml", "src/content/programmes.yaml"],
+    careers: ["src/content/careers.yaml"],
     industries: ["src/content/industries.yaml"],
     "how-we-work": ["src/content/faq.yaml"],
     blog: ["src/content/blog"],

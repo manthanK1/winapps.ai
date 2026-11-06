@@ -11,6 +11,7 @@ import {
   AI_PAGE,
   BLOG_PAGE,
   BLOG_POST,
+  CAREERS_PAGE,
   CLOCKS,
   CONTACT_PAGE,
   CTA,
@@ -35,7 +36,9 @@ import {
 } from "../data/copy";
 import {
   AUDIENCES,
+  careerPath,
   getBlog,
+  getCareers,
   getCourses,
   getFaq,
   getIndustries,
@@ -46,6 +49,7 @@ import {
   getWork,
   stripComments,
   trainingCounts,
+  type Career,
   type Course,
   type Programme,
 } from "./content";
@@ -650,6 +654,45 @@ export async function contactMd(site: Site) {
   );
 }
 
+// -------------------------------------------------------------- Careers ----
+
+const hrMail = () => `[${SITE.emailHr}](mailto:${SITE.emailHr})`;
+
+export async function careersMd(site: Site) {
+  const L = linker(site);
+  return finish(
+    join(
+      `# ${headingText(CAREERS_PAGE.hero)}`,
+      CAREERS_PAGE.hero.lead,
+      `## ${CAREERS_PAGE.listTitle}`,
+      bullets((await getCareers()).map((r) => `${L.page(r.data.title, careerPath(r.id))}: ${r.data.summary} ${r.data.experience}.`)),
+      `## ${CAREERS_PAGE.questions.title}`,
+      `${CAREERS_PAGE.questions.text} ${hrMail()}`
+    )
+  );
+}
+
+export async function careerMd(site: Site, role: Career) {
+  const L = linker(site);
+  const r = role.data;
+  return finish(
+    join(
+      `# ${r.title}`,
+      bullets([r.department, r.location, r.jobType, r.experience].filter((x): x is string => Boolean(x))),
+      `## ${CAREERS_PAGE.aboutTitle}`,
+      r.about,
+      `## ${CAREERS_PAGE.responsibilitiesTitle}`,
+      ...r.responsibilities.map((g) => join(g.heading && `### ${g.heading}`, bullets(g.items))),
+      ...r.sections.map((s) => join(`## ${s.title}`, bullets(s.items))),
+      `## ${CAREERS_PAGE.offerTitle}`,
+      bullets(r.offer),
+      `## ${CAREERS_PAGE.form.title}`,
+      `${r.apply} Use the form on ${L.url(careerPath(role.id))} or email ${hrMail()}.`,
+      L.link(CAREERS_PAGE.allRoles, "/careers/")
+    )
+  );
+}
+
 // ------------------------------------------------------------- Insights ----
 
 export async function blogMd(site: Site) {
@@ -733,7 +776,7 @@ export async function newsPostMd(site: Site, entry: NewsPost) {
 
 /** Every page with a Markdown twin, in reading order (llms-full.txt, links). */
 export async function markdownPages(site: Site): Promise<{ path: string; title: string; md: string }[]> {
-  const [services, work, courses, programmes, blog, news] = await Promise.all([getServices(), getWork(), getCourses(), getProgrammes(), getBlog(), getNews()]);
+  const [services, work, courses, programmes, careers, blog, news] = await Promise.all([getServices(), getWork(), getCourses(), getProgrammes(), getCareers(), getBlog(), getNews()]);
   const pages: { path: string; title: string; build: () => Promise<string> }[] = [
     { path: "/", title: "Home", build: () => homeMd(site) },
     { path: "/services/", title: SERVICES_PAGE.meta.title, build: () => servicesMd(site) },
@@ -742,6 +785,8 @@ export async function markdownPages(site: Site): Promise<{ path: string; title: 
     { path: "/how-we-work/", title: HOW_PAGE.meta.title, build: () => howWeWorkMd(site) },
     { path: "/about/", title: ABOUT_PAGE.meta.title, build: () => aboutMd(site) },
     { path: "/contact/", title: CONTACT_PAGE.meta.title, build: () => contactMd(site) },
+    { path: "/careers/", title: CAREERS_PAGE.meta.title, build: () => careersMd(site) },
+    ...careers.map((r) => ({ path: careerPath(r.id), title: r.data.title, build: () => careerMd(site, r) })),
     { path: "/industries/", title: INDUSTRIES_PAGE.meta.title, build: () => industriesMd(site) },
     { path: "/training/", title: TRAINING_PAGE.meta.title, build: () => trainingMd(site) },
     ...programmes.map((p) => ({ path: coursePath(p.id), title: p.data.name, build: () => programmeMd(site, p) })),
@@ -769,13 +814,14 @@ function llmsHeader(site: Site) {
 /** /llms.txt in the llmstxt.org format. */
 export async function llmsTxt(site: Site) {
   const L = linker(site);
-  const [services, industries, tracks, programmes, counts, work, blog, news] = await Promise.all([
+  const [services, industries, tracks, programmes, counts, work, careers, blog, news] = await Promise.all([
     getServices(),
     getIndustries(),
     getTracks(),
     getProgrammes(),
     trainingCounts(),
     getWork(),
+    getCareers(),
     getBlog(),
     getNews(),
   ]);
@@ -840,6 +886,12 @@ export async function llmsTxt(site: Site) {
         ...blog.map((p) => `${L.page(p.data.title, blogPath(p.id))}: ${postSummary(p)} (${BLOG_POST.card.updated} ${longDate(p.data.updated)})`),
         `${L.page(NEWS_PAGE.meta.title, "/news/")}: ${NEWS_PAGE.meta.description}`,
         ...news.map((p) => `${L.page(p.data.title, newsPath(p.id))}: ${p.data.dateLabel}. ${p.data.description}`),
+      ]),
+
+      `## Careers`,
+      bullets([
+        `${L.page(CAREERS_PAGE.meta.title, "/careers/")}: ${CAREERS_PAGE.meta.description}`,
+        ...careers.map((r) => `${L.page(r.data.title, careerPath(r.id))}: ${r.data.summary}`),
       ]),
 
       `## How to contact`,
