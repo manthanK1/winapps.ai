@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Static checks over the built site (run after `npm run build`):
 //
-//   node scripts/qa-html.mjs [distDir]
+//   node scripts/qa-html.mjs [distDir] [--release]
 //
 // Every HTML page: one <h1>, no skipped heading levels, <img> with alt/width/
 // height, unique ids, JSON-LD that parses, title ≤ 60 and description ≤ 155,
@@ -10,12 +10,16 @@
 // resolves under BASE_PATH, every V1 URL still exists, the sitemap lists
 // exactly the indexable pages, and (on the real domain) nothing points at
 // github.io. Reads SITE_URL and BASE_PATH like the build. Exits 1 on any
-// failure. No dependencies: the HTML is Astro's own output, so targeted
+// failure. Career pages must never use the old form, and any Tally embed must
+// carry that role's title. --release (before a cPanel upload) also fails a build
+// whose forms lack their Web3Forms key or Tally form ID. No dependencies: the HTML is Astro's own output, so targeted
 // regexes are enough.
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 
-const dist = process.argv[2] ?? "dist";
+const args = process.argv.slice(2);
+const release = args.includes("--release");
+const dist = args.find((a) => !a.startsWith("--")) ?? "dist";
 const origin = (process.env.SITE_URL ?? "https://www.winapps.co.in").replace(/\/+$/, "");
 const base = (process.env.BASE_PATH ?? "/").replace(/\/+$/, "");
 const failures = [];
@@ -165,6 +169,28 @@ for (const f of ["llms.txt", "llms-full.txt"]) {
   for (const u of urls) if (u.startsWith(`${origin}${base}/`) && !exists(new URL(u).pathname)) fail(f, `dead link ${u}`);
 }
 if (courseIds.length !== 16) fail("route", `expected 16 courses in training.yaml, found ${courseIds.length}`);
+
+// ---- Forms --------------------------------------------------------------------
+const careerTitles = new Map(
+  [...readFileSync("src/content/careers.yaml", "utf8").matchAll(/^- id:[ \t]*["']?([\w-]+)["']?[ \t]*\r?\n[ \t]+title:[ \t]*(.+?)[ \t]*\r?$/gm)].map((m) => [m[1], m[2].replace(/^["']|["']$/g, "")])
+);
+if (careerTitles.size !== careerIds.length) fail("careers", `read ${careerTitles.size} titles for ${careerIds.length} roles`);
+for (const [id, title] of careerTitles) {
+  const url = `/careers/${id}/`;
+  const src = pages.get(url)?.src ?? "";
+  if (/<form\b[^>]*data-career-form/i.test(src)) fail(url, "still has the old career form");
+  const embed = attr(src.match(/<iframe\b[^>]*data-tally-src[^>]*>/i)?.[0] ?? "", "data-tally-src");
+  if (embed) {
+    const position = new URL(decode(embed)).searchParams.get("position");
+    if (position !== decode(title)) fail(url, `Tally position is "${position}", expected "${title}"`);
+  } else if (release) fail(url, "no Tally embed: is PUBLIC_TALLY_CAREERS_FORM_ID set?");
+}
+if (release) {
+  for (const [url, p] of pages) {
+    if (!p.isRedirect && /<form\b[^>]*action="mailto:/i.test(p.src)) fail(url, "form posts to mailto: is PUBLIC_WEB3FORMS_KEY set?");
+  }
+  if (!/data-contact-form[^>]*data-mode="web3forms"/.test(pages.get("/contact/")?.src ?? "")) fail("/contact/", "contact form is not in web3forms mode");
+}
 
 // ---- Sitemap: exactly the indexable pages -----------------------------------
 const sitemapFiles = files.filter((f) => /sitemap-\d+\.xml$/.test(f));

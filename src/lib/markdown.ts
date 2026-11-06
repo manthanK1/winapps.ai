@@ -687,7 +687,7 @@ export async function careerMd(site: Site, role: Career) {
       `## ${CAREERS_PAGE.offerTitle}`,
       bullets(r.offer),
       `## ${CAREERS_PAGE.form.title}`,
-      `${r.apply} Use the form on ${L.url(careerPath(role.id))} or email ${hrMail()}.`,
+      `${r.apply} Use the form on ${L.url(careerPath(role.id))} with a PDF resume, or email it to ${hrMail()}.`,
       L.link(CAREERS_PAGE.allRoles, "/careers/")
     )
   );

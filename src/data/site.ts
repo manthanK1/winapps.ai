@@ -130,7 +130,7 @@ export function contactFor(serviceId: string): string {
 export const PROMISES = [
   { icon: "calendar", label: "Est. 2013" },
   { icon: "file-lock", label: "NDA before the first call" },
-  { icon: "clock", label: "Reply within 1 business day" },
+  { icon: "clock", label: "Reply within 24 hours on business days" },
   { icon: "key-round", label: "Your IP from day one" },
 ] as const;
 

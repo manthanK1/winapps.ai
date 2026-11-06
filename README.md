@@ -27,7 +27,7 @@ npm run brand         # rebuild the logo and favicon set (only when the logo cha
 npm run indexnow      # ping IndexNow with the live sitemap (CI does this after each deploy)
 ```
 
-Build-time settings (`SITE_URL`, `BASE_PATH`, `PUBLIC_WEB3FORMS_KEY`, `PUBLIC_PLAUSIBLE_DOMAIN`) are described in [DEPLOY.md](DEPLOY.md).
+Build-time settings (`SITE_URL`, `BASE_PATH`, `PUBLIC_WEB3FORMS_KEY`, `PUBLIC_TALLY_CAREERS_FORM_ID`, `PUBLIC_PLAUSIBLE_DOMAIN`) are described in [DEPLOY.md](DEPLOY.md).
 
 ## Where the text lives
 

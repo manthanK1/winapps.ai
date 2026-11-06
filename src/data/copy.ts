@@ -174,7 +174,7 @@ export const CLOCKS = {
   title: "Working hours, live",
   overlapBadge: "4+ hours overlap with Europe",
   online: "Team online now",
-  offline: "Replies next business day",
+  offline: "Replies within 24 hours on business days",
   zones: [
     { city: "New York", tz: "America/New_York", home: false },
     { city: "London", tz: "Europe/London", home: false },
@@ -218,7 +218,7 @@ export const ENGAGEMENT_MODELS = [
   },
 ] as const;
 export const ENGAGEMENT_BADGE = "Most chosen";
-export const ENGAGEMENT_REPLY = "Reply within 1 business day";
+export const ENGAGEMENT_REPLY = "Reply within 24 hours on business days";
 
 /** Short enquiry form at the top of the footer, on every page. */
 export const FOOTER_FORM = {
@@ -236,7 +236,7 @@ export const FOOTER_FORM = {
 /** Closing call to action on every page (V1 CtaBand). */
 export const CTA = {
   title: "Tell us what you're building.",
-  text: "A senior engineer, not a salesperson, replies within one business day. NDA available before any detailed discussion.",
+  text: "The relevant team replies within 24 hours on business days. NDA available before any detailed discussion.",
   primary: "Book a 30-min intro call",
   email: "Email us",
 } as const;
@@ -263,7 +263,7 @@ export const SERVICES_PAGE = {
 export const SERVICE_DETAIL = {
   eyebrow: "Service",
   cta: "Book a 30-min intro call",
-  reply: "Reply within 1 business day",
+  reply: "Reply within 24 hours on business days",
   whatItIs: "What it is",
   whatYouGet: "What you get",
   deliver: { eyebrow: "How we deliver", title: "Small, verified steps.", accent: "Your tools, your time zone." },
@@ -292,7 +292,7 @@ export const WORK_PAGE = {
   },
   cta: {
     title: "Want the details behind these?",
-    text: "We walk through architecture, team shape and references on a call, under NDA if you need one. A senior engineer replies within one business day.",
+    text: "We walk through architecture, team shape and references on a call, under NDA if you need one. The relevant team replies within 24 hours on business days.",
   },
   card: { problem: "Problem", delivered: "What we delivered", read: "Read the case study" },
   filter: { label: "Filter case studies by domain", all: "All", one: "case study", many: "case studies" },
@@ -476,13 +476,13 @@ export const CONTACT_PAGE = {
   meta: {
     title: "Contact",
     description:
-      "Tell us what you're building. A senior engineer replies within one business day. Email sales@winapps.co.in.",
+      "Tell us what you're building. The relevant team replies within 24 hours on business days. Email sales@winapps.co.in.",
   },
   hero: {
     eyebrow: "Contact",
     title: "Tell us what",
     accent: "you're building.",
-    lead: "A senior engineer, not a salesperson, replies within one business day. NDA available before any detailed discussion.",
+    lead: "The relevant team replies within 24 hours on business days. NDA available before any detailed discussion.",
   },
   formTitle: "Send us an inquiry",
   direct: "Talk to us directly",
@@ -490,7 +490,7 @@ export const CONTACT_PAGE = {
   basedIn: "Based in India, working with clients in India, the US, the UK and Europe.",
   nextTitle: "What happens next",
   next: [
-    { title: "A senior engineer replies", text: "Within one business day, with questions or times for a 30-minute call." },
+    { title: "The relevant team replies", text: "Within 24 hours on business days, with questions or times for a 30-minute call." },
     { title: "NDA, if you want one", text: "Signed before any detailed technical discussion." },
     { title: "Intro call", text: "We talk through what you're building and whether we're the right fit." },
     { title: "Discovery", text: "If it makes sense, a short fixed-fee Discovery gives you a plan and estimate you own." },
@@ -517,25 +517,30 @@ export const CONTACT_PAGE = {
     noScript: "This form needs JavaScript. Please email us instead:",
     opening: "Opening your email app. If nothing happens, write to",
     sending: "Sending…",
-    thanks: "Thanks, your inquiry is in.",
-    thanksText: "A senior engineer will reply within one business day.",
     failed: "Something went wrong sending the form. Please",
     failedLink: "send it by email instead",
     failedOr: "or write to",
   },
 } as const;
 
+/** The shared pop-up shown once a form submission is confirmed. */
+export const THANK_YOU = {
+  lead: "Thank you for your submission. The relevant team will reach out to you within 24 hours on business days.",
+  careers: "Thanks, your application is in. Our HR team will review it and contact you if there's a fit.",
+  close: "Close",
+} as const;
+
 export const CAREERS_PAGE = {
   meta: {
     title: "Careers",
     description:
-      "Open roles at Winapps in Karnal, Haryana: developers, QA, design, marketing, business analysis and business development. Upload your resume on each role's page.",
+      "Open roles at Winapps in Karnal, Haryana: developers, QA, design, marketing, business analysis and business development. Apply with a PDF resume on each role's page.",
   },
   hero: {
     eyebrow: "Careers",
     title: "Build software",
     accent: "with us.",
-    lead: "We're hiring in Karnal, Haryana. Every role is full-time and works from our office. Pick a role, read what it involves and upload your resume on its page.",
+    lead: "We're hiring in Karnal, Haryana. Every role is full-time and works from our office. Pick a role, read what it involves and upload your resume as a PDF on its page.",
   },
   listTitle: "Open roles",
   listEyebrow: "Now hiring",
@@ -553,32 +558,12 @@ export const CAREERS_PAGE = {
   },
   form: {
     title: "Apply for this role",
-    name: "Full name",
-    nameError: "Please enter your name.",
-    email: "Email",
-    emailError: "Please enter a valid email address.",
-    phone: "Phone",
-    phoneError: "Please enter a phone number.",
-    portfolio: "Portfolio or LinkedIn link",
-    message: "Anything you'd like to add",
-    optional: "(optional)",
-    resume: "Resume / CV",
-    resumeHint: "PDF, DOC or DOCX, up to 5 MB",
-    resumeMissing: "Please upload your resume.",
-    resumeType: "Please upload a PDF, DOC or DOCX file.",
-    resumeSize: "This file is over 5 MB. Please upload a smaller one.",
-    submit: "Submit application",
+    embedTitle: "Job application form",
+    resumeNote: "Please upload your resume as a PDF, up to 5 MB.",
+    fallback: "If the form doesn't load, email your PDF resume to",
+    emailOnly: "To apply, email your PDF resume to",
     privacy: "We use your details and resume only to consider you for this role.",
     privacyLink: "Privacy notice",
-    checkFields: "Please check the highlighted fields.",
-    captcha: "Please complete the security check, then submit again.",
-    noScript: "This form needs JavaScript. Please email your resume to",
-    sending: "Sending your application…",
-    thanks: "Thanks, your application is in.",
-    thanksText: "Our HR team will review it and contact you if there's a fit.",
-    opening: "Opening your email app. Attach your resume to that email before you send it. If nothing happens, email it to",
-    attachNote: "Resume: please attach it to this email before sending.",
-    failed: "Your application couldn't be sent. Please email your resume to",
   },
 } as const;
 

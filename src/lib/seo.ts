@@ -17,11 +17,11 @@ export function clip(text: string, max: number): string {
 }
 
 /**
- * "Page · Winapps®". The home page reads "Winapps® · <tagline>". When the
- * branded form is too long the brand is dropped, then the title is clipped.
+ * "Page · Winapps®". The home page reads just "Winapps". When the branded form
+ * is too long the brand is dropped, then the title is clipped.
  */
 export function pageTitle(title: string): string {
-  if (title === SITE.name) return clip(`${BRAND} · ${SITE.tagline}`, TITLE_MAX);
+  if (title === SITE.name) return SITE.name;
   const branded = `${title} · ${BRAND}`;
   return branded.length <= TITLE_MAX ? branded : clip(title, TITLE_MAX);
 }

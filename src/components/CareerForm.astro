@@ -1,11 +1,9 @@
 ---
-// Job application form with a resume upload. A static site cannot send email
-// itself, so the form posts to Web3Forms. Attachments need a paid Web3Forms Pro
-// plan, and submissions go to the address the key was created with, so this
-// form has its own key: PUBLIC_WEB3FORMS_HR_KEY, created with hr@winapps.co.in.
-// Without that key it opens the applicant's email app, addressed to HR, and
-// asks them to attach the resume there (a browser cannot attach it for them).
-import Icon from "./Icon.astro";
+// Job application: one free Tally form embedded on every role page, with the
+// role title passed in its hidden "position" field. Tally enforces the required
+// fields, the PDF-only rule and the size limit, and shows the reCAPTCHA. The
+// email line stays visible in case the embed is blocked. Without a form ID the
+// page only asks applicants to email HR.
 import { CAREERS_PAGE } from "../data/copy";
 import { SITE } from "../data/site";
 import { href } from "../lib/url";
@@ -15,242 +13,66 @@ interface Props {
 }
 const { position } = Astro.props;
 const f = CAREERS_PAGE.form;
-const key = import.meta.env.PUBLIC_WEB3FORMS_HR_KEY as string | undefined;
+const formId = import.meta.env.PUBLIC_TALLY_CAREERS_FORM_ID as string | undefined;
+const embed = formId
+  ? `https://tally.so/embed/${encodeURIComponent(formId)}?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1&position=${encodeURIComponent(position)}`
+  : undefined;
 ---
-<form
-  class="af"
-  method="post"
-  action={key ? "https://api.web3forms.com/submit" : `mailto:${SITE.emailHr}`}
-  enctype={key ? "multipart/form-data" : "text/plain"}
-  novalidate
-  data-career-form
-  data-mode={key ? "web3forms" : "mailto"}
-  data-position={position}
->
-  {key && (
+<div class="af">
+  {embed && (
     <>
-      <input type="hidden" name="access_key" value={key} />
-      <input type="hidden" name="subject" value={`Job application: ${position}`} />
-      <input type="hidden" name="from_name" value="Winapps careers" />
-      <input type="hidden" name="position" value={position} />
+      <p class="af__note">{f.resumeNote}</p>
+      <iframe class="af__embed" data-tally-src={embed} data-tally-form={formId} loading="lazy" width="100%" height="620" title={f.embedTitle}></iframe>
     </>
   )}
-  <!-- Honeypot: humans never see or fill this. -->
-  <div class="af__hp" aria-hidden="true">
-    <label>Leave this empty<input type="checkbox" name="botcheck" tabindex="-1" /></label>
-  </div>
-
-  <div class="af__grid">
-    <div>
-      <label class="field-label" for="af-name">{f.name}</label>
-      <input class="field" id="af-name" name="name" type="text" autocomplete="name" required aria-describedby="af-name-error" />
-      <p class="field-error" id="af-name-error" hidden>{f.nameError}</p>
-    </div>
-    <div>
-      <label class="field-label" for="af-email">{f.email}</label>
-      <input class="field" id="af-email" name="email" type="email" autocomplete="email" required aria-describedby="af-email-error" />
-      <p class="field-error" id="af-email-error" hidden>{f.emailError}</p>
-    </div>
-    <div>
-      <label class="field-label" for="af-phone">{f.phone}</label>
-      <input class="field" id="af-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required aria-describedby="af-phone-error" />
-      <p class="field-error" id="af-phone-error" hidden>{f.phoneError}</p>
-    </div>
-    <div>
-      <label class="field-label" for="af-portfolio">{f.portfolio} <span class="field-hint">{f.optional}</span></label>
-      <input class="field" id="af-portfolio" name="portfolio" type="url" inputmode="url" autocomplete="url" />
-    </div>
-  </div>
-
-  <div>
-    <label class="field-label" for="af-resume">{f.resume} <span class="field-hint">{f.resumeHint}</span></label>
-    <input class="field af__file" id="af-resume" name="attachment" type="file" accept=".pdf,.doc,.docx" required aria-describedby="af-resume-error" />
-    <p class="field-error" id="af-resume-error" hidden></p>
-  </div>
-
-  <div>
-    <label class="field-label" for="af-message">{f.message} <span class="field-hint">{f.optional}</span></label>
-    <textarea class="field af__message" id="af-message" name="message" rows="4"></textarea>
-  </div>
-
-  {key && <div class="af__captcha" data-captcha-box></div>}
-  {key && <noscript><p class="af__note">{f.noScript} <a class="link" href={`mailto:${SITE.emailHr}`}>{SITE.emailHr}</a>.</p></noscript>}
-
-  <div class="af__actions">
-    <button type="submit" class="btn btn--primary af__submit" data-submit>
-      {f.submit} <Icon name="arrow" size={18} class="arrow" />
-    </button>
-    <p class="af__note">{f.privacy} <a class="link" href={href("/privacy/")}>{f.privacyLink}</a>.</p>
-  </div>
-
-  <div role="status" aria-live="polite" class="af__status" data-form-status></div>
-</form>
+  <p class="af__note">{embed ? f.fallback : f.emailOnly} <a class="link" href={`mailto:${SITE.emailHr}`}>{SITE.emailHr}</a>.</p>
+  <p class="af__note">{f.privacy} <a class="link" href={href("/privacy/")}>{f.privacyLink}</a>.</p>
+</div>
 
 <style>
-  .af { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
-  .af__hp { display: none; }
-  .af__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
-  @media (min-width: 640px) {
-    .af__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  }
-  .af__file { cursor: pointer; }
-  .af__file::file-selector-button {
-    margin-right: 12px;
-    padding: 6px 12px;
-    border: 1px solid var(--rule-2);
-    background: var(--paper);
-    font: inherit;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--ink);
-    cursor: pointer;
-  }
-  textarea.af__message { min-height: 110px; }
-  .af__captcha:empty { display: none; }
-  .af__actions { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; justify-items: start; }
-  .af__submit { width: 100%; }
-  .af__submit[disabled] { opacity: 0.6; cursor: progress; }
-  @media (min-width: 640px) {
-    .af__submit { width: auto; }
-  }
+  .af { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .af__embed { width: 100%; border: 0; vertical-align: top; }
+  /* Without JavaScript the embed can't load, so the email line stands alone. */
+  :global(html:not(.js)) .af__embed { display: none; }
   .af__note { max-width: 62ch; font-size: 14px; line-height: 1.55; color: var(--muted); }
   /* Inline link: vertical padding grows the tap target to 44px. */
   .af__note a { padding-block: 13px; }
-  /* The live region stays in the accessibility tree, so screen readers announce it. */
-  .af__status { font-size: 15px; line-height: 1.5; color: var(--ink); }
-  .af__status:not(:empty) { padding: 16px 18px; border-left: 2px solid var(--rule-2); }
-  .af__status[data-kind="ok"] { border-left-color: var(--primary); background: #e7f0f1; }
-  .af__status[data-kind="error"] { border-left-color: var(--accent); background: #fdf1e2; }
-  .af__status[data-kind="info"] { color: var(--ink-2); background: #fff; }
 </style>
 
 <script>
-  import { CAREERS_PAGE } from "../data/copy";
-  import { SITE } from "../data/site";
-  import { attachCaptcha, sendLead } from "../scripts/lead-form";
+  import { showThankYou } from "../scripts/thank-you";
 
-  const T = CAREERS_PAGE.form;
-  const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const RESUME_TYPES = /\.(pdf|docx?)$/i;
-  // Web3Forms' limit for a file sent through a standard file input.
-  const MAX_BYTES = 5 * 1024 * 1024;
+  const TALLY_ORIGIN = "https://tally.so";
+  const iframe = document.querySelector<HTMLIFrameElement>("iframe[data-tally-src]");
 
-  const form = document.querySelector<HTMLFormElement>("[data-career-form]");
-  if (form) {
-    const status = form.querySelector<HTMLElement>("[data-form-status]");
-    const submit = form.querySelector<HTMLButtonElement>("[data-submit]");
-    const resume = form.querySelector<HTMLInputElement>('input[type="file"]');
-    const fields = ["name", "email", "phone"]
-      .map((n) => form.elements.namedItem(n))
-      .filter((el): el is HTMLInputElement => el instanceof HTMLInputElement);
-    const web3forms = form.dataset.mode === "web3forms";
-    const captcha = web3forms ? attachCaptcha(form) : undefined;
-
-    const valid = (el: HTMLInputElement) => {
-      const v = el.value.trim();
-      return v !== "" && (el.type !== "email" || EMAIL.test(v));
+  if (iframe) {
+    // Tally's script loads as the visitor nears the form, so role pages stay light
+    // and nobody who only reads the description contacts Tally.
+    const load = () => {
+      const script = document.createElement("script");
+      script.src = `${TALLY_ORIGIN}/widgets/embed.js`;
+      script.async = true;
+      script.onload = () => (window as unknown as { Tally?: { loadEmbeds(): void } }).Tally?.loadEmbeds();
+      script.onerror = () => {
+        iframe.hidden = true;
+      };
+      document.head.append(script);
     };
+    new IntersectionObserver((entries, observer) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      observer.disconnect();
+      load();
+    }, { rootMargin: "800px" }).observe(iframe);
 
-    const showError = (el: HTMLInputElement, show: boolean) => {
-      el.setAttribute("aria-invalid", String(show));
-      const error = document.getElementById(`${el.id}-error`);
-      if (error) error.hidden = !show;
-    };
-
-    /** The reason this file can't be used, or "" when it is fine. */
-    const resumeProblem = () => {
-      const file = resume?.files?.[0];
-      if (!file) return T.resumeMissing;
-      if (!RESUME_TYPES.test(file.name)) return T.resumeType;
-      if (file.size > MAX_BYTES) return T.resumeSize;
-      return "";
-    };
-
-    const checkResume = () => {
-      if (!resume) return false;
-      const problem = resumeProblem();
-      const error = document.getElementById(`${resume.id}-error`);
-      if (error) error.textContent = problem;
-      showError(resume, Boolean(problem));
-      return !problem;
-    };
-
-    // Messages are built as DOM nodes, so nothing typed can end up as markup.
-    const setStatus = (kind: "ok" | "error" | "info", ...parts: (string | Node)[]) => {
-      if (!status) return;
-      status.dataset.kind = kind;
-      status.replaceChildren(...parts);
-    };
-    const hrLink = () => {
-      const a = document.createElement("a");
-      a.className = "link";
-      a.href = `mailto:${SITE.emailHr}`;
-      a.textContent = SITE.emailHr;
-      return a;
-    };
-
-    for (const el of fields) {
-      el.addEventListener("blur", () => {
-        if (el.value) showError(el, !valid(el));
-      });
-      el.addEventListener("input", () => {
-        if (el.getAttribute("aria-invalid") === "true" && valid(el)) showError(el, false);
-      });
-    }
-    resume?.addEventListener("change", checkResume);
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const invalid: HTMLInputElement[] = fields.filter((el) => !valid(el));
-      fields.forEach((el) => showError(el, invalid.includes(el)));
-      if (!checkResume() && resume) invalid.push(resume);
-      if (invalid.length) {
-        invalid[0].focus();
-        setStatus("error", T.checkFields);
-        return;
-      }
-
-      const data = new FormData(form);
-      if (data.get("botcheck")) return;
-
-      if (!web3forms) {
-        const position = form.dataset.position ?? "";
-        const summary = [
-          `Position: ${position}`,
-          `Name: ${data.get("name")}`,
-          `Email: ${data.get("email")}`,
-          `Phone: ${data.get("phone")}`,
-          `Portfolio or LinkedIn: ${data.get("portfolio") || "-"}`,
-          "",
-          String(data.get("message") ?? ""),
-          "",
-          T.attachNote,
-        ].join("\n");
-        window.location.href = `mailto:${SITE.emailHr}?subject=${encodeURIComponent(`Job application: ${position}`)}&body=${encodeURIComponent(summary)}`;
-        setStatus("info", `${T.opening} `, hrLink(), ".");
-        return;
-      }
-
-      if (submit) submit.disabled = true;
-      setStatus("info", T.sending);
+    // The event carries the applicant's answers: read only the form ID, and never
+    // log or forward the message.
+    window.addEventListener("message", (e) => {
+      if (e.origin !== TALLY_ORIGIN || e.source !== iframe.contentWindow) return;
+      if (typeof e.data !== "string" || !e.data.includes("Tally.FormSubmitted")) return;
       try {
-        if (!(await captcha?.solved())) {
-          setStatus("error", T.captcha);
-          return;
-        }
-        // The token is added here: hCaptcha may have rendered after `data` was read.
-        data.set("h-captcha-response", String(new FormData(form).get("h-captcha-response") ?? ""));
-        await sendLead(form, data);
-        form.reset();
-        captcha?.reset();
-        const thanks = document.createElement("strong");
-        thanks.textContent = T.thanks;
-        setStatus("ok", thanks, ` ${T.thanksText}`);
+        if (JSON.parse(e.data)?.payload?.formId === iframe.dataset.tallyForm) showThankYou("careers");
       } catch {
-        captcha?.reset();
-        setStatus("error", `${T.failed} `, hrLink(), ".");
-      } finally {
-        if (submit) submit.disabled = false;
+        // Not a Tally event after all.
       }
     });
   }
