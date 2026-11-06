@@ -67,7 +67,6 @@ const t = CONTACT_PAGE.form;
           data-form-status
           data-sending={t.sending}
           data-captcha={t.captcha}
-          data-thanks={`${t.thanks} ${t.thanksText}`}
           data-failed={t.failed}
           data-failed-link={t.failedLink}
           data-failed-or={t.failedOr}
@@ -338,6 +337,7 @@ const t = CONTACT_PAGE.form;
 <script>
   import { SITE } from "../data/site";
   import { attachCaptcha, sendLead } from "../scripts/lead-form";
+  import { showThankYou } from "../scripts/thank-you";
 
   // Email strip on small screens: advance one address at a time. A copy of the
   // first address at the end lets it keep moving the same way, then jump back
@@ -434,7 +434,9 @@ const t = CONTACT_PAGE.form;
         await sendLead(form, data);
         form.reset();
         captcha?.reset();
-        setStatus("ok", T.thanks ?? "");
+        setStatus("info");
+        if (submit) submit.disabled = false;
+        showThankYou("lead", submit);
       } catch {
         captcha?.reset();
         setStatus("error", `${T.failed} `, link(mailto, T.failedLink ?? ""), ` ${T.failedOr} `, link(`mailto:${SITE.email}`, SITE.email), ".");

@@ -138,9 +138,10 @@ const redirect = absolute("/contact/?sent=1", Astro.site);
 </style>
 
 <script>
-  import { CONTACT_PAGE } from "../data/copy";
+  import { CONTACT_PAGE, THANK_YOU } from "../data/copy";
   import { SITE } from "../data/site";
   import { attachCaptcha, sendLead } from "../scripts/lead-form";
+  import { showThankYou } from "../scripts/thank-you";
 
   const T = CONTACT_PAGE.form;
   type Field = HTMLInputElement | HTMLTextAreaElement;
@@ -154,12 +155,6 @@ const redirect = absolute("/contact/?sent=1", Astro.site);
     a.href = hrefValue;
     a.textContent = text;
     return a;
-  }
-
-  function strong(text: string): HTMLElement {
-    const b = document.createElement("strong");
-    b.textContent = text;
-    return b;
   }
 
   const form = document.querySelector<HTMLFormElement>("[data-contact-form]");
@@ -188,7 +183,6 @@ const redirect = absolute("/contact/?sent=1", Astro.site);
       status.dataset.kind = kind;
       status.replaceChildren(...parts);
     };
-    const thanks = () => setStatus("ok", strong(T.thanks), ` ${T.thanksText}`);
     const captcha = form.dataset.mode === "web3forms" ? attachCaptcha(form) : undefined;
 
     for (const el of fields) {
@@ -247,7 +241,9 @@ const redirect = absolute("/contact/?sent=1", Astro.site);
         await sendLead(form, data);
         form.reset();
         captcha?.reset();
-        thanks();
+        setStatus("info");
+        if (submit) submit.disabled = false;
+        showThankYou("lead", submit);
       } catch {
         captcha?.reset();
         setStatus(
@@ -264,7 +260,9 @@ const redirect = absolute("/contact/?sent=1", Astro.site);
     });
 
     const params = new URLSearchParams(location.search);
-    if (params.has("sent")) thanks();
+    // A plain browser post lands here. Anyone can type this URL, so it stays inline
+    // and never opens the pop-up, which only follows a confirmed send.
+    if (params.has("sent")) setStatus("ok", THANK_YOU.lead);
 
     // Pre-fill from links: ?message= from the home prompt box, one or more
     // ?interest= from service pages and the prompt box's checkboxes.

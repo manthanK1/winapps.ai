@@ -1,0 +1,25 @@
+---
+// The one thank-you pop-up, shown by src/scripts/thank-you.ts once a form
+// submission is confirmed. A native modal <dialog> keeps keyboard focus inside,
+// closes on Esc and sits above the fixed footer bars.
+import { THANK_YOU } from "../data/copy";
+---
+<dialog class="thank-you" aria-labelledby="thank-you-text" data-thank-you data-lead={THANK_YOU.lead} data-careers={THANK_YOU.careers}>
+  <p class="thank-you__text" id="thank-you-text" data-thank-you-text></p>
+  <form method="dialog">
+    <button type="submit" class="btn btn--primary">{THANK_YOU.close}</button>
+  </form>
+</dialog>
+
+<style>
+  .thank-you {
+    width: min(480px, calc(100vw - 32px));
+    margin: auto;
+    padding: 28px;
+    border: 1px solid var(--ink);
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .thank-you::backdrop { background: rgb(0 0 0 / 0.5); }
+  .thank-you__text { margin-bottom: 20px; font-size: 18px; line-height: 1.45; }
+</style>
