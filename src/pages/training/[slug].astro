@@ -10,6 +10,7 @@ import PageHero from "../../components/PageHero.astro";
 import Icon from "../../components/Icon.astro";
 import SectionHead from "../../components/SectionHead.astro";
 import TechLogos from "../../components/TechLogos.astro";
+import TrainingForm from "../../components/TrainingForm.astro";
 import { HOME, TRAINING_ADVICE, TRAINING_DOMAINS, TRAINING_PAGE } from "../../data/copy";
 import { SITE, trainingEmailFor } from "../../data/site";
 import type { TechLogo } from "../../lib/tech-logos";
@@ -94,9 +95,13 @@ const num = (i: number) => String(i + 1).padStart(2, "0");
           {p.internship && <li class="chip">{TRAINING_PAGE.internship}</li>}
         </ul>
         <p class="answer text-2">{howToJoin}</p>
+        <a href="#enquire" class="btn btn--primary hero-enquire-btn">Enquire for this programme <Icon name="arrow" size={18} class="arrow" /></a>
       </>
     ) : (
-      <p class="answer text-2">Part of our {group} track: {"trackIntro" in props ? props.trackIntro : ""} {howToJoin}</p>
+      <>
+        <p class="answer text-2">Part of our {group} track: {"trackIntro" in props ? props.trackIntro : ""} {howToJoin}</p>
+        <a href="#enquire" class="btn btn--primary hero-enquire-btn">Enquire for this course <Icon name="arrow" size={18} class="arrow" /></a>
+      </>
     )}
   </PageHero>
 
@@ -113,11 +118,23 @@ const num = (i: number) => String(i + 1).padStart(2, "0");
       <div class="panel enquire">
         <TechLogos logos={c.logos} />
         <div class="enquire__actions">
-          <a href={trainingEmailFor(TRAINING_PAGE.courseMessage(c.name))} class="btn btn--primary btn--block">
-            <Icon name="mail" size={18} /> {TRAINING_PAGE.enquire}
+          <a href="#enquire" class="btn btn--primary btn--block">
+            Enquire online <Icon name="arrow" size={18} class="arrow" />
           </a>
           <a href={`mailto:${SITE.emailTraining}?subject=${encodeURIComponent(c.name)}`} class="btn btn--outline btn--block"><Icon name="mail" size={18} /> {SITE.emailTraining}</a>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="enquire" class="section section--flush-top enquire-section" aria-labelledby="enquire-title">
+    <div class="container">
+      <div class="panel">
+        <h2 id="enquire-title" class="learn__title">Enquire about {c.name}</h2>
+        <p class="text-2" style="margin-bottom: 24px;">
+          Send us your details to receive upcoming batch dates, timings, curriculum details, and fee structure.
+        </p>
+        <TrainingForm course={c.name} />
       </div>
     </div>
   </section>
@@ -174,6 +191,8 @@ const num = (i: number) => String(i + 1).padStart(2, "0");
   .answer { margin-top: 16px; max-width: 64ch; }
   .facts { margin-top: 24px; }
   .facts .chip { font-weight: 600; color: var(--ink); }
+  .hero-enquire-btn { margin-top: 24px; }
+  .enquire-section { scroll-margin-top: calc(var(--header-h) + 24px); }
 
   .learn { display: grid; gap: 24px; }
   @media (min-width: 1024px) {
