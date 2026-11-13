@@ -66,12 +66,50 @@ export function attachCaptcha(form: HTMLFormElement): Captcha {
   };
 }
 
-/** Posts to Web3Forms and throws unless it confirms the lead was accepted. */
+const GOOGLE_SCRIPT_URL = import.meta.env.PUBLIC_GOOGLE_SCRIPT_URL as string | undefined;
+
+/** Posts to Web3Forms and automatically saves to Google Sheet if configured. */
 export async function sendLead(form: HTMLFormElement, data: FormData): Promise<void> {
   // `redirect` is only for a plain browser post. In a fetch it could turn a
   // delivered lead into a reported failure.
   data.delete("redirect");
-  const res = await fetch(form.action, { method: "POST", headers: { Accept: "application/json" }, body: data });
-  const json: { success?: boolean } = await res.json().catch(() => ({}));
-  if (!res.ok || !json.success) throw new Error("Request failed");
+
+  // 1. Web3Forms post (Email notification)
+  const web3Promise = fetch(form.action, {
+    method: "POST",
+    headers: { Accept: "application/json" },
+    body: data,
+  }).then(async (res) => {
+    const json: { success?: boolean } = await res.json().catch(() => ({}));
+    if (!res.ok || !json.success) throw new Error("Request failed");
+    return json;
+  });
+
+  // 2. Google Apps Script Web App post (Google Sheet sync)
+  let sheetPromise: Promise<unknown> = Promise.resolve();
+  if (GOOGLE_SCRIPT_URL) {
+    const payload: Record<string, string> = {};
+    for (const [key, value] of data.entries()) {
+      if (key === "botcheck" || key === "h-captcha-response" || key === "access_key") continue;
+      if (typeof value === "string") {
+        if (payload[key]) {
+          payload[key] = `${payload[key]}, ${value}`;
+        } else {
+          payload[key] = value;
+        }
+      }
+    }
+
+    // Using text/plain prevents browser preflight OPTIONS request (CORS bypass for Google Apps Script)
+    sheetPromise = fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload),
+    }).catch((err) => {
+      // Don't fail form submission if Google Sheets sync faces a minor client-side network glitch
+      console.warn("Google Sheet sync warning:", err);
+    });
+  }
+
+  await Promise.all([web3Promise, sheetPromise]);
 }

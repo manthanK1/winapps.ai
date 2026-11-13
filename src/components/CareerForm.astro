@@ -1,9 +1,5 @@
 ---
-// Job application: one free Tally form embedded on every role page, with the
-// role title passed in its hidden "position" field. Tally enforces the required
-// fields, the PDF-only rule and the size limit, and shows the reCAPTCHA. The
-// email line stays visible in case the embed is blocked. Without a form ID the
-// page only asks applicants to email HR.
+import Icon from "./Icon.astro";
 import { CAREERS_PAGE } from "../data/copy";
 import { SITE } from "../data/site";
 import { href } from "../lib/url";
@@ -13,66 +9,133 @@ interface Props {
 }
 const { position } = Astro.props;
 const f = CAREERS_PAGE.form;
-const formId = import.meta.env.PUBLIC_TALLY_CAREERS_FORM_ID as string | undefined;
-const embed = formId
-  ? `https://tally.so/embed/${encodeURIComponent(formId)}?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1&position=${encodeURIComponent(position)}`
-  : undefined;
+const key = import.meta.env.PUBLIC_WEB3FORMS_HR_KEY as string | undefined;
 ---
+
 <div class="af">
-  {embed && (
-    <>
-      <p class="af__note">{f.resumeNote}</p>
-      <iframe class="af__embed" data-tally-src={embed} data-tally-form={formId} loading="lazy" width="100%" height="620" title={f.embedTitle}></iframe>
-    </>
+  {key ? (
+    <form
+      class="career-form"
+      method="post"
+      action="https://api.web3forms.com/submit"
+      data-career-form
+    >
+      <input type="hidden" name="access_key" value={key} />
+      <input type="hidden" name="subject" value={`Job Application: ${position}`} />
+      <input type="hidden" name="from_name" value="Winapps Careers" />
+      <input type="hidden" name="position" value={position} />
+      <input type="hidden" name="source" value="Careers Form" />
+      <input type="checkbox" name="botcheck" class="sr-only" tabindex="-1" aria-hidden="true" />
+
+      <div class="career-form__row">
+        <div class="career-form__field">
+          <label for="career-name">Full Name *</label>
+          <input type="text" id="career-name" name="name" required placeholder="Your full name" class="career-input" />
+        </div>
+        <div class="career-form__field">
+          <label for="career-email">Email Address *</label>
+          <input type="email" id="career-email" name="email" required placeholder="you@example.com" class="career-input" />
+        </div>
+      </div>
+
+      <div class="career-form__row">
+        <div class="career-form__field">
+          <label for="career-phone">Phone / WhatsApp *</label>
+          <input type="tel" id="career-phone" name="phone" required placeholder="+91 98765 43210" class="career-input" />
+        </div>
+        <div class="career-form__field">
+          <label for="career-resume">Resume / Portfolio Link (Google Drive, LinkedIn, etc.) *</label>
+          <input type="url" id="career-resume" name="resume_link" required placeholder="https://drive.google.com/..." class="career-input" />
+        </div>
+      </div>
+
+      <div class="career-form__field">
+        <label for="career-message">Cover Note / Experience Summary</label>
+        <textarea id="career-message" name="message" rows="4" placeholder="Tell us briefly about your relevant experience..." class="career-input"></textarea>
+      </div>
+
+      <div class="career-form__captcha" data-captcha-box></div>
+
+      <div>
+        <button type="submit" class="btn btn--primary" data-submit>
+          Apply for {position} <Icon name="arrow" size={18} class="arrow" />
+        </button>
+      </div>
+
+      <div role="status" aria-live="polite" class="career-form__status" data-form-status></div>
+    </form>
+  ) : (
+    <p class="af__note">{f.emailOnly} <a class="link" href={`mailto:${SITE.emailHr}`}>{SITE.emailHr}</a>.</p>
   )}
-  <p class="af__note">{embed ? f.fallback : f.emailOnly} <a class="link" href={`mailto:${SITE.emailHr}`}>{SITE.emailHr}</a>.</p>
+
+  <p class="af__note">Or email your resume directly to <a class="link" href={`mailto:${SITE.emailHr}`}>{SITE.emailHr}</a>.</p>
   <p class="af__note">{f.privacy} <a class="link" href={href("/privacy/")}>{f.privacyLink}</a>.</p>
 </div>
 
 <style>
-  .af { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
-  .af__embed { width: 100%; border: 0; vertical-align: top; }
-  /* Without JavaScript the embed can't load, so the email line stands alone. */
-  :global(html:not(.js)) .af__embed { display: none; }
+  .af { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .career-form { display: grid; gap: 16px; max-width: 680px; }
+  .career-form__row { display: grid; grid-template-columns: 1fr; gap: 16px; }
+  @media (min-width: 640px) {
+    .career-form__row { grid-template-columns: 1fr 1fr; }
+  }
+  .career-form__field { display: grid; gap: 6px; }
+  .career-form__field label { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .career-input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--rule-2);
+    border-radius: 8px;
+    background: #fff;
+    font-size: 14px;
+    color: var(--ink);
+  }
+  .career-input:focus { border-color: var(--primary); outline: none; }
+  .career-form__captcha:empty { display: none; }
+  .career-form__status:empty { display: none; }
+  .career-form__status { padding: 14px; border-radius: 6px; font-size: 14px; background: #e7f0f1; color: var(--ink); }
   .af__note { max-width: 62ch; font-size: 14px; line-height: 1.55; color: var(--muted); }
-  /* Inline link: vertical padding grows the tap target to 44px. */
-  .af__note a { padding-block: 13px; }
 </style>
 
 <script>
+  import { attachCaptcha, sendLead } from "../scripts/lead-form";
   import { showThankYou } from "../scripts/thank-you";
 
-  const TALLY_ORIGIN = "https://tally.so";
-  const iframe = document.querySelector<HTMLIFrameElement>("iframe[data-tally-src]");
+  const form = document.querySelector<HTMLFormElement>("[data-career-form]");
+  if (form) {
+    const captcha = attachCaptcha(form);
+    const status = form.querySelector<HTMLElement>("[data-form-status]");
+    const submit = form.querySelector<HTMLButtonElement>("[data-submit]");
 
-  if (iframe) {
-    // Tally's script loads as the visitor nears the form, so role pages stay light
-    // and nobody who only reads the description contacts Tally.
-    const load = () => {
-      const script = document.createElement("script");
-      script.src = `${TALLY_ORIGIN}/widgets/embed.js`;
-      script.async = true;
-      script.onload = () => (window as unknown as { Tally?: { loadEmbeds(): void } }).Tally?.loadEmbeds();
-      script.onerror = () => {
-        iframe.hidden = true;
-      };
-      document.head.append(script);
-    };
-    new IntersectionObserver((entries, observer) => {
-      if (!entries.some((entry) => entry.isIntersecting)) return;
-      observer.disconnect();
-      load();
-    }, { rootMargin: "800px" }).observe(iframe);
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = new FormData(form);
+      if (data.get("botcheck")) return;
 
-    // The event carries the applicant's answers: read only the form ID, and never
-    // log or forward the message.
-    window.addEventListener("message", (e) => {
-      if (e.origin !== TALLY_ORIGIN || e.source !== iframe.contentWindow) return;
-      if (typeof e.data !== "string" || !e.data.includes("Tally.FormSubmitted")) return;
+      if (submit) submit.disabled = true;
+      if (status) status.textContent = "Submitting application...";
+
       try {
-        if (JSON.parse(e.data)?.payload?.formId === iframe.dataset.tallyForm) showThankYou("careers");
+        if (!(await captcha?.solved())) {
+          if (status) status.textContent = "Please complete the captcha verification.";
+          return;
+        }
+        data.set("h-captcha-response", String(new FormData(form).get("h-captcha-response") ?? ""));
+        await sendLead(form, data);
+
+        // HR Google Sheet Web App URL Sync
+        const scriptURL = "https://script.google.com/macros/s/AKfycbzSctJ8KBS2AwzV52DwUxHP-lLS8hngBR1ubiLRgm00fKBHQiKIPwaUyR_TOA9aAO7K/exec";
+        fetch(scriptURL, { method: 'POST', body: new FormData(form) }).catch(err => console.error('HR Sheet Error:', err));
+
+        form.reset();
+        captcha?.reset();
+        if (status) status.textContent = "";
+        showThankYou("careers", submit);
       } catch {
-        // Not a Tally event after all.
+        captcha?.reset();
+        if (status) status.textContent = "Submission failed. Please email your resume directly.";
+      } finally {
+        if (submit) submit.disabled = false;
       }
     });
   }

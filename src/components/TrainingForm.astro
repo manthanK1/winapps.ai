@@ -1,0 +1,271 @@
+---
+import Icon from "./Icon.astro";
+import { SITE } from "../data/site";
+import { getProgrammes, getTracks } from "../lib/content";
+
+interface Props {
+  course?: string;
+}
+
+const { course } = Astro.props;
+const key = import.meta.env.PUBLIC_WEB3FORMS_TRAINING_KEY as string | undefined;
+
+// Load programmes and tracks to populate datalist suggestions
+const [programmes, tracks] = await Promise.all([getProgrammes(), getTracks()]);
+const suggestions = Array.from(
+  new Set([
+    ...programmes.map((p) => p.data.name),
+    ...tracks.flatMap((t) => [t.data.name, ...t.data.courses.map((c) => c.name)]),
+  ])
+);
+---
+
+<div class="tf-wrap">
+  {key ? (
+    <form
+      class="tf"
+      method="post"
+      action="https://api.web3forms.com/submit"
+      novalidate
+      data-training-form
+    >
+      <input type="hidden" name="access_key" value={key} />
+      <input type="hidden" name="subject" value={course ? `Training Inquiry: ${course}` : "New Training Inquiry from winapps website"} />
+      <input type="hidden" name="from_name" value="Winapps Training" />
+      <input type="hidden" name="source" value="Training Inquiry Form" />
+      <input type="checkbox" name="botcheck" class="sr-only" tabindex="-1" aria-hidden="true" />
+
+      <div class="tf__grid">
+        <div class="tf__field">
+          <label class="field-label" for="tf-name">Full Name <span class="tf__req">*</span></label>
+          <input
+            class="field"
+            id="tf-name"
+            name="name"
+            type="text"
+            autocomplete="name"
+            required
+            placeholder="Your full name"
+            aria-describedby="tf-name-error"
+          />
+          <p class="field-error" id="tf-name-error" data-error-for="name" hidden>Please enter your name.</p>
+        </div>
+
+        <div class="tf__field">
+          <label class="field-label" for="tf-email">Email Address <span class="tf__req">*</span></label>
+          <input
+            class="field"
+            id="tf-email"
+            name="email"
+            type="email"
+            autocomplete="email"
+            required
+            placeholder="you@example.com"
+            aria-describedby="tf-email-error"
+          />
+          <p class="field-error" id="tf-email-error" data-error-for="email" hidden>Please enter a valid email address.</p>
+        </div>
+
+        <div class="tf__field">
+          <label class="field-label" for="tf-phone">Phone / WhatsApp <span class="tf__req">*</span></label>
+          <input
+            class="field"
+            id="tf-phone"
+            name="phone"
+            type="tel"
+            autocomplete="tel"
+            required
+            placeholder="+91 98765 43210"
+            aria-describedby="tf-phone-error"
+          />
+          <p class="field-error" id="tf-phone-error" data-error-for="phone" hidden>Please enter a valid contact number.</p>
+        </div>
+
+        <div class="tf__field">
+          <label class="field-label" for="tf-course">Program / Track of Interest <span class="tf__req">*</span></label>
+          <input
+            class="field"
+            id="tf-course"
+            name="course"
+            type="text"
+            required
+            value={course ?? ""}
+            placeholder="e.g. Data Analytics with GenAI, Full Stack, AI & ML"
+            list="tf-courses-list"
+            autocomplete="off"
+            aria-describedby="tf-course-error"
+          />
+          <datalist id="tf-courses-list">
+            {suggestions.map((name) => (
+              <option value={name} />
+            ))}
+          </datalist>
+          <p class="field-error" id="tf-course-error" data-error-for="course" hidden>Please select or enter a program of interest.</p>
+        </div>
+
+        <div class="tf__field tf__field--wide">
+          <label class="field-label" for="tf-message">Questions / Message <span class="field-hint">(optional)</span></label>
+          <textarea
+            class="field tf__textarea"
+            id="tf-message"
+            name="message"
+            rows="4"
+            placeholder="Tell us about your background, college or organization, preferred batch timings, or specific questions..."
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="tf__captcha" data-captcha-box></div>
+      <noscript>
+        <p class="tf__note">
+          This form requires JavaScript. Please email your inquiry to{" "}
+          <a class="link" href={`mailto:${SITE.emailTraining}`}>{SITE.emailTraining}</a>.
+        </p>
+      </noscript>
+
+      <div class="tf__actions">
+        <button type="submit" class="btn btn--primary tf__submit" data-submit>
+          {course ? `Enquire about ${course}` : "Send Training Inquiry"} <Icon name="arrow" size={18} class="arrow" />
+        </button>
+        <p class="tf__note">
+          We use your details only to respond to this training inquiry. Questions? Write directly to{" "}
+          <a class="link" href={`mailto:${SITE.emailTraining}`}>{SITE.emailTraining}</a>.
+        </p>
+      </div>
+
+      <div role="status" aria-live="polite" class="tf__status" data-form-status></div>
+    </form>
+  ) : (
+    <div class="tf__fallback">
+      <p class="tf__note">
+        Online inquiry is currently unavailable. Please email your inquiry directly to{" "}
+        <a class="link" href={`mailto:${SITE.emailTraining}`}>{SITE.emailTraining}</a>.
+      </p>
+    </div>
+  )}
+</div>
+
+<style>
+  .tf-wrap { width: 100%; }
+  .tf { display: grid; gap: 24px; max-width: 820px; }
+  .tf__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  @media (min-width: 640px) {
+    .tf__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  .tf__field { display: flex; flex-direction: column; }
+  .tf__field--wide { grid-column: 1 / -1; }
+  .tf__req { color: var(--danger); font-weight: 700; margin-left: 2px; }
+  .tf__textarea { min-height: 110px; resize: vertical; }
+  .tf__captcha:empty { display: none; }
+  .tf__actions { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; justify-items: start; }
+  .tf__submit { width: 100%; }
+  .tf__submit[disabled] { opacity: 0.6; cursor: progress; }
+  @media (min-width: 640px) {
+    .tf__submit { width: auto; }
+  }
+  .tf__note { max-width: 65ch; font-size: 14px; line-height: 1.55; color: var(--muted); }
+  .tf__status { font-size: 15px; line-height: 1.5; color: var(--ink); }
+  .tf__status:not(:empty) { padding: 14px 18px; border-left: 3px solid var(--rule-2); }
+  .tf__status[data-kind="ok"] { border-left-color: var(--primary); background: #e7f0f1; }
+  .tf__status[data-kind="error"] { border-left-color: var(--danger); background: #fdf1e2; }
+  .tf__status[data-kind="info"] { color: var(--ink-2); background: #fff; border-left-color: var(--rule-2); }
+</style>
+
+<script>
+  import { attachCaptcha, sendLead } from "../scripts/lead-form";
+  import { showThankYou } from "../scripts/thank-you";
+
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const forms = document.querySelectorAll<HTMLFormElement>("[data-training-form]");
+  forms.forEach((form) => {
+    const status = form.querySelector<HTMLElement>("[data-form-status]");
+    const submit = form.querySelector<HTMLButtonElement>("[data-submit]");
+    const captcha = attachCaptcha(form);
+
+    const requiredFieldNames = ["name", "email", "phone", "course"];
+    const fields = requiredFieldNames
+      .map((name) => form.elements.namedItem(name))
+      .filter((el): el is HTMLInputElement => el instanceof HTMLInputElement);
+
+    const validateField = (el: HTMLInputElement): boolean => {
+      const val = el.value.trim();
+      if (!val) return false;
+      if (el.type === "email") return EMAIL_RE.test(val);
+      if (el.type === "tel") return val.replace(/\D/g, "").length >= 7;
+      return true;
+    };
+
+    const toggleError = (el: HTMLInputElement, hasError: boolean) => {
+      el.setAttribute("aria-invalid", String(hasError));
+      const err = form.querySelector<HTMLElement>(`[data-error-for="${el.name}"]`);
+      if (err) err.hidden = !hasError;
+    };
+
+    const setStatus = (kind: "ok" | "error" | "info", message: string) => {
+      if (!status) return;
+      status.dataset.kind = kind;
+      status.textContent = message;
+    };
+
+    fields.forEach((el) => {
+      el.addEventListener("blur", () => {
+        if (el.value.trim()) toggleError(el, !validateField(el));
+      });
+      el.addEventListener("input", () => {
+        if (el.getAttribute("aria-invalid") === "true" && validateField(el)) {
+          toggleError(el, false);
+        }
+      });
+    });
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const invalidFields = fields.filter((el) => !validateField(el));
+      fields.forEach((el) => toggleError(el, invalidFields.includes(el)));
+
+      if (invalidFields.length > 0) {
+        invalidFields[0].focus();
+        setStatus("error", "Please fill in all required fields correctly.");
+        return;
+      }
+
+      const data = new FormData(form);
+      if (data.get("botcheck")) return;
+
+      const chosenCourse = data.get("course");
+      if (chosenCourse && typeof chosenCourse === "string") {
+        data.set("subject", `Training Inquiry: ${chosenCourse}`);
+      }
+
+      if (submit) submit.disabled = true;
+      setStatus("info", "Submitting your inquiry...");
+
+      try {
+        if (!(await captcha?.solved())) {
+          setStatus("error", "Please complete the security check, then send again.");
+          return;
+        }
+
+        data.set("h-captcha-response", String(new FormData(form).get("h-captcha-response") ?? ""));
+        await sendLead(form, data);
+
+        // Training Google Sheet Web App Sync (Updated with latest correct script URL)
+        const scriptURL = "https://script.google.com/macros/s/AKfycbyXNN0wXe1MdTC171n0OxAipv64DV6e4JXURa5xKzLstVgFPuWug0D9Ucwdquo-DF66QQ/exec";
+        fetch(scriptURL, { method: 'POST', body: new FormData(form) })
+          .catch((err) => console.error('Training Sheet Error:', err));
+
+        form.reset();
+        captcha?.reset();
+        setStatus("ok", "");
+        showThankYou("training", submit);
+      } catch (err) {
+        captcha?.reset();
+        setStatus("error", "Something went wrong sending your inquiry. Please email training@winapps.co.in directly.");
+      } finally {
+        if (submit) submit.disabled = false;
+      }
+    });
+  });
+</script>

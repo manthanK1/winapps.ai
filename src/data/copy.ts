@@ -527,6 +527,7 @@ export const CONTACT_PAGE = {
 export const THANK_YOU = {
   lead: "Thank you for your submission. The relevant team will reach out to you within 24 hours on business days.",
   careers: "Thanks, your application is in. Our HR team will review it and contact you if there's a fit.",
+  training: "Thank you for your inquiry. Our training team will get back to you with syllabus, batch timings and fee details within 24 hours on business days.",
   close: "Close",
 } as const;
 

@@ -10,6 +10,7 @@ import PageHero from "../../components/PageHero.astro";
 import Icon from "../../components/Icon.astro";
 import SectionHead from "../../components/SectionHead.astro";
 import TechLogos from "../../components/TechLogos.astro";
+import TrainingForm from "../../components/TrainingForm.astro";
 import { TRAINING_ADVICE, TRAINING_DOMAINS, TRAINING_PAGE } from "../../data/copy";
 import { SITE, trainingEmailFor } from "../../data/site";
 import { AUDIENCES, getCourses, getProgrammes, getTracks, programmeAsCourse, trainingCounts } from "../../lib/content";
@@ -24,6 +25,7 @@ const jump = [
   ...AUDIENCES.map((a) => ({ label: audiences[a].label, href: `#${a}` })),
   { label: TRAINING_PAGE.domains.title, href: "#domains" },
   { label: TRAINING_PAGE.shortCourses.title, href: "#short-courses" },
+  { label: "Enquire", href: "#inquiry" },
 ];
 ---
 <BaseLayout
@@ -185,6 +187,20 @@ const jump = [
     </section>
   ))}
 
+  <section id="inquiry" class="section section--tight" aria-labelledby="inquiry-title">
+    <div class="container">
+      <div class="panel">
+        <SectionHead
+          id="inquiry-title"
+          eyebrow="Training Inquiry"
+          title="Enroll or ask about upcoming batches"
+          intro="Tell us which course or domain interests you. Our training team will send syllabus, schedule, and fee details within 24 hours on business days."
+        />
+        <TrainingForm />
+      </div>
+    </div>
+  </section>
+
   <section class="section" aria-labelledby="training-cta-title">
     <div class="container closing">
       <div class="closing__text veil">
@@ -192,9 +208,10 @@ const jump = [
         <p class="lead closing__lead">{cta.text}</p>
       </div>
       <div class="closing__actions">
-        <a href={trainingEmailFor(TRAINING_ADVICE.message)} class="btn btn--primary">
-          <Icon name="mail" size={18} /> {TRAINING_ADVICE.cta}
+        <a href="#inquiry" class="btn btn--primary">
+          Enquire now <Icon name="arrow" size={18} class="arrow" />
         </a>
+        <a href={`mailto:${SITE.emailTraining}`} class="btn btn--outline"><Icon name="mail" size={18} /> {SITE.emailTraining}</a>
       </div>
     </div>
   </section>
