@@ -134,6 +134,43 @@ Tracks every step and sub-item of [WINAPPS_V2_PROMPT.md](WINAPPS_V2_PROMPT.md) a
 
 ## Log
 
+Newest first. Add an entry after every piece of work (see `CLAUDE.md`).
+
+- 2026-11-13 PR #8 "Form updates" by Diksha (`dikshabali6119-web:diksha_updates`, 1 commit `f1067a6`) merged into `main` as `4f7a3f0` at the owner's request.
+  - **What it adds:** a Web3Forms job application form on role pages (replaces the Tally embed; asks for a resume link, not a PDF), a training enquiry form (`TrainingForm.astro`) on `/training/` and every course page, a "training" thank-you message, and Google Sheets copies of contact, footer, careers and training submissions. Those copies post to Apps Script URLs hard-coded in the components, plus an optional `PUBLIC_GOOGLE_SCRIPT_URL` in `lead-form.ts`. The Apps Script sources are in `scripts/google-sheet-*.js`. It also adds `*.zip` to `.gitignore` and strips many code comments.
+  - **Fixed in the follow-up PR (`fix/restore-deploy-workflow`):** PR #8 deleted `.github/workflows/deploy.yml` and `.env.example`, which would have stopped the GitHub Pages preview. Both restored from `1e876ef`. The new `PUBLIC_WEB3FORMS_HR_KEY` and `PUBLIC_WEB3FORMS_TRAINING_KEY` were added to the workflow (repo variables `WEB3FORMS_HR_KEY`, `WEB3FORMS_TRAINING_KEY`) and to `.env.example`.
+  - **Checks on the merged code:** `npm run check` 0 errors, `npm run build` 87 pages, `npm run qa` all passed.
+  - **Open:** (1) Without the HR/training keys, the careers and training forms fall back to "email us". The repo variables aren't set, and the local `.env` needs them for the FTP build. (2) If `PUBLIC_GOOGLE_SCRIPT_URL` is ever set, contact and footer leads reach the sheet twice (hard-coded post plus `sendLead`). (3) The training form posts to the same sheet URL as sales leads, although a separate training script exists. (4) The Apps Script endpoints accept any POST, so the sheets can get spam. (5) The privacy page doesn't mention Google Sheets. (6) Production (cPanel) isn't updated until a new `dist/` is uploaded.
+
+- 2026-11-13 investigation, no code changed: checked the outside developer's work (GitHub `dikshabali6119-web`). Her only PR, #4 ("Change header position from absolute to fixed", 3 commits from 3–4 Nov, Header/Footer/BaseLayout), was never merged; she closed it herself on 2026-11-12. The same day she re-forked the repo (05:14 UTC) and created branch `diksha_updates` (05:16 UTC), but pushed nothing: both her `main` and `diksha_updates` are identical to our `main` (`1e876ef`, 0 ahead / 0 behind). Her new features are not on GitHub yet, so they are probably only on her computer. The old PR #4 commits survive only through the closed PR. Open: she needs to commit, push to `diksha_updates` and open a new PR to `manthanK1/winapps.ai` `main`.
+
+- 2026-11-12 devlog: added `CLAUDE.md` with the rule to update this log after every piece of work, and backfilled PRs #5–#7 below. Made a source zip at `C:\Users\hp\winapps-project.zip` (2.2 MB, 248 files) with `git archive` of `f0584a9`, which has the same content as `origin/main` (`1e876ef`). It leaves out `node_modules`, `dist`, `.env` and the old dist zips, and predates this entry.
+- 2026-11-11 dev server: explained how to start it in PowerShell (`npm run dev`, or `npm.cmd run dev` if script execution is blocked). No code changed.
+- 2026-11-06 PR #7 (`feature/release-1-forms`, merged as `1e876ef`): the latest PR, Release 1 forms.
+  - **Changes:**
+    - Home `<title>` is just "Winapps".
+    - Role pages embed one Tally form once `PUBLIC_TALLY_CAREERS_FORM_ID` is set; until then they say to email a PDF resume to hr@winapps.co.in.
+    - A shared thank-you pop-up (`ThankYouDialog.astro`, `scripts/thank-you.ts`) opens only after Web3Forms or Tally confirms a submission.
+    - Reply wording is "within 24 hours on business days", attributed to "the relevant team".
+    - Privacy, `DEPLOY.md`, `.env.example` and `npm run qa:release` updated.
+  - **Checks:** `npm run check` 0 errors, build 87 pages, `npm run qa` pass, 83 browser checks pass against stubbed services. The GitHub Pages deploy succeeded.
+  - **Live site:** www.winapps.co.in was uploaded from a build made before the title change, so it needs a re-upload of `dist`.
+  - **Open:**
+    - The privacy page already describes Tally, reCAPTCHA, Google Sheets and a 6-month deletion period, none of which is active or confirmed.
+    - Not done yet: the Tally form ID, Sheets and the hr@ alert, the hCaptcha switch in Web3Forms, and the Web3Forms missing-token test (ask the user first, because it may send a real email).
+    - The Tally cookie test must be reported before deploy.
+    - `.htaccess` (https/www redirects, real 404) is not done.
+    - The Stevie badge says 2023 but the caption says 2024.
+    - Release 2 (cookie banner, GA4, Clarity) is not approved.
+- 2026-11-06 PR #6 (`feature/web3forms-leads`):
+  - Contact and footer forms post through Web3Forms with hCaptcha when a key is set at build time, and fall back to `mailto` without one.
+  - Adds Careers: a list page plus one page for each of the 9 roles, linked from the desktop and mobile menus, footer, search, sitemap and llms.txt.
+  - Footer LinkedIn, Instagram and Facebook logos are in colour.
+  - Build 87 pages, `npm run qa` pass.
+- 2026-11-05 PR #5 (`feature/case-studies-all-domains`):
+  - Adds the home "Our Journey" section with headline figures and award badges, and reworks the footer around the contact form.
+  - Removes phone and WhatsApp site-wide; training enquiries open an email.
+  - Build 77 pages, `npm run qa` pass.
 - 2026-11-02 case studies: matched the live /case-studies page (20 case studies, 12 domains). Added the 16 missing ones to `src/content/work`, a `domains` field and domain filter chips on /work (`?domain=ai` links), AI case studies on /ai, industry links, and redirects from every live `/case-studies/<slug>` to its new page. The home page shows the first four. `npm run check` 0/0/0, build clean (77 pages), `npm run qa` all pass.
 
 - 2026-10-30 preview: you chose to view the site on github.io for now, with no DNS change. CI now defaults to `SITE_URL=https://manthank1.github.io` and `BASE_PATH=/winapps.ai/`, and IndexNow is skipped until the real domain is set. `npm run qa` checks links against the base path and applies its "no github.io" rule only to real-domain builds. Both builds (preview and production) pass `npm run qa` locally. `DEPLOY.md` describes the preview and the later switch.
