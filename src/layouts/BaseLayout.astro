@@ -71,8 +71,11 @@ const schemas: object[] = [
   ...jsonLd,
 ];
 const plausibleDomain = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN;
+<<<<<<< HEAD
 const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID ?? "";
 const clarityId = import.meta.env.PUBLIC_CLARITY_ID ?? "";
+=======
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
 ---
 <!doctype html>
 <html lang="en-GB">
@@ -89,6 +92,7 @@ const clarityId = import.meta.env.PUBLIC_CLARITY_ID ?? "";
     <link rel="preload" href={headingFont} as="font" type="font/woff2" crossorigin />
     <script is:inline>document.documentElement.classList.add("js");</script>
 
+<<<<<<< HEAD
     <!-- Google Consent Mode v2 (default denied before user accepts) -->
     <script is:inline>
       window.dataLayer = window.dataLayer || [];
@@ -101,6 +105,8 @@ const clarityId = import.meta.env.PUBLIC_CLARITY_ID ?? "";
       });
     </script>
 
+=======
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
     <link rel="icon" href={href("/favicon.ico")} sizes="32x32" />
     <link rel="icon" type="image/png" sizes="32x32" href={href("/favicon-32.png")} />
     <link rel="apple-touch-icon" href={href("/apple-touch-icon.png")} />
@@ -131,9 +137,14 @@ const clarityId = import.meta.env.PUBLIC_CLARITY_ID ?? "";
     {schemas.map((s) => <script type="application/ld+json" set:html={JSON.stringify(s)} />)}
 
     {plausibleDomain && <script is:inline defer data-domain={plausibleDomain} src="https://plausible.io/js/script.js" />}
+<<<<<<< HEAD
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vanilla-cookieconsent@3/dist/cookieconsent.css" />
   </head>
   <body data-ga-id={gaId} data-clarity-id={clarityId}>
+=======
+  </head>
+  <body>
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
     <a href="#main" class="skip-link">Skip to content</a>
     {/* Depth backdrop: painted under the ribbon canvas, so the ribbon stays in front. */}
     <PageDepth level={depth} hero={ribbon === "home"} />
@@ -147,7 +158,12 @@ const clarityId = import.meta.env.PUBLIC_CLARITY_ID ?? "";
 
     <script>
       // The ribbon is decoration: start it only once the page has painted and
+<<<<<<< HEAD
       // the main thread is idle, so it never delays the hero text.
+=======
+      // the main thread is idle, so it never delays the hero text. Any failure
+      // (no WebGL, old browser) simply leaves the page without it.
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
       const canvas = document.querySelector<HTMLCanvasElement>("canvas[data-ribbon]");
       if (canvas) {
         const start = () =>
@@ -163,6 +179,7 @@ const clarityId = import.meta.env.PUBLIC_CLARITY_ID ?? "";
         else addEventListener("load", whenIdle, { once: true });
       }
     </script>
+<<<<<<< HEAD
 
     <!-- Global CTA & Contact Click Tracking -->
     <script>
@@ -312,3 +329,7 @@ const clarityId = import.meta.env.PUBLIC_CLARITY_ID ?? "";
     </script>
   </body>
 </html>
+=======
+  </body>
+</html>
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66

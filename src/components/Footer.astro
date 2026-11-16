@@ -1,7 +1,18 @@
 ---
+<<<<<<< HEAD
 import Icon from "./Icon.astro";
 import SocialLogo from "./SocialLogo.astro";
 import { EMAILS, FOOTER, SITE, SOCIAL, SOCIAL_POPUP } from "../data/site";
+=======
+// Footer in the design's language (1px ink rule, near-white panel): a short
+// enquiry form (#contact), then all of V1's columns: Services, Training,
+// Explore, Company, Legal, Social. The email strip and the meta row stay fixed
+// to the bottom of the screen on every page. Like the contact form, the form
+// posts to Web3Forms when PUBLIC_WEB3FORMS_KEY is set and otherwise composes an email.
+import Icon from "./Icon.astro";
+import SocialLogo from "./SocialLogo.astro";
+import { EMAILS, FOOTER, SITE, SOCIAL } from "../data/site";
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
 import { CONTACT_PAGE, FOOTER_FORM, TRAINING_PAGE } from "../data/copy";
 import { AUDIENCES, getServices } from "../lib/content";
 import { absolute, href } from "../lib/url";
@@ -10,9 +21,12 @@ const services = await getServices();
 const year = new Date().getFullYear();
 const key = import.meta.env.PUBLIC_WEB3FORMS_KEY as string | undefined;
 const t = CONTACT_PAGE.form;
+<<<<<<< HEAD
 
 const cleanUrl = (url: string) =>
   url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
+=======
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
 ---
 <footer class="site-footer" id="contact">
   <div class="container">
@@ -36,6 +50,10 @@ const cleanUrl = (url: string) =>
             <input type="hidden" name="from_name" value="Winapps website" />
             <input type="hidden" name="redirect" value={absolute("/contact/?sent=1", Astro.site)} />
             <input type="hidden" name="source" value="Footer form" />
+<<<<<<< HEAD
+=======
+            <!-- Honeypot: humans never see or fill this. -->
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
             <input type="checkbox" name="botcheck" class="sr-only" tabindex="-1" aria-hidden="true" />
           </>
         )}
@@ -85,11 +103,19 @@ const cleanUrl = (url: string) =>
           </ul>
         </div>
         <div>
+<<<<<<< HEAD
           <h2 class="site-footer__head">SkillUp</h2>
           <ul class="list-reset">
             {AUDIENCES.map((a) => <li><a href={href(`/training/#${a}`)}>{TRAINING_PAGE.audiences[a].label}</a></li>)}
             <li><a href={href("/training/#short-courses")}>{TRAINING_PAGE.shortCourses.title}</a></li>
             <li><a href={href("/training/")}>All SkillUp</a></li>
+=======
+          <h2 class="site-footer__head">Training</h2>
+          <ul class="list-reset">
+            {AUDIENCES.map((a) => <li><a href={href(`/training/#${a}`)}>{TRAINING_PAGE.audiences[a].label}</a></li>)}
+            <li><a href={href("/training/#short-courses")}>{TRAINING_PAGE.shortCourses.title}</a></li>
+            <li><a href={href("/training/")}>All training</a></li>
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
           </ul>
         </div>
         <div>
@@ -111,6 +137,7 @@ const cleanUrl = (url: string) =>
         <div>
           <h2 class="site-footer__head">Social</h2>
           <ul class="list-reset site-footer__social">
+<<<<<<< HEAD
             {SOCIAL.map((s) => (
               <li class="social-item">
                 <a href={SOCIAL_POPUP[s.label]?.[0]?.href ?? s.href} target="_blank" rel="noopener noreferrer" class="social-trigger">
@@ -126,6 +153,9 @@ const cleanUrl = (url: string) =>
                 </div>
               </li>
             ))}
+=======
+            {SOCIAL.map((s) => <li><a href={s.href} target="_blank" rel="noopener">{s.label}<SocialLogo name={s.icon} /></a></li>)}
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
           </ul>
         </div>
       </nav>
@@ -138,6 +168,10 @@ const cleanUrl = (url: string) =>
             <Icon name="mail" size={16} />
             <span class="site-footer__route-text">
               <span class="site-footer__route-label">{e.label}</span>
+<<<<<<< HEAD
+=======
+              {/* An address may wrap at "@" if it must, never mid-word. */}
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
               <span>{e.address.split("@")[0]}<wbr />@{e.address.split("@")[1]}</span>
             </span>
           </a>
@@ -150,10 +184,14 @@ const cleanUrl = (url: string) =>
 
     <div class="site-footer__bar">
       <p>© {SITE.founded}–{year} {SITE.name}®. All rights reserved.</p>
+<<<<<<< HEAD
       <p>
         {SITE.legalName} · <a href={`mailto:${SITE.email}`}>{SITE.email}</a> ·
         <button type="button" id="cookie-settings" class="cookie-settings-link">Cookie settings</button>
       </p>
+=======
+      <p>{SITE.legalName} · <a href={`mailto:${SITE.email}`}>{SITE.email}</a></p>
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
     </div>
   </div>
 </footer>
@@ -165,6 +203,10 @@ const cleanUrl = (url: string) =>
     margin-top: clamp(48px, 8vw, 120px);
     border-top: 1px solid var(--ink);
     background-color: var(--paper);
+<<<<<<< HEAD
+=======
+    /* The site grid, subtle, with one soft glow: the footer is opaque, so it carries its own. */
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
     background-image:
       radial-gradient(45% 90% at 90% 100%, rgb(var(--depth-gold-rgb) / 0.1), transparent 70%),
       radial-gradient(40% 80% at 5% 0%, rgb(var(--depth-grid-rgb) / 0.07), transparent 70%),
@@ -173,6 +215,10 @@ const cleanUrl = (url: string) =>
     background-size: auto, auto, var(--depth-grid-cell) var(--depth-grid-cell), var(--depth-grid-cell) var(--depth-grid-cell);
     background-position: 0 0, 0 0, center top, center top;
     color: var(--ink);
+<<<<<<< HEAD
+=======
+    /* Room to scroll the last links clear of the fixed strip and meta row. */
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
     padding-bottom: calc(var(--footer-fixed-h) + 24px);
   }
   .footer-form-section {
@@ -221,6 +267,13 @@ const cleanUrl = (url: string) =>
   }
   .site-footer__legal { font: 600 18px/1.25 var(--font-display); letter-spacing: -0.01em; }
   .site-footer__blurb { margin-top: 10px; max-width: 34ch; font-size: 14px; color: var(--ink-2); }
+<<<<<<< HEAD
+=======
+  /* Contact strip, fixed just above the meta row; --footer-fixed-h (global.css)
+     is the height of the pair. Below 720px it shows one address at a time: a
+     swipeable row the script also advances. From 720px, all of them sit in
+     equal cells split by 1px rules (the list colour shows through the gaps). */
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
   .site-footer__contact {
     position: fixed;
     left: 0;
@@ -282,6 +335,10 @@ const cleanUrl = (url: string) =>
   @media (min-width: 720px) {
     .site-footer__route { padding-right: 14px; }
   }
+<<<<<<< HEAD
+=======
+  /* Narrow cells: the icon sits above the text to leave the address room. */
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
   @media (min-width: 720px) and (max-width: 899px) {
     .site-footer__route { flex-direction: column; align-items: flex-start; gap: 2px; min-height: 52px; padding-block: 8px; }
   }
@@ -317,6 +374,7 @@ const cleanUrl = (url: string) =>
     .site-footer__cols a { min-height: 36px; }
   }
   .site-footer__cols a:hover { color: var(--primary); text-decoration: underline; text-underline-offset: 4px; }
+<<<<<<< HEAD
 
   /* ---- Social Links: No Box, Direct URLs Reveal Inline on Hover ---- */
   .site-footer__social {
@@ -388,6 +446,11 @@ const cleanUrl = (url: string) =>
     color: var(--ink);
   }
 
+=======
+  /* A fixed width lines the logos up in a column despite the names' lengths. */
+  .site-footer__social a { display: flex; justify-content: space-between; gap: 10px; width: 7.5em; }
+  .site-footer__social :global(svg) { flex: none; }
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
   .site-footer__bar {
     position: fixed;
     left: 0;
@@ -406,6 +469,7 @@ const cleanUrl = (url: string) =>
     color: var(--ink-2);
   }
   .site-footer__bar a { color: inherit; }
+<<<<<<< HEAD
   .cookie-settings-link {
     background: none;
     border: none;
@@ -418,14 +482,23 @@ const cleanUrl = (url: string) =>
   .cookie-settings-link:hover {
     color: var(--primary);
   }
+=======
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
 </style>
 
 <script>
   import { SITE } from "../data/site";
   import { attachCaptcha, sendLead } from "../scripts/lead-form";
   import { showThankYou } from "../scripts/thank-you";
+<<<<<<< HEAD
   import { gaEvent } from "../utils/analytics";
 
+=======
+
+  // Email strip on small screens: advance one address at a time. A copy of the
+  // first address at the end lets it keep moving the same way, then jump back
+  // unseen. Touch, hover or keyboard focus pauses it so nothing moves mid-tap.
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
   const strip = document.querySelector<HTMLElement>("[data-email-strip]");
   const routes = strip?.querySelector<HTMLElement>("[data-email-routes]");
   if (strip && routes && routes.firstElementChild) {
@@ -452,6 +525,10 @@ const cleanUrl = (url: string) =>
       showDot(index);
       window.clearTimeout(settle);
       settle = window.setTimeout(() => {
+<<<<<<< HEAD
+=======
+        // Resting on the copy: return to the real first address, instantly.
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
         if (index >= total) {
           routes.scrollTo({ left: 0, behavior: "auto" });
           index = 0;
@@ -478,6 +555,10 @@ const cleanUrl = (url: string) =>
     const submit = form.querySelector<HTMLButtonElement>("[data-submit]");
     const T = status?.dataset ?? {};
 
+<<<<<<< HEAD
+=======
+    // Messages are built as DOM nodes, so nothing typed can end up as markup.
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
     const setStatus = (kind: "ok" | "error" | "info", ...parts: (string | Node)[]) => {
       if (!status) return;
       status.dataset.kind = kind;
@@ -497,6 +578,10 @@ const cleanUrl = (url: string) =>
       const subject = `Project inquiry from ${data.get("name")}`;
       const mailto = `mailto:${SITE.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(summary)}`;
 
+<<<<<<< HEAD
+=======
+      // Without a Web3Forms key there is nowhere to post to, so compose an email.
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
       if (!web3forms) {
         window.location.href = mailto;
         return;
@@ -510,6 +595,7 @@ const cleanUrl = (url: string) =>
           setStatus("error", T.captcha ?? "");
           return;
         }
+<<<<<<< HEAD
         data.set("h-captcha-response", String(new FormData(form).get("h-captcha-response") ?? ""));
         await sendLead(form, data);
 
@@ -518,6 +604,11 @@ const cleanUrl = (url: string) =>
 
         gaEvent("generate_lead", { form_name: "footer_form" });
 
+=======
+        // The token is added here: hCaptcha may have rendered after `data` was read.
+        data.set("h-captcha-response", String(new FormData(form).get("h-captcha-response") ?? ""));
+        await sendLead(form, data);
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
         form.reset();
         captcha?.reset();
         setStatus("info");
@@ -531,4 +622,8 @@ const cleanUrl = (url: string) =>
       }
     });
   }
+<<<<<<< HEAD
 </script>
+=======
+</script>
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66

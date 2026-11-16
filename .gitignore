@@ -1,7 +1,10 @@
 # build output
 dist/
 .astro/
+<<<<<<< HEAD
 *.zip
+=======
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
 
 # dependencies
 node_modules/

@@ -74,9 +74,15 @@ export const RIBBON_CONFIG: RibbonConfig = {
   breeze: 1,
   gloss: 1,
   showWordmark: true,
+<<<<<<< HEAD
   wordmarkScale: 1.35,
   wordmarkScaleNarrow: 1.15,
   landscapeLiftPx: 120,
+=======
+  wordmarkScale: 2,
+  wordmarkScaleNarrow: 1.25,
+  landscapeLiftPx: 84,
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
   wWidth: 0.22,
   foldRadius: 0.075,
   wMiddle: 0.4,
@@ -635,6 +641,7 @@ class Ribbon {
     const Lh = Math.min(1.35, halfW * (narrow ? 0.62 : 0.5));
     const cxW = narrow ? 0 : halfW * 0.26;
     // Inner pages: the W sits above the top edge, only the flick and descent show.
+<<<<<<< HEAD
     // In landscape, lift the W into upper region while keeping its top point (cyW + 0.5 * Lh) safely below header.
     const maxCyW = halfH - 100 * pxToWorld - 0.5 * Lh;
     const cyW = inner
@@ -642,6 +649,9 @@ class Ribbon {
       : narrow
         ? 0.55
         : Math.min(maxCyW, 0.32 + cfg.landscapeLiftPx * pxToWorld);
+=======
+    const cyW = inner ? halfH + cfg.inner.wAbove * Lh + cfg.inner.wAboveOffset : narrow ? 0.55 : 0.32 + cfg.landscapeLiftPx * pxToWorld;
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
     const xStart = -halfW * 1.35;
 
     const WP = this.WP;
@@ -965,7 +975,11 @@ class Ribbon {
     // wordmark under the W (projected; it lives in the hero, so add the scroll offset back)
     const wd = this.wordmark;
     if (wd && !inner) {
+<<<<<<< HEAD
       const px = cxW, py = botY - 0.16 * Lh;
+=======
+      const px = cxW, py = botY - 0.36 * Lh;
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
       const cx4 = PV[0] * px + PV[4] * py + PV[12], cy4 = PV[1] * px + PV[5] * py + PV[13], cw4 = PV[3] * px + PV[7] * py + PV[15];
       const sxp = ((cx4 / cw4) * 0.5 + 0.5) * cw, syp = (1 - ((cy4 / cw4) * 0.5 + 0.5)) * ch + scrolled;
       let a = showWord && this.formedAt !== null ? sstep(0, 1, (t - this.formedAt) / 1.1) : 0;

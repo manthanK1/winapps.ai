@@ -66,13 +66,18 @@ export function attachCaptcha(form: HTMLFormElement): Captcha {
   };
 }
 
+<<<<<<< HEAD
 const GOOGLE_SCRIPT_URL = import.meta.env.PUBLIC_GOOGLE_SCRIPT_URL as string | undefined;
 
 /** Posts to Web3Forms and automatically saves to Google Sheet if configured. */
+=======
+/** Posts to Web3Forms and throws unless it confirms the lead was accepted. */
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
 export async function sendLead(form: HTMLFormElement, data: FormData): Promise<void> {
   // `redirect` is only for a plain browser post. In a fetch it could turn a
   // delivered lead into a reported failure.
   data.delete("redirect");
+<<<<<<< HEAD
 
   // 1. Web3Forms post (Email notification)
   const web3Promise = fetch(form.action, {
@@ -112,4 +117,9 @@ export async function sendLead(form: HTMLFormElement, data: FormData): Promise<v
   }
 
   await Promise.all([web3Promise, sheetPromise]);
+=======
+  const res = await fetch(form.action, { method: "POST", headers: { Accept: "application/json" }, body: data });
+  const json: { success?: boolean } = await res.json().catch(() => ({}));
+  if (!res.ok || !json.success) throw new Error("Request failed");
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
 }

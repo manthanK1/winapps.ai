@@ -25,9 +25,15 @@ export const SITE = {
   emailHr: "hr@winapps.co.in",
   /** Where every "Book a call" button goes (V1 had no external booking tool). */
   bookingPath: "/contact/",
+<<<<<<< HEAD
   linkedin: "https://www.linkedin.com/showcase/winapps-skillup/",
   instagram: "https://www.instagram.com/winappsskillup/",
   facebook: "https://www.facebook.com/profile.php?id=61596505349989",
+=======
+  linkedin: "https://www.linkedin.com/company/winapps.co.in/",
+  instagram: "https://www.instagram.com/winapps_software/",
+  facebook: "https://www.facebook.com/profile.php?id=100063887836935",
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
   // TODO(Winapps): registered office address. V1 never published one, so it
   // stays null until supplied. JSON-LD then carries the country only.
   address: null as null | { street: string; city: string; region: string; postalCode: string; country: string },
@@ -47,6 +53,7 @@ export const SOCIAL = [
   { label: "Facebook", href: SITE.facebook, icon: "facebook" },
 ] as const;
 
+<<<<<<< HEAD
 // Popover links for each social platform
 export const SOCIAL_POPUP = {
   LinkedIn: [
@@ -63,6 +70,8 @@ export const SOCIAL_POPUP = {
   ],
 } as const;
 
+=======
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
 // Primary navigation (header). Items with `menu` open a dropdown built from
 // the content collections; `href` is where the item itself leads.
 export const NAV = [
@@ -72,7 +81,11 @@ export const NAV = [
   { label: "How we work", href: "/how-we-work/" },
   { label: "Insights", href: "/blog/", menu: "insights" },
   { label: "About", href: "/about/" },
+<<<<<<< HEAD
   { label: "SkillUP", href: "/training/", menu: "training" },
+=======
+  { label: "Training", href: "/training/", menu: "training" },
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
   { label: "Careers", href: "/careers/" },
 ] as const;
 

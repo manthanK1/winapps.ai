@@ -13,72 +13,110 @@ User-agent: Applebot
 User-agent: DuckDuckBot
 User-agent: YouBot
 Allow: /
+<<<<<<< HEAD
 Disallow: /admin/
+=======
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
 
 # OpenAI: ChatGPT search, user-requested fetches, model training
 User-agent: OAI-SearchBot
 User-agent: ChatGPT-User
 User-agent: GPTBot
 Allow: /
+<<<<<<< HEAD
 Disallow: /admin/
+=======
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
 
 # Anthropic: Claude search, user-requested fetches, model training
 User-agent: Claude-SearchBot
 User-agent: Claude-User
 User-agent: ClaudeBot
 Allow: /
+<<<<<<< HEAD
 Disallow: /admin/
+=======
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
 
 # Perplexity: search index and user-requested fetches
 User-agent: PerplexityBot
 User-agent: Perplexity-User
 Allow: /
+<<<<<<< HEAD
 Disallow: /admin/
+=======
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
 
 # Google: Gemini grounding/training control token, Vertex AI agents
 User-agent: Google-Extended
 User-agent: Google-CloudVertexBot
 Allow: /
+<<<<<<< HEAD
 Disallow: /admin/
+=======
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
 
 # Apple Intelligence (control token, Applebot does the crawling)
 User-agent: Applebot-Extended
 Allow: /
+<<<<<<< HEAD
 Disallow: /admin/
+=======
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
 
 # DuckDuckGo AI-assisted answers
 User-agent: DuckAssistBot
 Allow: /
+<<<<<<< HEAD
 Disallow: /admin/
+=======
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
 
 # Amazon: Alexa search, user-requested fetches, Amazonbot
 User-agent: Amzn-SearchBot
 User-agent: Amzn-User
 User-agent: Amazonbot
 Allow: /
+<<<<<<< HEAD
 Disallow: /admin/
+=======
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
 
 # Mistral AI (Le Chat / Vibe): search index and user-requested fetches
 User-agent: MistralAI-Index
 User-agent: MistralAI-User
 Allow: /
+<<<<<<< HEAD
 Disallow: /admin/
+=======
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
 
 # Meta AI: search index, user-requested fetches, model training
 User-agent: Meta-WebIndexer
 User-agent: Meta-ExternalFetcher
 User-agent: meta-externalagent
 Allow: /
+<<<<<<< HEAD
 Disallow: /admin/
+=======
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
 
 # Common Crawl (an open dataset many AI systems are built on)
 User-agent: CCBot
 Allow: /
+<<<<<<< HEAD
 Disallow: /admin/
+=======
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
 
 # Everyone else
 User-agent: *
 Allow: /
+<<<<<<< HEAD
 Disallow: /admin/
 
 Sitemap: https://www.winapps.co.in/sitemap-index.xml
+=======
+
+Sitemap: https://www.winapps.co.in/sitemap-index.xml
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66

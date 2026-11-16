@@ -10,7 +10,10 @@ import PageHero from "../../components/PageHero.astro";
 import Icon from "../../components/Icon.astro";
 import SectionHead from "../../components/SectionHead.astro";
 import TechLogos from "../../components/TechLogos.astro";
+<<<<<<< HEAD
 import TrainingForm from "../../components/TrainingForm.astro";
+=======
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
 import { TRAINING_ADVICE, TRAINING_DOMAINS, TRAINING_PAGE } from "../../data/copy";
 import { SITE, trainingEmailFor } from "../../data/site";
 import { AUDIENCES, getCourses, getProgrammes, getTracks, programmeAsCourse, trainingCounts } from "../../lib/content";
@@ -25,7 +28,10 @@ const jump = [
   ...AUDIENCES.map((a) => ({ label: audiences[a].label, href: `#${a}` })),
   { label: TRAINING_PAGE.domains.title, href: "#domains" },
   { label: TRAINING_PAGE.shortCourses.title, href: "#short-courses" },
+<<<<<<< HEAD
   { label: "Enquire", href: "#inquiry" },
+=======
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
 ];
 ---
 <BaseLayout
@@ -187,6 +193,7 @@ const jump = [
     </section>
   ))}
 
+<<<<<<< HEAD
   <section id="inquiry" class="section section--tight" aria-labelledby="inquiry-title">
     <div class="container">
       <div class="panel">
@@ -201,6 +208,8 @@ const jump = [
     </div>
   </section>
 
+=======
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
   <section class="section" aria-labelledby="training-cta-title">
     <div class="container closing">
       <div class="closing__text veil">
@@ -208,10 +217,16 @@ const jump = [
         <p class="lead closing__lead">{cta.text}</p>
       </div>
       <div class="closing__actions">
+<<<<<<< HEAD
         <a href="#inquiry" class="btn btn--primary">
           Enquire now <Icon name="arrow" size={18} class="arrow" />
         </a>
         <a href={`mailto:${SITE.emailTraining}`} class="btn btn--outline"><Icon name="mail" size={18} /> {SITE.emailTraining}</a>
+=======
+        <a href={trainingEmailFor(TRAINING_ADVICE.message)} class="btn btn--primary">
+          <Icon name="mail" size={18} /> {TRAINING_ADVICE.cta}
+        </a>
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
       </div>
     </div>
   </section>

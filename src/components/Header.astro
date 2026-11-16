@@ -36,7 +36,11 @@ const menuActive = (menu: string) =>
   <a href={href("/")} class="site-logo" aria-label={`${SITE.name} home`}>
     <picture>
       <source srcset={href("/brand/winapps-logo-still.webp")} type="image/webp" media="(prefers-reduced-motion: reduce)" />
+<<<<<<< HEAD
       <img src={href("/brand/winapps-logo.gif")} alt={SITE.name} width="400" height="447" decoding="async" />
+=======
+      <img src={href("/brand/winapps-logo.gif")} alt={SITE.name} width="257" height="287" decoding="async" />
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
     </picture>
   </a>
 
@@ -53,7 +57,11 @@ const menuActive = (menu: string) =>
               data-active={menuActive(item.menu) ? "" : undefined}
               data-menu-trigger
             >
+<<<<<<< HEAD
               {item.menu === "training" ? "SkillUp" : item.label}
+=======
+              {item.label}
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
               <Icon name="chevron-down" size={11} class="site-nav__chev" />
             </button>
             <div id={`menu-${item.menu}`} class="mega" hidden data-menu-panel>
@@ -128,7 +136,11 @@ const menuActive = (menu: string) =>
                         </div>
                       </div>
                     </div>
+<<<<<<< HEAD
                     <a class="link-u" href={href("/training/")}>All SkillUp <Icon name="arrow" size={16} /></a>
+=======
+                    <a class="link-u" href={href("/training/")}>All training <Icon name="arrow" size={16} /></a>
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
                   </div>
                 )}
                 {item.menu === "insights" && (
@@ -172,6 +184,7 @@ const menuActive = (menu: string) =>
 <!-- MENU overlay: V1's expanded drawer. A modal <dialog> traps focus and closes on Escape. -->
 <dialog id="site-menu" class="menu-overlay on-dark depth-dark" aria-label="Menu">
   <div class="menu-overlay__bar">
+<<<<<<< HEAD
     <a href={href("/")} class="menu-overlay__mark" aria-label={`${SITE.name} home`}>
       <picture class="menu-overlay__pic">
         <source srcset={href("/brand/winapps-logo-still.webp")} type="image/webp" media="(prefers-reduced-motion: reduce)" />
@@ -180,6 +193,9 @@ const menuActive = (menu: string) =>
       </picture>
       <span>WINAPPS</span>
     </a>
+=======
+    <a href={href("/")} class="menu-overlay__mark" aria-label={`${SITE.name} home`}><span aria-hidden="true"></span>WINAPPS</a>
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
     <button type="button" class="menu-overlay__close" data-menu-close>
       CLOSE <Icon name="close" size={14} />
     </button>
@@ -189,9 +205,13 @@ const menuActive = (menu: string) =>
       <ul class="list-reset">
         {MENU_LINKS.map((l) => (
           <li>
+<<<<<<< HEAD
             <a href={href(l.href)} class:list={["menu-overlay__big", { "is-contact": l.href === "/contact/" }]} aria-current={isActive(current, l.href) ? "page" : undefined}>
               {l.href === "/training/" ? "SkillUp" : l.label}
             </a>
+=======
+            <a href={href(l.href)} class:list={["menu-overlay__big", { "is-contact": l.href === "/contact/" }]} aria-current={isActive(current, l.href) ? "page" : undefined}>{l.label}</a>
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
           </li>
         ))}
       </ul>
@@ -205,11 +225,19 @@ const menuActive = (menu: string) =>
         </ul>
       </details>
       <details class="menu-group" open data-menu-group>
+<<<<<<< HEAD
         <summary>SkillUp <Icon name="plus" size={14} class="menu-group__icon" /></summary>
         <ul class="list-reset">
           {AUDIENCES.map((a) => <li><a href={href(`/training/#${a}`)}>{TRAINING_PAGE.audiences[a].label}</a></li>)}
           <li><a href={href("/training/#short-courses")}>{TRAINING_PAGE.shortCourses.title}</a></li>
           <li><a href={href("/training/")} class="menu-group__all" aria-current={current === href("/training/") ? "page" : undefined}>All SkillUp</a></li>
+=======
+        <summary>Training <Icon name="plus" size={14} class="menu-group__icon" /></summary>
+        <ul class="list-reset">
+          {AUDIENCES.map((a) => <li><a href={href(`/training/#${a}`)}>{TRAINING_PAGE.audiences[a].label}</a></li>)}
+          <li><a href={href("/training/#short-courses")}>{TRAINING_PAGE.shortCourses.title}</a></li>
+          <li><a href={href("/training/")} class="menu-group__all" aria-current={current === href("/training/") ? "page" : undefined}>All training</a></li>
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
         </ul>
       </details>
       <div class="menu-overlay__contact">
@@ -242,7 +270,11 @@ const menuActive = (menu: string) =>
   .site-header {
     position: fixed;
     inset: 0 0 auto 0;
+<<<<<<< HEAD
     z-index: 50;
+=======
+    z-index: 20;
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -250,6 +282,7 @@ const menuActive = (menu: string) =>
     height: var(--header-h);
     padding: 0 var(--gutter);
     border-bottom: 1px solid var(--rule);
+<<<<<<< HEAD
     background: #F8F9F8;
   }
   .site-logo {
@@ -272,6 +305,20 @@ const menuActive = (menu: string) =>
     width: auto;
     object-fit: contain;
   }
+=======
+    background: var(--header-bg);
+  }
+  .site-logo {
+    display: flex;
+    align-items: flex-start;
+    flex: none;
+    height: var(--header-h);
+    padding-top: 6px;
+    overflow: hidden;
+    text-decoration: none;
+  }
+  .site-logo img { display: block; height: 82px; width: auto; max-width: none; }
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
 
   /* ---- Nav ----------------------------------------------------------------- */
   .site-nav { display: none; }
@@ -437,8 +484,13 @@ const menuActive = (menu: string) =>
   /* ≤640: one tidy row. */
   @media (max-width: 640px) {
     .site-header { gap: 8px; }
+<<<<<<< HEAD
     .site-logo { padding: 4px 0; }
     .site-logo img { max-height: calc(var(--header-h) - 10px); }
+=======
+    .site-logo { padding-top: 4px; }
+    .site-logo img { height: 66px; }
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
     .site-actions { gap: 8px; }
     .hdr-book { padding: 0 12px; font-size: 13px; }
     .hdr-book :global(.hdr-book__arrow) { display: none; }
@@ -446,7 +498,12 @@ const menuActive = (menu: string) =>
     .hdr-menu { padding: 0 12px; }
   }
   @media (max-width: 400px) {
+<<<<<<< HEAD
     .site-logo img { max-height: calc(var(--header-h) - 12px); }
+=======
+    .site-logo { padding-top: 6px; }
+    .site-logo img { height: 58px; }
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
     .hdr-menu { padding: 0; width: 44px; }
     .hdr-menu__label { display: none; }
   }
@@ -474,14 +531,20 @@ const menuActive = (menu: string) =>
     align-items: center;
     justify-content: space-between;
     flex: none;
+<<<<<<< HEAD
     min-height: var(--header-h);
     padding: 8px 0;
     border-bottom: 1px solid var(--overlay-rule);
     overflow: visible;
+=======
+    height: var(--header-h);
+    border-bottom: 1px solid var(--overlay-rule);
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
   }
   .menu-overlay__mark {
     display: flex;
     align-items: center;
+<<<<<<< HEAD
     gap: 14px;
     min-height: 44px;
     color: #fff;
@@ -506,6 +569,16 @@ const menuActive = (menu: string) =>
     object-fit: contain;
     flex: none;
   }
+=======
+    gap: 10px;
+    min-height: 44px;
+    color: #fff;
+    font: 700 19px/1 var(--font-display);
+    letter-spacing: 0.14em;
+    text-decoration: none;
+  }
+  .menu-overlay__mark span { display: block; width: 14px; height: 14px; background: var(--accent); }
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
   .menu-overlay__close {
     display: flex;
     align-items: center;
@@ -760,4 +833,8 @@ const menuActive = (menu: string) =>
   search.addEventListener("click", (e) => {
     if (e.target === search) search.close();
   });
+<<<<<<< HEAD
 </script>
+=======
+</script>
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66

@@ -1,4 +1,12 @@
 ---
+<<<<<<< HEAD
+=======
+// Contact form (V1 ContactForm, restyled). With PUBLIC_WEB3FORMS_KEY set it
+// posts to Web3Forms, protected by hCaptcha, which needs JavaScript. Without a
+// key it falls back to composing an email. A honeypot field also blocks simple bots.
+// Links can pre-fill it: ?interest=<need> (repeatable) and ?message=<text>.
+// Service pages and the home "What do you want to build?" box use this.
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
 import Icon from "./Icon.astro";
 import { CONTACT_PAGE } from "../data/copy";
 import { BUDGETS, COUNTRIES, NEEDS, SITE } from "../data/site";
@@ -24,9 +32,16 @@ const redirect = absolute("/contact/?sent=1", Astro.site);
       <input type="hidden" name="subject" value="New project inquiry from winapps website" />
       <input type="hidden" name="from_name" value="Winapps website" />
       <input type="hidden" name="redirect" value={redirect} />
+<<<<<<< HEAD
       <input type="hidden" name="source" value="Sales Inquiry" />
     </>
   )}
+=======
+      <input type="hidden" name="source" value="Contact page form" />
+    </>
+  )}
+  <!-- Honeypot: humans never see or fill this. -->
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
   <div class="cf__hp" aria-hidden="true">
     <label>Leave this empty<input type="checkbox" name="botcheck" tabindex="-1" /></label>
   </div>
@@ -120,7 +135,14 @@ const redirect = absolute("/contact/?sent=1", Astro.site);
     .cf__submit { width: auto; }
   }
   .cf__note { max-width: 62ch; font-size: 14px; line-height: 1.55; color: var(--muted); }
+<<<<<<< HEAD
   .cf__note a { padding-block: 13px; }
+=======
+  /* Inline link: vertical padding grows the tap target to 44px. */
+  .cf__note a { padding-block: 13px; }
+  /* The live region stays in the accessibility tree (never display:none),
+     so screen readers announce what the script writes into it. */
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
   .cf__status { font-size: 15px; line-height: 1.5; color: var(--ink); }
   .cf__status:not(:empty) { padding: 16px 18px; border-left: 2px solid var(--rule-2); }
   .cf__status[data-kind="ok"] { border-left-color: var(--primary); background: #e7f0f1; }
@@ -133,7 +155,10 @@ const redirect = absolute("/contact/?sent=1", Astro.site);
   import { SITE } from "../data/site";
   import { attachCaptcha, sendLead } from "../scripts/lead-form";
   import { showThankYou } from "../scripts/thank-you";
+<<<<<<< HEAD
   import { gaEvent } from "../utils/analytics";
+=======
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
 
   const T = CONTACT_PAGE.form;
   type Field = HTMLInputElement | HTMLTextAreaElement;
@@ -168,6 +193,11 @@ const redirect = absolute("/contact/?sent=1", Astro.site);
       if (error) error.hidden = !show;
     };
 
+<<<<<<< HEAD
+=======
+    // Messages are built as DOM nodes (no innerHTML), so nothing typed into
+    // the form can end up as markup.
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
     const setStatus = (kind: Kind, ...parts: (string | Node)[]) => {
       if (!status) return;
       status.dataset.kind = kind;
@@ -179,6 +209,10 @@ const redirect = absolute("/contact/?sent=1", Astro.site);
       el.addEventListener("blur", () => {
         if (el.value) showError(el, !valid(el));
       });
+<<<<<<< HEAD
+=======
+      // Clear the error as soon as the field is fixed.
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
       el.addEventListener("input", () => {
         if (el.getAttribute("aria-invalid") === "true" && valid(el)) showError(el, false);
       });
@@ -225,6 +259,7 @@ const redirect = absolute("/contact/?sent=1", Astro.site);
           return;
         }
         data.set("needs", needs);
+<<<<<<< HEAD
         data.set("h-captcha-response", String(new FormData(form).get("h-captcha-response") ?? ""));
         await sendLead(form, data);
 
@@ -234,6 +269,11 @@ const redirect = absolute("/contact/?sent=1", Astro.site);
 
         gaEvent("generate_lead", { form_name: "contact_form" });
 
+=======
+        // The token is added here: hCaptcha may have rendered after `data` was read.
+        data.set("h-captcha-response", String(new FormData(form).get("h-captcha-response") ?? ""));
+        await sendLead(form, data);
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
         form.reset();
         captcha?.reset();
         setStatus("info");
@@ -255,8 +295,17 @@ const redirect = absolute("/contact/?sent=1", Astro.site);
     });
 
     const params = new URLSearchParams(location.search);
+<<<<<<< HEAD
     if (params.has("sent")) setStatus("ok", THANK_YOU.lead);
 
+=======
+    // A plain browser post lands here. Anyone can type this URL, so it stays inline
+    // and never opens the pop-up, which only follows a confirmed send.
+    if (params.has("sent")) setStatus("ok", THANK_YOU.lead);
+
+    // Pre-fill from links: ?message= from the home prompt box, one or more
+    // ?interest= from service pages and the prompt box's checkboxes.
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
     const message = form.elements.namedItem("message");
     const prefill = params.get("message")?.trim();
     if (prefill && message instanceof HTMLTextAreaElement && !message.value) message.value = prefill.slice(0, 5000);
@@ -265,4 +314,8 @@ const redirect = absolute("/contact/?sent=1", Astro.site);
       if (wanted.includes(box.value)) box.checked = true;
     }
   }
+<<<<<<< HEAD
 </script>
+=======
+</script>
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66

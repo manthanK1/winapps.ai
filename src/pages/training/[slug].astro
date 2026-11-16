@@ -10,7 +10,10 @@ import PageHero from "../../components/PageHero.astro";
 import Icon from "../../components/Icon.astro";
 import SectionHead from "../../components/SectionHead.astro";
 import TechLogos from "../../components/TechLogos.astro";
+<<<<<<< HEAD
 import TrainingForm from "../../components/TrainingForm.astro";
+=======
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
 import { HOME, TRAINING_ADVICE, TRAINING_DOMAINS, TRAINING_PAGE } from "../../data/copy";
 import { SITE, trainingEmailFor } from "../../data/site";
 import type { TechLogo } from "../../lib/tech-logos";
@@ -95,6 +98,7 @@ const num = (i: number) => String(i + 1).padStart(2, "0");
           {p.internship && <li class="chip">{TRAINING_PAGE.internship}</li>}
         </ul>
         <p class="answer text-2">{howToJoin}</p>
+<<<<<<< HEAD
         <a href="#enquire" class="btn btn--primary hero-enquire-btn">Enquire for this programme <Icon name="arrow" size={18} class="arrow" /></a>
       </>
     ) : (
@@ -102,6 +106,11 @@ const num = (i: number) => String(i + 1).padStart(2, "0");
         <p class="answer text-2">Part of our {group} track: {"trackIntro" in props ? props.trackIntro : ""} {howToJoin}</p>
         <a href="#enquire" class="btn btn--primary hero-enquire-btn">Enquire for this course <Icon name="arrow" size={18} class="arrow" /></a>
       </>
+=======
+      </>
+    ) : (
+      <p class="answer text-2">Part of our {group} track: {"trackIntro" in props ? props.trackIntro : ""} {howToJoin}</p>
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
     )}
   </PageHero>
 
@@ -118,8 +127,13 @@ const num = (i: number) => String(i + 1).padStart(2, "0");
       <div class="panel enquire">
         <TechLogos logos={c.logos} />
         <div class="enquire__actions">
+<<<<<<< HEAD
           <a href="#enquire" class="btn btn--primary btn--block">
             Enquire online <Icon name="arrow" size={18} class="arrow" />
+=======
+          <a href={trainingEmailFor(TRAINING_PAGE.courseMessage(c.name))} class="btn btn--primary btn--block">
+            <Icon name="mail" size={18} /> {TRAINING_PAGE.enquire}
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
           </a>
           <a href={`mailto:${SITE.emailTraining}?subject=${encodeURIComponent(c.name)}`} class="btn btn--outline btn--block"><Icon name="mail" size={18} /> {SITE.emailTraining}</a>
         </div>
@@ -127,6 +141,7 @@ const num = (i: number) => String(i + 1).padStart(2, "0");
     </div>
   </section>
 
+<<<<<<< HEAD
   <section id="enquire" class="section section--flush-top enquire-section" aria-labelledby="enquire-title">
     <div class="container">
       <div class="panel">
@@ -139,6 +154,8 @@ const num = (i: number) => String(i + 1).padStart(2, "0");
     </div>
   </section>
 
+=======
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
   {siblings.length > 0 ? (
     <section class="section" aria-labelledby="more-title">
       <div class="container">
@@ -191,8 +208,11 @@ const num = (i: number) => String(i + 1).padStart(2, "0");
   .answer { margin-top: 16px; max-width: 64ch; }
   .facts { margin-top: 24px; }
   .facts .chip { font-weight: 600; color: var(--ink); }
+<<<<<<< HEAD
   .hero-enquire-btn { margin-top: 24px; }
   .enquire-section { scroll-margin-top: calc(var(--header-h) + 24px); }
+=======
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
 
   .learn { display: grid; gap: 24px; }
   @media (min-width: 1024px) {

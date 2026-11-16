@@ -67,8 +67,11 @@ const files = {
   "icon-512.png": await icon(512, 0.1, white),
   "icon-maskable-512.png": await icon(512, 0.2, white),
   "brand/icon-512.png": await icon(512, 0.1, white),
+<<<<<<< HEAD
   "brand/winapps-mark.png": mark,
   "brand/winapps-mark.webp": await sharp(mark).webp({ quality: 95 }).toBuffer(),
+=======
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
 };
 for (const [name, buf] of Object.entries(files)) await writeFile(`${OUT}/${name}`, buf);
 
@@ -94,6 +97,7 @@ pngs.forEach((png, i) => {
 });
 await writeFile(`${OUT}/favicon.ico`, Buffer.concat([header, ...pngs]));
 
+<<<<<<< HEAD
 // 4. Animated mark alone (W ribbon, no WINAPPS text) for menu overlay and brand headers
 await sharp(`${OUT}/brand/winapps-logo.gif`, { animated: true })
   .extract({ left: 0, top: 0, width: 257, height: 170 })
@@ -105,4 +109,6 @@ await sharp(`${OUT}/brand/winapps-logo.gif`, { animated: true })
   .webp({ loop: 0, quality: 95 })
   .toFile(`${OUT}/brand/winapps-mark-animated.webp`);
 
+=======
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
 console.log(`W mark ${markW}×${markH} at (${left},${top}); wrote still logo, favicon.ico and ${Object.keys(files).length} icons.`);

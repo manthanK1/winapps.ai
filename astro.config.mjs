@@ -102,18 +102,25 @@ export default defineConfig({
     inlineStylesheets: "always",
   },
   // V1's old-site redirects, plus V1's internal styleguide (not carried over).
+<<<<<<< HEAD
 
 // Exclude hidden admin route from sitemap
 // (The filter is applied to each generated page URL)
 // Ensure the admin page does not appear in search engines.
 
+=======
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
   redirects: {
     ...Object.fromEntries(Object.entries(LEGACY_REDIRECTS).map(([from, to]) => [from, `${base}${to}`])),
     "/styleguide": `${base}/`,
   },
   integrations: [
     sitemap({
+<<<<<<< HEAD
       filter: (page) => !/\/(404|styleguide|admin)\/?$/.test(new URL(page).pathname),
+=======
+      filter: (page) => !/\/(404|styleguide)\/?$/.test(new URL(page).pathname),
+>>>>>>> 1e876effd3d3d2b4b0cd0efcbb081788684f9a66
       serialize(item) {
         const path = new URL(item.url).pathname.slice(base.length) || "/";
         item.lastmod = (lastmodFor(path) ?? BUILD_DATE).toISOString();
