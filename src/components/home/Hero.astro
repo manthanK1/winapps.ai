@@ -1,0 +1,103 @@
+---
+// Home hero, as in the design: a full-height stage for the WebGL W, with the
+// text block bottom-left, clear of the footer's fixed strip. The header (fixed,
+// outside <main>) overlays the top. #ribbon-word is the WINAPPS wordmark the ribbon places under its W.
+//
+// Wide screens (landscape): the W fills the upper middle and its left wave
+// dips to ~48% of the height, and the wordmark spans ~69–78% from 50vw. V1's
+// copy is taller than the design's, so the headline and CTAs
+// stay bottom-left (headline sized by height as well as width, like the W) and
+// the lead moves to the right column, under the wordmark. DOM order is kept.
+// Narrow screens (portrait phones and tablets): the ribbon draws the W centred
+// at ~29–52% of the viewport height and the wordmark at ~55%, so the text
+// starts below 60svh and the hero grows taller than the screen if it must.
+// The text carries .veil: invisible at rest, but once the page scrolls the
+// ribbon's descent passes behind it. The h1 is the LCP element: no entrance
+// animation.
+import Icon from "../Icon.astro";
+import { HOME } from "../../data/copy";
+import { SITE } from "../../data/site";
+import { href } from "../../lib/url";
+
+const { hero } = HOME;
+---
+<section class="hero" aria-labelledby="hero-title" data-depth="hero">
+  <div id="ribbon-word" class="ribbon-word" aria-hidden="true">WINAPPS</div>
+  <div class="hero__text">
+    <p class="eyebrow veil">{hero.eyebrow}</p>
+    <h1 id="hero-title" class="display hero__title veil">{hero.title}</h1>
+    <p class="lead hero__lead veil">{hero.lead}</p>
+    <div class="hero__actions veil">
+      <a href={href(SITE.bookingPath)} class="btn btn--primary">{hero.primary.label} <Icon name="arrow" size={18} class="arrow" /></a>
+      <a href={href(hero.secondary.href)} class="link-u">{hero.secondary.label}</a>
+    </div>
+  </div>
+  <div class="hero__scroll" aria-hidden="true">SCROLL<span></span></div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 640px;
+    min-height: max(640px, 100vh);
+    min-height: max(640px, 100svh);
+    padding: calc(var(--header-h) + 32px) var(--gutter) calc(clamp(32px, 7vh, 72px) + var(--footer-fixed-h));
+    overflow: clip;
+  }
+  .hero__text {
+    position: relative;
+    z-index: 2;
+    max-width: min(680px, 44vw);
+  }
+  .hero__text > .eyebrow { margin-bottom: 22px; }
+  .hero__lead { margin-top: 24px; max-width: 54ch; }
+  .hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px; margin-top: 36px; }
+
+  .hero__scroll {
+    position: absolute;
+    right: var(--gutter);
+    bottom: calc(clamp(32px, 7vh, 72px) + var(--footer-fixed-h));
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+  }
+  .hero__scroll span { display: block; width: 1px; height: 44px; background: var(--ink); }
+
+  /* Strictly landscape: an exactly square screen keeps the portrait layout below. */
+  @media (min-aspect-ratio: 1001/1000) {
+    .hero__text {
+      --hero-gap: 48px;
+      display: grid;
+      grid-template-columns: minmax(0, calc(50vw - var(--gutter) - var(--hero-gap))) minmax(0, 1fr);
+      column-gap: var(--hero-gap);
+      max-width: none;
+      padding-right: 96px; /* clear of the SCROLL indicator */
+    }
+    .hero__text > * { grid-column: 1; }
+    .hero__title { font-size: clamp(40px, min(5.4vw, 7.2vh), 82px); }
+    .hero__text > .hero__lead { grid-column: 2; grid-row: 1 / span 4; align-self: end; max-width: 40ch; margin: 0; }
+  }
+
+  /* Portrait: the W and wordmark fill the top ~56%; text flows below. Listed
+     after the landscape rules so an exactly square viewport gets this one. */
+  @media (max-aspect-ratio: 1/1) {
+    .hero {
+      justify-content: flex-start;
+      min-height: 100vh;
+      min-height: 100svh;
+      padding-top: 60vh;
+      padding-top: 60svh;
+      padding-bottom: calc(clamp(48px, 8vw, 72px) + var(--footer-fixed-h));
+    }
+    .hero__text { max-width: 680px; }
+    .hero__scroll { display: none; }
+  }
+</style>

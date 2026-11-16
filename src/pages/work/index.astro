@@ -1,0 +1,130 @@
+---
+// Case studies (V1 /work/): numbered case cards with h2 titles; the first
+// and fourth are the wide ones, as in V1 and on the home page. Domain chips
+// (V1's /case-studies filter) narrow the list in the browser; /work/?domain=ai
+// opens pre-filtered. Without JavaScript the chips stay hidden and every case
+// study shows.
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHero from "../../components/PageHero.astro";
+import CaseCard from "../../components/CaseCard.astro";
+import CtaBand from "../../components/CtaBand.astro";
+import { WORK_DOMAINS, WORK_PAGE, type WorkDomain } from "../../data/copy";
+import { getWork } from "../../lib/content";
+
+const work = await getWork();
+const crumbs = [{ name: "Case Studies", path: "/work/" }];
+const { hero, filter } = WORK_PAGE;
+const isWide = (i: number) => i === 0 || i === 3;
+const domains = (Object.keys(WORK_DOMAINS) as WorkDomain[])
+  .map((key) => ({ key, label: WORK_DOMAINS[key], count: work.filter((w) => w.data.domains.includes(key)).length }))
+  .filter((d) => d.count > 0);
+---
+<BaseLayout
+  title={WORK_PAGE.meta.title}
+  description={WORK_PAGE.meta.description}
+  breadcrumbs={crumbs}
+  pageType="CollectionPage"
+  markdownPath="/work.md"
+>
+  <PageHero breadcrumbs={crumbs} eyebrow={hero.eyebrow} title={hero.title} accent={hero.accent} lead={hero.lead} />
+
+  <section class="section section--flush-top" aria-label="Case studies">
+    <div class="container">
+      <div class="work-filter" role="group" aria-label={filter.label} data-work-filter hidden>
+        <button type="button" class="filter-chip" data-domain="" aria-pressed="true">
+          {filter.all} <span class="filter-chip__n">{work.length}</span>
+        </button>
+        {domains.map((d) => (
+          <button type="button" class="filter-chip" data-domain={d.key} aria-pressed="false">
+            {d.label} <span class="filter-chip__n">{d.count}</span>
+          </button>
+        ))}
+      </div>
+      <p class="sr-only" role="status" aria-live="polite" data-work-status data-one={filter.one} data-many={filter.many}></p>
+
+      <ul class="list-reset work-grid" data-work-grid>
+        {work.map((item, i) => (
+          <li class:list={{ "work-grid__wide": isWide(i) }} data-domains={item.data.domains.join(" ")}>
+            <CaseCard item={item} num={i + 1} featured={isWide(i)} headingLevel="h2" />
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <CtaBand title={WORK_PAGE.cta.title} text={WORK_PAGE.cta.text} />
+</BaseLayout>
+
+<script>
+  const bar = document.querySelector<HTMLElement>("[data-work-filter]");
+  const grid = document.querySelector<HTMLElement>("[data-work-grid]");
+  const status = document.querySelector<HTMLElement>("[data-work-status]");
+  if (bar && grid) {
+    const chips = [...bar.querySelectorAll<HTMLButtonElement>("[data-domain]")];
+    const items = [...grid.querySelectorAll<HTMLElement>(":scope > li")];
+    const known = new Set(chips.map((c) => c.dataset.domain));
+
+    const apply = (domain: string, announce: boolean) => {
+      let shown = 0;
+      for (const li of items) {
+        const match = !domain || (li.dataset.domains ?? "").split(" ").includes(domain);
+        li.hidden = !match;
+        if (match) shown++;
+      }
+      for (const c of chips) c.setAttribute("aria-pressed", String(c.dataset.domain === domain));
+      grid.classList.toggle("is-filtered", Boolean(domain));
+      if (announce && status) status.textContent = `${shown} ${(shown === 1 ? status.dataset.one : status.dataset.many) ?? ""}`;
+    };
+
+    bar.addEventListener("click", (e) => {
+      const chip = (e.target as Element).closest<HTMLButtonElement>("[data-domain]");
+      if (!chip) return;
+      const domain = chip.dataset.domain ?? "";
+      apply(domain, true);
+      const url = new URL(location.href);
+      if (domain) url.searchParams.set("domain", domain);
+      else url.searchParams.delete("domain");
+      history.replaceState(null, "", url);
+    });
+
+    const initial = new URLSearchParams(location.search).get("domain") ?? "";
+    apply(known.has(initial) ? initial : "", false);
+    bar.hidden = false;
+  }
+</script>
+
+<style>
+  .work-filter { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 40px; }
+  .filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 8px 16px;
+    border: 1px solid var(--rule-2);
+    background: #fff;
+    color: var(--ink-2);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+  }
+  .filter-chip:hover { border-color: var(--yellow); background: var(--yellow-tint); color: var(--ink); }
+  .filter-chip[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: #fff; }
+  .filter-chip__n { font-size: 12px; opacity: 0.7; font-variant-numeric: tabular-nums; }
+
+  .work-grid { display: grid; gap: 24px; grid-auto-flow: dense; }
+  .work-grid > li[hidden] { display: none; }
+  /* Filtered lists aren't in V1 order, so drop the numbers and wide cards. */
+  .work-grid.is-filtered :global(.card__num) { display: none; }
+  @media (min-width: 768px) {
+    .work-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1024px) {
+    .work-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .work-grid__wide { grid-column: span 2; }
+    .work-grid.is-filtered .work-grid__wide { grid-column: auto; }
+  }
+</style>

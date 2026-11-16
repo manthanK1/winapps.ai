@@ -1,0 +1,150 @@
+---
+// One page per open role: /careers/<id>/. The description comes from
+// src/content/careers.yaml; the application form takes the resume.
+import type { GetStaticPaths, InferGetStaticPropsType } from "astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHero from "../../components/PageHero.astro";
+import CareerForm from "../../components/CareerForm.astro";
+import Icon from "../../components/Icon.astro";
+import SectionHead from "../../components/SectionHead.astro";
+import { CAREERS_PAGE } from "../../data/copy";
+import { careerPath, getCareers } from "../../lib/content";
+import { href } from "../../lib/url";
+
+export const getStaticPaths = (async () => {
+  const roles = await getCareers();
+  return roles.map((role) => ({
+    params: { slug: role.id },
+    props: { role, others: roles.filter((o) => o.id !== role.id) },
+  }));
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { role, others } = Astro.props;
+const r = role.data;
+const path = careerPath(role.id);
+const crumbs = [
+  { name: "Careers", path: "/careers/" },
+  { name: r.title, path },
+];
+const num = (i: number) => String(i + 1).padStart(2, "0");
+---
+<BaseLayout
+  title={r.title}
+  description={r.seoDescription}
+  breadcrumbs={crumbs}
+  pageType="ItemPage"
+  markdownPath={`/careers/${role.id}.md`}
+>
+  <PageHero breadcrumbs={crumbs} eyebrow={CAREERS_PAGE.hero.eyebrow} title={r.title}>
+    <ul class="chips facts" aria-label="Role facts">
+      {r.department && <li class="chip">{r.department}</li>}
+      <li class="chip">{r.location}</li>
+      <li class="chip">{r.jobType}</li>
+      <li class="chip">{r.experience}</li>
+    </ul>
+    <a href="#apply" class="btn btn--primary apply-link">{CAREERS_PAGE.apply} <Icon name="arrow" size={18} class="arrow" /></a>
+  </PageHero>
+
+  <section class="section section--flush-top" aria-label="Role details">
+    <div class="container details">
+      <div class="details__main">
+        <div class="panel">
+          <h2 class="details__title">{CAREERS_PAGE.aboutTitle}</h2>
+          <p class="text-2">{r.about}</p>
+        </div>
+        <div class="panel">
+          <h2 class="details__title">{CAREERS_PAGE.responsibilitiesTitle}</h2>
+          {r.responsibilities.map((group) => (
+            <div class="group">
+              {group.heading && <h3 class="group__heading">{group.heading}</h3>}
+              <ul class="ticks">
+                {group.items.map((item) => <li><Icon name="check" size={16} /><span>{item}</span></li>)}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div class="details__side">
+        {r.sections.map((section) => (
+          <div class="panel">
+            <h2 class="details__title">{section.title}</h2>
+            <ul class="ticks">
+              {section.items.map((item) => <li><Icon name="check" size={16} /><span>{item}</span></li>)}
+            </ul>
+          </div>
+        ))}
+        <div class="panel">
+          <h2 class="details__title">{CAREERS_PAGE.offerTitle}</h2>
+          <ul class="ticks">
+            {r.offer.map((item) => <li><Icon name="check" size={16} /><span>{item}</span></li>)}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="apply" class="section section--flush-top apply" aria-labelledby="apply-title">
+    <div class="container">
+      <div class="panel apply__panel">
+        <h2 id="apply-title" class="details__title apply__title">{CAREERS_PAGE.form.title}</h2>
+        <p class="text-2 apply__note">{r.apply}</p>
+        <CareerForm position={r.title} />
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--flush-top" aria-labelledby="more-title">
+    <div class="container">
+      <SectionHead
+        id="more-title"
+        eyebrow={CAREERS_PAGE.moreEyebrow}
+        title={CAREERS_PAGE.moreTitle}
+        link={{ label: CAREERS_PAGE.allRoles, href: "/careers/" }}
+      />
+      <ul class="list-reset others">
+        {others.map((o, i) => (
+          <li class="card other">
+            <span class="card__num" aria-hidden="true">{num(i)}</span>
+            <h3 class="card__title other__title">
+              <a class="stretched" href={href(careerPath(o.id))}>{o.data.title}</a>
+            </h3>
+            <p class="card__text">{o.data.summary}</p>
+            <p class="card__more" aria-hidden="true"><Icon name="arrow" size={16} class="arrow" /></p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .facts { margin-top: 24px; }
+  .facts .chip { font-weight: 600; color: var(--ink); }
+  .apply-link { margin-top: 28px; }
+
+  .details { display: grid; gap: 24px; }
+  @media (min-width: 1024px) {
+    .details { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); align-items: start; }
+  }
+  .details__main, .details__side { display: grid; gap: 24px; min-width: 0; }
+  .details__title { margin-bottom: 20px; font-size: clamp(24px, 1.2vw + 14px, 32px); line-height: 1.1; letter-spacing: -0.025em; }
+  .group + .group { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--rule); }
+  .group__heading { margin-bottom: 14px; font-size: 18px; line-height: 1.25; }
+
+  /* Clear the fixed header when "Apply now" jumps here. */
+  .apply { scroll-margin-top: calc(var(--header-h) + 24px); }
+  .apply__panel { max-width: 960px; }
+  .apply__title { margin-bottom: 10px; }
+  .apply__note { margin-bottom: 28px; }
+
+  .others { display: grid; gap: 24px; }
+  @media (min-width: 768px) {
+    .others { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1100px) {
+    .others { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+  .other__title { font-size: clamp(18px, 0.4vw + 14px, 20px); }
+</style>

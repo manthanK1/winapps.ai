@@ -1,0 +1,52 @@
+---
+// A technology name that pops up its official logo on hover (chips, the home
+// tech stack). Names without a logo in src/lib/tech-logos.ts render as plain
+// text. The logo is decorative: the name itself is the accessible text.
+import { logoForLabel } from "../lib/tech-logos";
+
+interface Props {
+  name: string;
+}
+const { name } = Astro.props;
+const logo = logoForLabel(name);
+---
+{logo ? (
+  <span class="tech">
+    <span class="tech__pop" aria-hidden="true">
+      <img src={logo.src} alt="" width="32" height="32" loading="lazy" decoding="async" />
+    </span>
+    {name}
+  </span>
+) : name}
+
+<style>
+  .tech { position: relative; display: inline-block; }
+  .tech__pop {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 12px);
+    z-index: 5;
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border: 1px solid var(--yellow);
+    background: #fff;
+    box-shadow: var(--lift-shadow);
+    opacity: 0;
+    transform: translate(-50%, 6px) scale(0.8);
+    transition: opacity 0.2s, transform 0.25s var(--ease);
+    pointer-events: none;
+  }
+  .tech__pop img { width: 32px; height: 32px; object-fit: contain; }
+  /* The whole chip is the hover target, not just the text inside it. */
+  .tech:hover .tech__pop,
+  :global(.chip:hover) .tech__pop,
+  :global(.stack__list li:hover) .tech__pop {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tech__pop { transform: translate(-50%, 0); }
+  }
+</style>

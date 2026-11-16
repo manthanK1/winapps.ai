@@ -1,0 +1,79 @@
+---
+// All six practices as numbered cards 01–06 (V1 /services/). Each title +
+// tagline is the card's one link and stretches over the card; "Explore the
+// practice" is visual only, so screen readers hear the title once.
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHero from "../../components/PageHero.astro";
+import Icon from "../../components/Icon.astro";
+import CtaBand from "../../components/CtaBand.astro";
+import { SERVICES_PAGE } from "../../data/copy";
+import { getServices } from "../../lib/content";
+import { href } from "../../lib/url";
+
+const services = await getServices();
+const crumbs = [{ name: "Services", path: "/services/" }];
+const { hero } = SERVICES_PAGE;
+const num = (i: number) => String(i + 1).padStart(2, "0");
+---
+<BaseLayout
+  title={SERVICES_PAGE.meta.title}
+  description={SERVICES_PAGE.meta.description}
+  breadcrumbs={crumbs}
+  pageType="CollectionPage"
+  markdownPath="/services.md"
+>
+  <PageHero breadcrumbs={crumbs} eyebrow={hero.eyebrow} title={hero.title} accent={hero.accent} lead={hero.lead} />
+
+  <section class="section section--flush-top" aria-label="All services">
+    <div class="container">
+      <ol class="list-reset svc-grid">
+        {services.map((s, i) => (
+          <li>
+            <article class="card svc">
+              <span class="card__num" aria-hidden="true">{num(i)}</span>
+              <h2 class="card__title svc__title">
+                <a class="stretched" href={href(`/services/${s.id}/`)}>
+                  {s.data.title} <span class="svc__tagline">{s.data.tagline}</span>
+                </a>
+              </h2>
+              <p class="card__text">{s.data.summary}</p>
+              <div class="svc__get">
+                <p class="eyebrow">{SERVICES_PAGE.whatYouGet}</p>
+                <p class="svc__outcome">{s.data.outcome}</p>
+              </div>
+              <p class="card__more svc__more" aria-hidden="true">
+                {SERVICES_PAGE.explore} <Icon name="arrow" size={16} class="arrow" />
+              </p>
+            </article>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .svc-grid { display: grid; gap: 24px; }
+  @media (min-width: 768px) {
+    .svc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1280px) {
+    .svc-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  .svc { height: 100%; }
+  .svc__title { font-size: clamp(26px, 1.4vw + 16px, 36px); line-height: 1.05; letter-spacing: -0.025em; }
+  .svc__tagline { display: block; }
+  /* Outcome and the "Explore" line sit at the bottom, so cards in a row line up. */
+  .svc__get { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--rule-2); }
+  .svc__get .eyebrow { margin-bottom: 10px; }
+  .svc__outcome {
+    font-family: var(--font-display);
+    font-size: 19px;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+  .svc__more { margin-top: 6px; }
+</style>

@@ -1,0 +1,24 @@
+---
+// Accessible accordion on native <details>/<summary>. Answers are in the
+// HTML (crawlable, no JS needed). The FAQPage JSON-LD on the same page must
+// use exactly these items.
+import Icon from "./Icon.astro";
+
+interface Props {
+  items: readonly { question: string; answer: string }[];
+  /** Group name: opening one closes the others in the same group. */
+  name?: string;
+}
+const { items, name = "faq" } = Astro.props;
+---
+<div class="faq">
+  {items.map((f) => (
+    <details name={name}>
+      <summary>
+        <span>{f.question}</span>
+        <Icon name="plus" size={18} class="faq__icon" />
+      </summary>
+      <div class="faq__answer"><p>{f.answer}</p></div>
+    </details>
+  ))}
+</div>

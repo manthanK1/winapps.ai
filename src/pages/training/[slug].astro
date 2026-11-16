@@ -1,0 +1,224 @@
+---
+// One page per training item: /training/<id>/. Two kinds share the route:
+//  · programmes (src/content/programmes.yaml): long-form, for working
+//    professionals or college students, with a duration in months;
+//  · short courses (src/content/training.yaml): V1's courses, grouped in tracks.
+// No fees or batch dates are published, so people enquire by email. The build stops if a programme and a course share an id.
+import type { GetStaticPaths, InferGetStaticPropsType } from "astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHero from "../../components/PageHero.astro";
+import Icon from "../../components/Icon.astro";
+import SectionHead from "../../components/SectionHead.astro";
+import TechLogos from "../../components/TechLogos.astro";
+import TrainingForm from "../../components/TrainingForm.astro";
+import { HOME, TRAINING_ADVICE, TRAINING_DOMAINS, TRAINING_PAGE } from "../../data/copy";
+import { SITE, trainingEmailFor } from "../../data/site";
+import type { TechLogo } from "../../lib/tech-logos";
+import { getCourses, getProgrammes, getTracks, programmeAsCourse, trainingCounts } from "../../lib/content";
+import { course as courseSchema, coursePath } from "../../lib/schema";
+import { href } from "../../lib/url";
+
+type Item = { id: string; name: string; summary: string; logos: readonly TechLogo[] };
+
+export const getStaticPaths = (async () => {
+  const [tracks, courses, programmes, counts] = await Promise.all([getTracks(), getCourses(), getProgrammes(), trainingCounts()]);
+  const clash = programmes.find((p) => courses.some((c) => c.id === p.id));
+  if (clash) throw new Error(`Training id "${clash.id}" is used by both a programme and a course; ids must be unique.`);
+  // The training lead's closing sentence: "Pick one and email us for the
+  // next batch, timings and fees."
+  const howToJoin = TRAINING_PAGE.hero.lead(counts).replace(/^.*\.\s+(?=[A-Z])/, "");
+  const asItem = (x: { id: string; name: string; summary: string; logos: readonly TechLogo[] }): Item => ({ id: x.id, name: x.name, summary: x.summary, logos: x.logos });
+  return [
+    ...programmes.map((p) => ({
+      params: { slug: p.id },
+      props: {
+        kind: "programme" as const,
+        item: { ...asItem({ id: p.id, ...p.data }), topics: p.data.topics },
+        schema: programmeAsCourse(p),
+        programme: p.data,
+        howToJoin,
+        group: TRAINING_PAGE.audiences[p.data.audience].label,
+        groupHref: `/training/#${p.data.audience}`,
+        groupNum: 0,
+        siblings: programmes.filter((o) => o.data.audience === p.data.audience && o.id !== p.id).map((o) => ({ ...asItem({ id: o.id, ...o.data }), months: o.data.months })),
+      },
+    })),
+    ...courses.map((c) => ({
+      params: { slug: c.id },
+      props: {
+        kind: "course" as const,
+        item: { ...asItem(c), topics: c.topics },
+        schema: c,
+        programme: null,
+        howToJoin,
+        group: c.track.name,
+        groupHref: `/training/#${c.track.id}`,
+        groupNum: tracks.findIndex((t) => t.id === c.track.id) + 1,
+        trackIntro: c.track.intro,
+        siblings: courses.filter((o) => o.track.id === c.track.id && o.id !== c.id).map((o) => ({ ...asItem(o), months: 0 })),
+      },
+    })),
+  ];
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const props = Astro.props;
+const { kind, item: c, schema, programme: p, howToJoin, group, groupHref, groupNum, siblings } = props;
+const path = coursePath(c.id);
+const crumbs = [
+  { name: "Training", path: "/training/" },
+  { name: c.name, path },
+];
+const domain = p ? TRAINING_DOMAINS.find((d) => d.id === p.domain) : undefined;
+const description =
+  kind === "programme" && p
+    ? `${c.summary} ${TRAINING_PAGE.months(p.months)}, ${TRAINING_PAGE.audiences[p.audience].label.toLowerCase()}.`
+    : `${c.summary} Part of our ${group} track.`;
+const num = (i: number) => String(i + 1).padStart(2, "0");
+---
+<BaseLayout
+  title={c.name}
+  description={description}
+  breadcrumbs={crumbs}
+  jsonLd={[courseSchema(Astro.site, schema)]}
+  pageType="ItemPage"
+  markdownPath={`/training/${c.id}.md`}
+>
+  <PageHero breadcrumbs={crumbs} eyebrow={group} title={c.name} lead={c.summary}>
+    {kind === "programme" && p ? (
+      <>
+        <ul class="chips facts" aria-label="Programme facts">
+          <li class="chip">{TRAINING_PAGE.months(p.months)}</li>
+          <li class="chip">{TRAINING_PAGE.audiences[p.audience].label}</li>
+          {domain && <li class="chip">{domain.name}</li>}
+          {p.internship && <li class="chip">{TRAINING_PAGE.internship}</li>}
+        </ul>
+        <p class="answer text-2">{howToJoin}</p>
+        <a href="#enquire" class="btn btn--primary hero-enquire-btn">Enquire for this programme <Icon name="arrow" size={18} class="arrow" /></a>
+      </>
+    ) : (
+      <>
+        <p class="answer text-2">Part of our {group} track: {"trackIntro" in props ? props.trackIntro : ""} {howToJoin}</p>
+        <a href="#enquire" class="btn btn--primary hero-enquire-btn">Enquire for this course <Icon name="arrow" size={18} class="arrow" /></a>
+      </>
+    )}
+  </PageHero>
+
+  <section class="section section--flush-top" aria-labelledby="learn-title">
+    <div class="container learn">
+      <div class="panel learn__topics">
+        <h2 id="learn-title" class="learn__title">{TRAINING_PAGE.learn}</h2>
+        <ul class="ticks">
+          {c.topics.map((topic) => (
+            <li><Icon name="check" size={16} /><span>{topic}</span></li>
+          ))}
+        </ul>
+      </div>
+      <div class="panel enquire">
+        <TechLogos logos={c.logos} />
+        <div class="enquire__actions">
+          <a href="#enquire" class="btn btn--primary btn--block">
+            Enquire online <Icon name="arrow" size={18} class="arrow" />
+          </a>
+          <a href={`mailto:${SITE.emailTraining}?subject=${encodeURIComponent(c.name)}`} class="btn btn--outline btn--block"><Icon name="mail" size={18} /> {SITE.emailTraining}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="enquire" class="section section--flush-top enquire-section" aria-labelledby="enquire-title">
+    <div class="container">
+      <div class="panel">
+        <h2 id="enquire-title" class="learn__title">Enquire about {c.name}</h2>
+        <p class="text-2" style="margin-bottom: 24px;">
+          Send us your details to receive upcoming batch dates, timings, curriculum details, and fee structure.
+        </p>
+        <TrainingForm course={c.name} />
+      </div>
+    </div>
+  </section>
+
+  {siblings.length > 0 ? (
+    <section class="section" aria-labelledby="more-title">
+      <div class="container">
+        <SectionHead
+          id="more-title"
+          eyebrow={kind === "programme" ? TRAINING_PAGE.programmesEyebrow : TRAINING_PAGE.trackEyebrow(groupNum)}
+          title={kind === "programme" ? `More programmes ${group.toLowerCase()}` : `Other courses in ${group}`}
+          link={{ label: HOME.training.allLink, href: groupHref }}
+        />
+        <ul class="list-reset siblings">
+          {siblings.map((s, i) => (
+            <li class="card sibling">
+              <div class="sibling__top">
+                <span class="card__num" aria-hidden="true">{num(i)}</span>
+                <TechLogos logos={s.logos} small />
+              </div>
+              <h3 class="card__title sibling__title">
+                <a class="stretched" href={href(coursePath(s.id))}>{s.name}</a>
+              </h3>
+              {s.months > 0 && <p class="sibling__months">{TRAINING_PAGE.months(s.months)}</p>}
+              <p class="card__text">{s.summary}</p>
+              <p class="card__more" aria-hidden="true"><Icon name="arrow" size={16} class="arrow" /></p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  ) : (
+    <div class="container back">
+      <a class="link-u veil" href={href(groupHref)}>{HOME.training.allLink} <Icon name="arrow" size={16} /></a>
+    </div>
+  )}
+
+  <section class:list={["section", { "section--flush-top": siblings.length > 0 }]} aria-labelledby="advice-title">
+    <div class="container">
+      <div class="panel panel--dark on-dark advice">
+        <div class="advice__text">
+          <h2 id="advice-title" class="advice__title">{TRAINING_ADVICE.title}</h2>
+          <p class="lead">{TRAINING_ADVICE.text}</p>
+        </div>
+        <a href={trainingEmailFor(TRAINING_ADVICE.message)} class="btn btn--light">
+          <Icon name="mail" size={18} /> {TRAINING_ADVICE.cta}
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .answer { margin-top: 16px; max-width: 64ch; }
+  .facts { margin-top: 24px; }
+  .facts .chip { font-weight: 600; color: var(--ink); }
+  .hero-enquire-btn { margin-top: 24px; }
+  .enquire-section { scroll-margin-top: calc(var(--header-h) + 24px); }
+
+  .learn { display: grid; gap: 24px; }
+  @media (min-width: 1024px) {
+    .learn { grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); align-items: start; }
+  }
+  .learn__title { margin-bottom: 28px; font-size: clamp(28px, 1.8vw + 14px, 40px); line-height: 1.08; letter-spacing: -0.025em; }
+  .learn__topics .ticks { gap: 14px; font-size: 17px; }
+  .enquire { display: grid; gap: 28px; }
+  .enquire__actions { display: grid; gap: 12px; }
+  .enquire .btn { white-space: normal; text-align: center; }
+
+  .siblings { display: grid; gap: 24px; }
+  @media (min-width: 768px) {
+    .siblings { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1100px) {
+    .siblings { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  .sibling__top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  .sibling__title { font-size: clamp(20px, 0.6vw + 14px, 24px); }
+  .sibling__months { margin-top: -8px; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--primary); }
+
+  .advice { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 28px 40px; }
+  .advice__text { max-width: 720px; }
+  .advice__title { margin-bottom: 16px; font-size: clamp(28px, 2.4vw + 12px, 44px); line-height: 1.05; letter-spacing: -0.025em; }
+  @media (max-width: 520px) {
+    .advice .btn { width: 100%; }
+  }
+</style>

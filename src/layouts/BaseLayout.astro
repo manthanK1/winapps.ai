@@ -1,0 +1,314 @@
+---
+// Every page: pre-rendered HTML with all content in the source, one <h1>,
+// canonical on the production domain, Open Graph/Twitter, and JSON-LD
+// (Organization + ProfessionalService, WebSite, WebPage, BreadcrumbList,
+// plus whatever the page passes in). The WebGL ribbon is decoration only and
+// loads after first paint.
+import "../styles/global.css";
+import headingFont from "../assets/fonts/inter-tight-600.woff2?url";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import PageDepth from "../components/PageDepth.astro";
+import ThankYouDialog from "../components/ThankYouDialog.astro";
+import { SITE } from "../data/site";
+import { metaDescription, pageTitle } from "../lib/seo";
+import { absolute, href } from "../lib/url";
+import { breadcrumbs as breadcrumbSchema, organization, webPage, website, type WebPageType } from "../lib/schema";
+
+interface Props {
+  title: string;
+  description: string;
+  /** Breadcrumb trail after Home, e.g. [{ name: "Work", path: "/work/" }] */
+  breadcrumbs?: { name: string; path: string }[];
+  /** Page-specific JSON-LD (Service, Course, FAQPage, Article…). */
+  jsonLd?: object[];
+  /** schema.org type of this page's WebPage node. */
+  pageType?: WebPageType;
+  /** Skip the generic WebPage node (when jsonLd already carries one, e.g. ContactPage). */
+  noWebPage?: boolean;
+  ogType?: "website" | "article";
+  /** Article dates for og/article meta. */
+  published?: Date;
+  modified?: Date;
+  /** Clean Markdown version of this page, advertised to AI crawlers. */
+  markdownPath?: string;
+  noindex?: boolean;
+  /** "home": the full W intro. "inner": the calm curtain. "none": no canvas. */
+  ribbon?: "home" | "inner" | "none";
+  /** Background depth level for the page's sections (grid and light); sections may override with data-depth. */
+  depth?: "strong" | "medium" | "subtle";
+}
+
+const {
+  title,
+  description,
+  breadcrumbs = [],
+  jsonLd = [],
+  pageType = "WebPage",
+  noWebPage = false,
+  ogType = "website",
+  published,
+  modified,
+  markdownPath,
+  noindex = false,
+  ribbon = "inner",
+  depth = "medium",
+} = Astro.props;
+
+const fullTitle = pageTitle(title);
+const metaDesc = metaDescription(description);
+const canonical = new URL(Astro.url.pathname, Astro.site).toString();
+const ogImage = absolute("/brand/og.png", Astro.site);
+const logoImage = absolute("/brand/icon-512.png", Astro.site);
+const trail = [{ name: "Home", path: "/" }, ...breadcrumbs];
+const path = Astro.url.pathname.slice(import.meta.env.BASE_URL.replace(/\/$/, "").length) || "/";
+
+const schemas: object[] = [
+  organization(Astro.site, logoImage, ogImage),
+  website(Astro.site),
+  ...(noWebPage ? [] : [webPage(Astro.site, { type: pageType, name: fullTitle, description: metaDesc, path, dateModified: modified })]),
+  breadcrumbSchema(Astro.site, trail),
+  ...jsonLd,
+];
+const plausibleDomain = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN;
+const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID ?? "";
+const clarityId = import.meta.env.PUBLIC_CLARITY_ID ?? "";
+---
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={metaDesc} />
+    <link rel="canonical" href={canonical} />
+    {noindex ? <meta name="robots" content="noindex, follow" /> : <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />}
+    <meta name="theme-color" content="#FFFFFF" />
+    <meta name="author" content={SITE.legalName} />
+
+    <link rel="preload" href={headingFont} as="font" type="font/woff2" crossorigin />
+    <script is:inline>document.documentElement.classList.add("js");</script>
+
+    <!-- Google Consent Mode v2 (default denied before user accepts) -->
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){window.dataLayer.push(arguments);}
+      gtag('consent', 'default', {
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+        analytics_storage: 'denied'
+      });
+    </script>
+
+    <link rel="icon" href={href("/favicon.ico")} sizes="32x32" />
+    <link rel="icon" type="image/png" sizes="32x32" href={href("/favicon-32.png")} />
+    <link rel="apple-touch-icon" href={href("/apple-touch-icon.png")} />
+    <link rel="manifest" href={href("/site.webmanifest")} />
+    <link rel="sitemap" type="application/xml" href={href("/sitemap-index.xml")} />
+    <link rel="alternate" type="text/plain" title="llms.txt" href={href("/llms.txt")} />
+    {markdownPath && <link rel="alternate" type="text/markdown" href={href(markdownPath)} />}
+
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={`${SITE.name}®`} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={metaDesc} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Winapps logo: senior engineers for software that has to work." />
+    <meta property="og:locale" content="en_GB" />
+    {published && <meta property="article:published_time" content={published.toISOString()} />}
+    {modified && <meta property="article:modified_time" content={modified.toISOString()} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={metaDesc} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content="Winapps logo: senior engineers for software that has to work." />
+
+    {schemas.map((s) => <script type="application/ld+json" set:html={JSON.stringify(s)} />)}
+
+    {plausibleDomain && <script is:inline defer data-domain={plausibleDomain} src="https://plausible.io/js/script.js" />}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vanilla-cookieconsent@3/dist/cookieconsent.css" />
+  </head>
+  <body data-ga-id={gaId} data-clarity-id={clarityId}>
+    <a href="#main" class="skip-link">Skip to content</a>
+    {/* Depth backdrop: painted under the ribbon canvas, so the ribbon stays in front. */}
+    <PageDepth level={depth} hero={ribbon === "home"} />
+    {ribbon !== "none" && <canvas class="ribbon-canvas" data-ribbon={ribbon} aria-hidden="true"></canvas>}
+    <Header />
+    <main id="main" class="site-main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+    <ThankYouDialog />
+
+    <script>
+      // The ribbon is decoration: start it only once the page has painted and
+      // the main thread is idle, so it never delays the hero text.
+      const canvas = document.querySelector<HTMLCanvasElement>("canvas[data-ribbon]");
+      if (canvas) {
+        const start = () =>
+          import("../scripts/ribbon")
+            .then(({ mountRibbon }) => {
+              const variant = canvas.dataset.ribbon === "home" ? "home" : "inner";
+              if (!mountRibbon(canvas, { variant, wordmark: document.getElementById("ribbon-word"), depth: document.getElementById("hero-depth") })) canvas.remove();
+            })
+            .catch(() => canvas.remove());
+        const whenIdle = () =>
+          "requestIdleCallback" in window ? requestIdleCallback(start, { timeout: 1500 }) : setTimeout(start, 120);
+        if (document.readyState === "complete") whenIdle();
+        else addEventListener("load", whenIdle, { once: true });
+      }
+    </script>
+
+    <!-- Global CTA & Contact Click Tracking -->
+    <script>
+      import { gaEvent } from "../utils/analytics";
+
+      document.addEventListener("click", (e) => {
+        const target = e.target as HTMLElement | null;
+        const linkOrBtn = target?.closest("a, button");
+        if (!linkOrBtn) return;
+
+        const hrefAttr = linkOrBtn.getAttribute("href") || "";
+        const text = (linkOrBtn.textContent || "").trim();
+
+        // 1. Track mailto: and tel: links -> contact_click
+        if (hrefAttr.startsWith("mailto:") || hrefAttr.startsWith("tel:")) {
+          gaEvent("contact_click", {
+            contact_type: hrefAttr.startsWith("mailto:") ? "email" : "phone",
+            contact_value: hrefAttr.replace(/^(mailto:|tel:)/, ""),
+          });
+          return;
+        }
+
+        // 2. Track key CTAs -> cta_click
+        if (/book a call|book a 30-min intro call|see our work/i.test(text)) {
+          gaEvent("cta_click", {
+            cta_text: text,
+            cta_url: hrefAttr,
+          });
+        }
+      });
+    </script>
+
+    <!-- Vanilla CookieConsent v3 + Conditional GA4 & Clarity Loader -->
+    <script is:inline src="https://cdn.jsdelivr.net/npm/vanilla-cookieconsent@3/dist/cookieconsent.umd.js"></script>
+    <script is:inline>
+      (function () {
+        var gaId = document.body.dataset.gaId || "";
+        var clarityId = document.body.dataset.clarityId || "";
+        var analyticsLoaded = false;
+
+        function loadAnalytics() {
+          if (analyticsLoaded) return;
+          analyticsLoaded = true;
+
+          // Update Google Consent Mode v2 to granted
+          if (typeof window.gtag === "function") {
+            window.gtag("consent", "update", {
+              analytics_storage: "granted"
+            });
+          }
+
+          // Load GA4 only after consent
+          if (gaId && !gaId.includes("PLACEHOLDER")) {
+            var gaScript = document.createElement("script");
+            gaScript.async = true;
+            gaScript.src = "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(gaId);
+            document.head.appendChild(gaScript);
+
+            window.gtag("js", new Date());
+            window.gtag("config", gaId);
+          }
+
+          // Load Microsoft Clarity only after consent
+          if (clarityId && !clarityId.includes("PLACEHOLDER")) {
+            (function(c,l,a,r,i,t,y){
+              c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+              t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+              y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+            })(window, document, "clarity", "script", clarityId);
+          }
+        }
+
+        function revokeAnalytics() {
+          if (typeof window.gtag === "function") {
+            window.gtag("consent", "update", {
+              analytics_storage: "denied",
+              ad_storage: "denied",
+              ad_user_data: "denied",
+              ad_personalization: "denied"
+            });
+          }
+        }
+
+        function syncConsent() {
+          if (window.CookieConsent && window.CookieConsent.acceptedCategory("analytics")) {
+            loadAnalytics();
+          } else {
+            revokeAnalytics();
+          }
+        }
+
+        function initConsent() {
+          if (!window.CookieConsent) return;
+
+          window.CookieConsent.run({
+            guiOptions: {
+              consentModal: { layout: "box", position: "bottom right", equalWeightButtons: true },
+              settingsModal: { layout: "box", position: "right", equalWeightButtons: true }
+            },
+            categories: {
+              necessary: { enabled: true, readOnly: true },
+              analytics: { enabled: false }
+            },
+            onConsent: syncConsent,
+            onChange: syncConsent,
+            language: {
+              default: "en",
+              translations: {
+                en: {
+                  consentModal: {
+                    title: "We use cookies",
+                    description: "We use essential cookies to make this site work, and optional analytics cookies (Google Analytics & Microsoft Clarity) to understand how visitors use our site.",
+                    acceptAllBtn: "Accept",
+                    acceptNecessaryBtn: "Reject",
+                    showPreferencesBtn: "Manage preferences"
+                  },
+                  settingsModal: {
+                    title: "Cookie preferences",
+                    acceptAllBtn: "Accept all",
+                    acceptNecessaryBtn: "Reject all",
+                    savePreferencesBtn: "Save preferences",
+                    closeIconLabel: "Close",
+                    sections: [
+                      { title: "Essential cookies", description: "Required for basic site functionality and security.", linkedCategory: "necessary" },
+                      { title: "Analytics cookies", description: "Help us measure traffic and improve user experience via GA4 and Microsoft Clarity.", linkedCategory: "analytics" }
+                    ]
+                  }
+                }
+              }
+            }
+          });
+
+          var btn = document.getElementById("cookie-settings");
+          if (btn) {
+            btn.addEventListener("click", function () {
+              window.CookieConsent.showPreferences();
+            });
+          }
+        }
+
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", initConsent);
+        } else {
+          initConsent();
+        }
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,44 @@
+---
+// Inline SVG icons. "arrow", "search", "menu" and "close" are the
+// design's own marks (square line caps); the rest are simple line icons in the
+// same weight. Decorative by default (aria-hidden); pass `label` to name one.
+// `size` is the icon's width; height follows the viewBox.
+export type IconName =
+  | "arrow"
+  | "arrow-up-right"
+  | "search"
+  | "menu"
+  | "close"
+  | "check"
+  | "plus"
+  | "chevron-down"
+  | "mail";
+
+interface Props {
+  name: IconName;
+  size?: number;
+  class?: string;
+  label?: string;
+}
+const { name, size = 18, class: className = "", label } = Astro.props;
+
+const ICONS: Record<IconName, { w: number; h: number; body: string }> = {
+  arrow: { w: 18, h: 14, body: '<path d="M1 7h15M10 1l6 6-6 6"/>' },
+  "arrow-up-right": { w: 16, h: 16, body: '<path d="M4 12L12 4M5.5 4H12v6.5"/>' },
+  search: { w: 24, h: 24, body: '<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/>' },
+  menu: { w: 18, h: 12, body: '<path d="M0 1h18M0 6h18M0 11h18"/>' },
+  close: { w: 14, h: 14, body: '<path d="M1 1l12 12M13 1L1 13"/>' },
+  check: { w: 16, h: 16, body: '<path d="M2.5 8.5l3.5 3.5 7.5-8"/>' },
+  plus: { w: 16, h: 16, body: '<path d="M8 1.5v13M1.5 8h13"/>' },
+  "chevron-down": { w: 14, h: 9, body: '<path d="M1 1l6 6 6-6"/>' },
+  mail: { w: 24, h: 24, body: '<path d="M2.5 5h19v14h-19z"/><path d="M2.5 5.5L12 13l9.5-7.5"/>' },
+};
+
+const icon = ICONS[name];
+const width = size;
+const height = Math.round((size * icon.h) / icon.w);
+const paint = 'fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square"';
+const a11y = label ? `role="img" aria-label="${label}"` : 'aria-hidden="true"';
+const svg = `<svg class="icon icon-${name}${className ? " " + className : ""}" width="${width}" height="${height}" viewBox="0 0 ${icon.w} ${icon.h}" ${paint} ${a11y} focusable="false">${icon.body}</svg>`;
+---
+<Fragment set:html={svg} />

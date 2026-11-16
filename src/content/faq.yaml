@@ -1,0 +1,25 @@
+# Home page FAQ. Answers are taken from Winapps' stated commitments.
+- id: ip
+  order: 1
+  question: Who owns the code and IP?
+  answer: You do. Our contracts assign all intellectual property to you, and code is committed to repositories you control from the first day of the engagement.
+- id: gdpr
+  order: 2
+  question: How do you handle GDPR and data protection?
+  answer: We sign a Data Processing Agreement on request, work in your environments with access you grant and revoke, and avoid copying production personal data to local machines. We're happy to complete your vendor security questionnaire.
+- id: time-zones
+  order: 3
+  question: How does the time difference work in practice?
+  answer: Teams shift their day to keep at least 4 hours of overlap with Central European time and 3–4 hours with US Eastern. Standups, reviews and demos happen live; the rest is async, so work often moves forward while you sleep.
+- id: interviews
+  order: 4
+  question: Can we interview the engineers?
+  answer: Yes, and we encourage it. You see profiles, run your own technical interview and approve every person before they join. If someone isn't the right fit, we replace them at no cost.
+- id: contracts
+  order: 5
+  question: How do contracts and payments work?
+  answer: We invoice monthly in USD, EUR or GBP. We can work under your MSA or ours. Discovery is fixed-fee; projects are milestone-based; pods are monthly with 30 days' notice.
+- id: start
+  order: 6
+  question: How quickly can you start?
+  answer: An intro call can usually happen within the week. Discovery typically starts within 1–2 weeks, and a full pod within 2–4 weeks of signing.

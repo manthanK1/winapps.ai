@@ -1,0 +1,58 @@
+---
+// Blog guide or news card. The title is the card's one link and stretches
+// over the whole card; the "Read the guide" line is visual only.
+import type { CollectionEntry } from "astro:content";
+import Icon from "./Icon.astro";
+import { BLOG_POST, NEWS_PAGE } from "../data/copy";
+import { href } from "../lib/url";
+
+interface Props {
+  post: CollectionEntry<"blog"> | CollectionEntry<"news">;
+  /** Shows "01", "02"… above the title. */
+  num?: number;
+  headingLevel?: "h2" | "h3";
+  /** Larger title and description (lead post on an index page). */
+  featured?: boolean;
+}
+const { post, num, headingLevel: H = "h3", featured = false } = Astro.props;
+
+// "20 Feb 2026": fixed English month names, so the output never depends on
+// the build machine's ICU data (some versions print "Sept").
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const day = (d: Date) => `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
+
+const isBlog = post.collection === "blog";
+const date = post.collection === "blog" ? post.data.updated : post.data.date;
+const meta = post.collection === "blog" ? BLOG_POST.card.meta(post.data.readMinutes) : NEWS_PAGE.card.meta;
+const dateText = post.collection === "blog" ? `${BLOG_POST.card.updated} ${day(date)}` : post.data.dateLabel;
+const more = isBlog ? BLOG_POST.card.read : NEWS_PAGE.card.read;
+---
+<article class:list={["card post", { "post--featured": featured }]}>
+  {num !== undefined && <span class="card__num" aria-hidden="true">{String(num).padStart(2, "0")}</span>}
+  <p class="eyebrow">{meta}</p>
+  <H class="card__title post__title">
+    <a class="stretched" href={href(`/${post.collection}/${post.id}/`)}>{post.data.title}</a>
+  </H>
+  <p class="card__text post__text">{post.data.description}</p>
+  <div class="card__more post__foot">
+    <time datetime={date.toISOString().slice(0, 10)}>{dateText}</time>
+    <span class="post__read" aria-hidden="true">{more} <Icon name="arrow" size={16} class="arrow" /></span>
+  </div>
+</article>
+
+<style>
+  .post { height: 100%; }
+  .post__title { font-size: clamp(20px, 0.6vw + 14px, 24px); }
+  .post__text { font-size: 15px; }
+  .post--featured .post__title { font-size: clamp(28px, 2vw + 14px, 40px); line-height: 1.05; letter-spacing: -0.025em; }
+  .post--featured .post__text { font-size: clamp(17px, 0.45vw + 14px, 20px); line-height: 1.5; }
+  .post__foot {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 16px;
+    padding-top: 18px;
+    border-top: 1px solid var(--rule);
+  }
+  .post__foot time { font-weight: 500; color: var(--muted); }
+  .post__read { display: inline-flex; align-items: center; gap: 10px; }
+</style>

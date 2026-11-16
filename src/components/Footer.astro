@@ -1,0 +1,534 @@
+---
+import Icon from "./Icon.astro";
+import SocialLogo from "./SocialLogo.astro";
+import { EMAILS, FOOTER, SITE, SOCIAL, SOCIAL_POPUP } from "../data/site";
+import { CONTACT_PAGE, FOOTER_FORM, TRAINING_PAGE } from "../data/copy";
+import { AUDIENCES, getServices } from "../lib/content";
+import { absolute, href } from "../lib/url";
+
+const services = await getServices();
+const year = new Date().getFullYear();
+const key = import.meta.env.PUBLIC_WEB3FORMS_KEY as string | undefined;
+const t = CONTACT_PAGE.form;
+
+const cleanUrl = (url: string) =>
+  url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
+---
+<footer class="site-footer" id="contact">
+  <div class="container">
+    <div class="footer-form-section">
+      <div class="footer-form-header">
+        <h2 class="footer-form-title">{FOOTER_FORM.title}</h2>
+        <p class="footer-form-subtitle">{FOOTER_FORM.text}</p>
+      </div>
+      <form
+        class="footer-form"
+        method="post"
+        action={key ? "https://api.web3forms.com/submit" : `mailto:${SITE.email}`}
+        enctype={key ? undefined : "text/plain"}
+        data-footer-form
+        data-mode={key ? "web3forms" : "mailto"}
+      >
+        {key && (
+          <>
+            <input type="hidden" name="access_key" value={key} />
+            <input type="hidden" name="subject" value="New project inquiry from winapps website" />
+            <input type="hidden" name="from_name" value="Winapps website" />
+            <input type="hidden" name="redirect" value={absolute("/contact/?sent=1", Astro.site)} />
+            <input type="hidden" name="source" value="Footer form" />
+            <input type="checkbox" name="botcheck" class="sr-only" tabindex="-1" aria-hidden="true" />
+          </>
+        )}
+        <div>
+          <label for="footer-name" class="sr-only">{FOOTER_FORM.name}</label>
+          <input type="text" id="footer-name" name="name" placeholder={FOOTER_FORM.name} autocomplete="name" required class="footer-input" />
+        </div>
+        <div>
+          <label for="footer-email" class="sr-only">{FOOTER_FORM.email}</label>
+          <input type="email" id="footer-email" name="email" placeholder={FOOTER_FORM.email} autocomplete="email" required class="footer-input" />
+        </div>
+        <div class="footer-form__wide">
+          <label for="footer-message" class="sr-only">{FOOTER_FORM.message}</label>
+          <textarea id="footer-message" name="message" placeholder={FOOTER_FORM.messagePlaceholder} rows="3" required class="footer-input footer-textarea"></textarea>
+        </div>
+        {key && <div class="footer-form__wide footer-form__captcha" data-captcha-box></div>}
+        {key && <noscript><p class="footer-form__wide footer-form__note">{t.noScript} <a href={`mailto:${SITE.email}`}>{SITE.email}</a></p></noscript>}
+        <div class="footer-form__wide">
+          <button type="submit" class="btn btn--primary" data-submit>{FOOTER_FORM.submit} <Icon name="arrow" size={18} class="arrow" /></button>
+        </div>
+        <p class="footer-form__wide footer-form__note">{FOOTER_FORM.privacy} <a href={href("/privacy/")}>{FOOTER_FORM.privacyLink}</a>.</p>
+        <div
+          role="status"
+          aria-live="polite"
+          class="footer-form__wide footer-form__status"
+          data-form-status
+          data-sending={t.sending}
+          data-captcha={t.captcha}
+          data-failed={t.failed}
+          data-failed-link={t.failedLink}
+          data-failed-or={t.failedOr}
+        ></div>
+      </form>
+    </div>
+
+    <div class="site-footer__grid">
+      <div class="site-footer__brand">
+        <p class="site-footer__legal">{SITE.legalName}</p>
+        <p class="site-footer__blurb">{FOOTER.blurb}</p>
+      </div>
+
+      <nav class="site-footer__cols" aria-label="Footer">
+        <div>
+          <h2 class="site-footer__head">Services</h2>
+          <ul class="list-reset">
+            {services.map((s) => <li><a href={href(`/services/${s.id}/`)}>{s.data.title}</a></li>)}
+          </ul>
+        </div>
+        <div>
+          <h2 class="site-footer__head">SkillUp</h2>
+          <ul class="list-reset">
+            {AUDIENCES.map((a) => <li><a href={href(`/training/#${a}`)}>{TRAINING_PAGE.audiences[a].label}</a></li>)}
+            <li><a href={href("/training/#short-courses")}>{TRAINING_PAGE.shortCourses.title}</a></li>
+            <li><a href={href("/training/")}>All SkillUp</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="site-footer__head">Explore</h2>
+          <ul class="list-reset">
+            {FOOTER.explore.map((l) => <li><a href={href(l.href)}>{l.label}</a></li>)}
+          </ul>
+        </div>
+        <div>
+          <h2 class="site-footer__head">Company</h2>
+          <ul class="list-reset">
+            {FOOTER.company.map((l) => <li><a href={href(l.href)}>{l.label}</a></li>)}
+          </ul>
+          <h2 class="site-footer__head site-footer__head--gap">Legal</h2>
+          <ul class="list-reset">
+            {FOOTER.legal.map((l) => <li><a href={href(l.href)}>{l.label}</a></li>)}
+          </ul>
+        </div>
+        <div>
+          <h2 class="site-footer__head">Social</h2>
+          <ul class="list-reset site-footer__social">
+            {SOCIAL.map((s) => (
+              <li class="social-item">
+                <a href={SOCIAL_POPUP[s.label]?.[0]?.href ?? s.href} target="_blank" rel="noopener noreferrer" class="social-trigger">
+                  <span>{s.label}</span>
+                  <SocialLogo name={s.icon} />
+                </a>
+                <div class="social-links-inline">
+                  {(SOCIAL_POPUP[s.label] ?? []).map((link) => (
+                    <a href={link.href} target="_blank" rel="noopener noreferrer" class="social-direct-url" title={link.label}>
+                      {link.label}
+                    </a>
+                  ))}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </nav>
+    </div>
+
+    <address class="site-footer__contact" data-email-strip>
+      <div class="site-footer__routes" data-email-routes>
+        {EMAILS.map((e) => (
+          <a class="site-footer__route" href={`mailto:${e.address}`}>
+            <Icon name="mail" size={16} />
+            <span class="site-footer__route-text">
+              <span class="site-footer__route-label">{e.label}</span>
+              <span>{e.address.split("@")[0]}<wbr />@{e.address.split("@")[1]}</span>
+            </span>
+          </a>
+        ))}
+      </div>
+      <span class="site-footer__dots" aria-hidden="true">
+        {EMAILS.map((_, i) => <span class:list={["site-footer__dot", { "is-active": i === 0 }]}></span>)}
+      </span>
+    </address>
+
+    <div class="site-footer__bar">
+      <p>© {SITE.founded}–{year} {SITE.name}®. All rights reserved.</p>
+      <p>
+        {SITE.legalName} · <a href={`mailto:${SITE.email}`}>{SITE.email}</a> ·
+        <button type="button" id="cookie-settings" class="cookie-settings-link">Cookie settings</button>
+      </p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    position: relative;
+    z-index: 1;
+    margin-top: clamp(48px, 8vw, 120px);
+    border-top: 1px solid var(--ink);
+    background-color: var(--paper);
+    background-image:
+      radial-gradient(45% 90% at 90% 100%, rgb(var(--depth-gold-rgb) / 0.1), transparent 70%),
+      radial-gradient(40% 80% at 5% 0%, rgb(var(--depth-grid-rgb) / 0.07), transparent 70%),
+      linear-gradient(rgb(var(--depth-grid-rgb) / 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(var(--depth-grid-rgb) / 0.06) 1px, transparent 1px);
+    background-size: auto, auto, var(--depth-grid-cell) var(--depth-grid-cell), var(--depth-grid-cell) var(--depth-grid-cell);
+    background-position: 0 0, 0 0, center top, center top;
+    color: var(--ink);
+    padding-bottom: calc(var(--footer-fixed-h) + 24px);
+  }
+  .footer-form-section {
+    padding-block: clamp(40px, 6vw, 60px) 40px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .footer-form-header { max-width: 600px; margin-bottom: 24px; }
+  .footer-form-title { margin-bottom: 8px; font: 600 clamp(1.5rem, 2.5vw, 2rem)/1.2 var(--font-display); letter-spacing: -0.02em; }
+  .footer-form-subtitle { font-size: 0.95rem; color: var(--ink-2); }
+  .footer-form { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  @media (min-width: 768px) {
+    .footer-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .footer-form__wide { grid-column: span 2; }
+  }
+  .footer-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--rule-2);
+    border-radius: 8px;
+    outline: none;
+    background: #fff;
+    font-size: 14px;
+    color: var(--ink);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .footer-input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgb(0 0 0 / 0.05); }
+  .footer-textarea { display: block; min-height: 90px; resize: vertical; }
+  .footer-form__captcha:empty { display: none; }
+  .footer-form__note { font-size: 13px; color: var(--muted); }
+  .footer-form__note a { color: inherit; }
+  .footer-form__status { font-size: 15px; line-height: 1.5; color: var(--ink); }
+  .footer-form__status:empty { display: none; }
+  .footer-form__status:not(:empty) { padding: 16px 18px; border-left: 2px solid var(--rule-2); }
+  .footer-form__status[data-kind="ok"] { border-left-color: var(--primary); background: #e7f0f1; }
+  .footer-form__status[data-kind="error"] { border-left-color: var(--accent); background: #fdf1e2; }
+  .footer-form__status[data-kind="info"] { color: var(--ink-2); background: #fff; }
+  .footer-form__status a { text-decoration: underline; }
+  .site-footer__grid {
+    display: grid;
+    gap: 48px;
+    padding-block: clamp(32px, 5vw, 60px) 32px;
+  }
+  @media (min-width: 1100px) {
+    .site-footer__grid { grid-template-columns: minmax(260px, 1fr) 2.6fr; gap: 64px; }
+  }
+  .site-footer__legal { font: 600 18px/1.25 var(--font-display); letter-spacing: -0.01em; }
+  .site-footer__blurb { margin-top: 10px; max-width: 34ch; font-size: 14px; color: var(--ink-2); }
+  .site-footer__contact {
+    position: fixed;
+    left: 0;
+    bottom: calc(56px + env(safe-area-inset-bottom));
+    z-index: 9998;
+    width: 100%;
+    border-block: 1px solid var(--rule-2);
+    background: #fff;
+    box-shadow: 0 -4px 12px rgb(0 0 0 / 0.08);
+    font-style: normal;
+  }
+  .site-footer__routes {
+    display: flex;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .site-footer__routes::-webkit-scrollbar { display: none; }
+  .site-footer__dots {
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    display: flex;
+    gap: 6px;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+  .site-footer__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--rule-2); transition: background-color 0.2s; }
+  .site-footer__dot.is-active { background: var(--primary); }
+  @media (min-width: 640px) {
+    .site-footer__contact { bottom: calc(36px + env(safe-area-inset-bottom)); }
+  }
+  @media (min-width: 720px) {
+    .site-footer__contact { background: var(--rule-2); }
+    .site-footer__routes {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1px;
+      overflow: visible;
+    }
+    .site-footer__dots, .site-footer__route[data-clone] { display: none; }
+  }
+  .site-footer__route {
+    display: flex;
+    flex: 0 0 100%;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding: 8px 70px 8px 14px;
+    background: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    transition: background-color 0.2s, box-shadow 0.2s;
+  }
+  @media (min-width: 720px) {
+    .site-footer__route { padding-right: 14px; }
+  }
+  @media (min-width: 720px) and (max-width: 899px) {
+    .site-footer__route { flex-direction: column; align-items: flex-start; gap: 2px; min-height: 52px; padding-block: 8px; }
+  }
+  .site-footer__route:hover { background: var(--yellow-tint); box-shadow: inset 0 3px 0 var(--yellow); }
+  .site-footer__route :global(svg) { flex: none; color: var(--primary); }
+  .site-footer__route-text { display: grid; gap: 1px; line-height: 1.1; }
+  .site-footer__route-label { font-size: 9px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .site-footer__cols {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 36px 24px;
+  }
+  @media (min-width: 720px) {
+    .site-footer__cols { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  }
+  .site-footer__head {
+    margin-bottom: 10px;
+    font: 600 12px/1.3 var(--font-body);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--primary);
+  }
+  .site-footer__head--gap { margin-top: 28px; }
+  .site-footer__cols a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-size: 14px;
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+  @media (min-width: 1100px) {
+    .site-footer__cols a { min-height: 36px; }
+  }
+  .site-footer__cols a:hover { color: var(--primary); text-decoration: underline; text-underline-offset: 4px; }
+
+  /* ---- Social Links: No Box, Direct URLs Reveal Inline on Hover ---- */
+  .site-footer__social {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .social-item {
+    display: flex;
+    flex-direction: column;
+  }
+  .site-footer__social .social-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 8em;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    text-decoration: none;
+    transition: color 0.25s var(--ease);
+  }
+  .social-item:hover .social-trigger,
+  .social-item:focus-within .social-trigger {
+    color: var(--primary);
+    text-decoration: none;
+  }
+  .site-footer__social :global(.social-logo) {
+    flex: none;
+    transition: transform 0.25s var(--ease);
+  }
+  .social-item:hover :global(.social-logo),
+  .social-item:focus-within :global(.social-logo) {
+    transform: scale(1.15);
+  }
+
+  /* Direct URLs smoothly reveal underneath without any white box */
+  .social-links-inline {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    padding-left: 8px;
+    border-left: 2px solid var(--primary);
+    transition: max-height 0.25s ease, opacity 0.2s ease, margin 0.2s ease;
+  }
+  .social-item:hover .social-links-inline,
+  .social-item:focus-within .social-links-inline {
+    max-height: 90px;
+    opacity: 1;
+    margin-top: 2px;
+    margin-bottom: 6px;
+  }
+  .site-footer__cols .social-direct-url {
+    display: block;
+    min-height: auto;
+    padding: 3px 0;
+    font-size: 12px;
+    line-height: 1.35;
+    color: var(--primary);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    word-break: break-all;
+  }
+  .site-footer__cols .social-direct-url:hover {
+    color: var(--ink);
+  }
+
+  .site-footer__bar {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    z-index: 9999;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 4px 12px;
+    width: 100%;
+    padding: 8px 16px calc(8px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--ink);
+    background-color: var(--paper);
+    box-shadow: 0 -4px 12px rgb(0 0 0 / 0.08);
+    font-size: 11px;
+    color: var(--ink-2);
+  }
+  .site-footer__bar a { color: inherit; }
+  .cookie-settings-link {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .cookie-settings-link:hover {
+    color: var(--primary);
+  }
+</style>
+
+<script>
+  import { SITE } from "../data/site";
+  import { attachCaptcha, sendLead } from "../scripts/lead-form";
+  import { showThankYou } from "../scripts/thank-you";
+  import { gaEvent } from "../utils/analytics";
+
+  const strip = document.querySelector<HTMLElement>("[data-email-strip]");
+  const routes = strip?.querySelector<HTMLElement>("[data-email-routes]");
+  if (strip && routes && routes.firstElementChild) {
+    const total = routes.children.length;
+    const clone = routes.firstElementChild.cloneNode(true) as HTMLElement;
+    clone.dataset.clone = "";
+    clone.setAttribute("aria-hidden", "true");
+    clone.tabIndex = -1;
+    routes.append(clone);
+
+    const dots = strip.querySelectorAll(".site-footer__dot");
+    const small = window.matchMedia("(max-width: 719px)");
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let index = 0;
+    let holdUntil = 0;
+    let settle: number | undefined;
+
+    const showDot = (i: number) => dots.forEach((dot, n) => dot.classList.toggle("is-active", n === i % total));
+
+    routes.addEventListener("scroll", () => {
+      const width = routes.clientWidth;
+      if (!width) return;
+      index = Math.round(routes.scrollLeft / width);
+      showDot(index);
+      window.clearTimeout(settle);
+      settle = window.setTimeout(() => {
+        if (index >= total) {
+          routes.scrollTo({ left: 0, behavior: "auto" });
+          index = 0;
+        }
+      }, 120);
+    }, { passive: true });
+
+    const hold = () => { holdUntil = Date.now() + 8000; };
+    const paused = () => document.hidden || Date.now() < holdUntil || strip.matches(":hover, :focus-within");
+    routes.addEventListener("pointerdown", hold, { passive: true });
+    routes.addEventListener("touchmove", hold, { passive: true });
+
+    window.setInterval(() => {
+      if (!small.matches || reduced.matches || paused()) return;
+      routes.scrollTo({ left: (index + 1) * routes.clientWidth, behavior: "smooth" });
+    }, 3500);
+  }
+
+  const form = document.querySelector<HTMLFormElement>("[data-footer-form]");
+  if (form) {
+    const web3forms = form.dataset.mode === "web3forms";
+    const captcha = web3forms ? attachCaptcha(form) : undefined;
+    const status = form.querySelector<HTMLElement>("[data-form-status]");
+    const submit = form.querySelector<HTMLButtonElement>("[data-submit]");
+    const T = status?.dataset ?? {};
+
+    const setStatus = (kind: "ok" | "error" | "info", ...parts: (string | Node)[]) => {
+      if (!status) return;
+      status.dataset.kind = kind;
+      status.replaceChildren(...parts);
+    };
+    const link = (url: string, text: string) => {
+      const a = document.createElement("a");
+      a.href = url;
+      a.textContent = text;
+      return a;
+    };
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = new FormData(form);
+      const summary = [`Name: ${data.get("name")}`, `Email: ${data.get("email")}`, "", String(data.get("message"))].join("\n");
+      const subject = `Project inquiry from ${data.get("name")}`;
+      const mailto = `mailto:${SITE.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(summary)}`;
+
+      if (!web3forms) {
+        window.location.href = mailto;
+        return;
+      }
+      if (data.get("botcheck")) return;
+
+      if (submit) submit.disabled = true;
+      setStatus("info", T.sending ?? "");
+      try {
+        if (!(await captcha?.solved())) {
+          setStatus("error", T.captcha ?? "");
+          return;
+        }
+        data.set("h-captcha-response", String(new FormData(form).get("h-captcha-response") ?? ""));
+        await sendLead(form, data);
+
+        const scriptURL = "https://script.google.com/macros/s/AKfycbxLQ2U6QOvjeBRjsg4kjf3fcX7t9Azo8RkRl3Dsthom1HKvffjokUmaC4dVaijdktNM/exec";
+        fetch(scriptURL, { method: 'POST', body: new FormData(form) }).catch(err => console.error('Sheet Error:', err));
+
+        gaEvent("generate_lead", { form_name: "footer_form" });
+
+        form.reset();
+        captcha?.reset();
+        setStatus("info");
+        if (submit) submit.disabled = false;
+        showThankYou("lead", submit);
+      } catch {
+        captcha?.reset();
+        setStatus("error", `${T.failed} `, link(mailto, T.failedLink ?? ""), ` ${T.failedOr} `, link(`mailto:${SITE.email}`, SITE.email), ".");
+      } finally {
+        if (submit) submit.disabled = false;
+      }
+    });
+  }
+</script>

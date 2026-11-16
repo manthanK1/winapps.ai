@@ -1,0 +1,67 @@
+---
+// Fixed-scope project · Dedicated pod · Team extension (V1 EngagementModels).
+// The dedicated pod is visually primary: #134F53 panel, square "Most chosen"
+// badge and the reply note. Every CTA leads to the contact page.
+import Icon from "./Icon.astro";
+import { ENGAGEMENT_BADGE, ENGAGEMENT_MODELS, ENGAGEMENT_REPLY } from "../data/copy";
+import { SITE } from "../data/site";
+import { href } from "../lib/url";
+---
+<ul class="models">
+  {ENGAGEMENT_MODELS.map((m, i) => (
+    <li class:list={["card model", { "model--featured on-dark": m.featured }]}>
+      <div class="model__top">
+        <span class="card__num" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+        {m.featured && <p class="model__badge">{ENGAGEMENT_BADGE}</p>}
+      </div>
+      <h3 class="card__title">{m.name}</h3>
+      <p class="model__fit">{m.fit}</p>
+      <ul class="ticks model__points">
+        {m.points.map((p) => (
+          <li><Icon name="check" size={16} /><span>{p}</span></li>
+        ))}
+      </ul>
+      <div class="model__cta">
+        <a href={href(SITE.bookingPath)} class:list={["btn btn--block", m.featured ? "btn--accent" : "btn--outline"]}>
+          {m.cta}<span class="sr-only">: {m.name}</span> <Icon name="arrow" size={18} class="arrow" />
+        </a>
+        {m.featured && <p class="model__note">{ENGAGEMENT_REPLY}</p>}
+      </div>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .models {
+    display: grid;
+    gap: 24px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 1024px) {
+    .models { grid-template-columns: 1fr 1.2fr 1fr; align-items: stretch; }
+  }
+  .model__top { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 28px; }
+  .model__fit { margin-top: -8px; font-size: 15px; color: var(--muted); }
+  .model__points { flex: 1; align-content: start; font-size: 15px; }
+  .model__cta { display: grid; gap: 12px; margin-top: 12px; }
+  .model__note { text-align: center; font-size: 13px; }
+
+  .model--featured { background: var(--primary); border-top-color: var(--accent); }
+  .model--featured .card__num { color: #fff; }
+  .model--featured .model__fit, .model--featured .model__note { color: var(--on-dark-2); }
+  @media (min-width: 1024px) {
+    .model--featured { padding: 40px 40px 44px; }
+  }
+  .model__badge {
+    padding: 6px 10px;
+    background: var(--accent);
+    color: var(--ink);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+</style>

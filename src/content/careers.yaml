@@ -1,0 +1,462 @@
+# Open roles: one page each at /careers/<id>/, listed on /careers/. The wording
+# comes from Winapps' job descriptions. To close a role, delete its entry; to
+# open one, copy an entry and give it a new id.
+#
+# - id: the page URL. Unique and lower-case.
+# - summary: one line for the role's card on /careers/.
+# - seoDescription: search result text, 170 characters at most.
+# - responsibilities: lists, each with an optional heading.
+# - sections: the role's other lists (skills, qualifications), titled as HR wrote them.
+# - apply: what to send, shown above the application form.
+
+- id: business-development-executive
+  title: Business Development Executive (BDE)
+  order: 1
+  department: Business Development / Sales
+  location: Karnal, Haryana
+  jobType: Full-time, work from office
+  experience: Freshers or 1–3 years
+  summary: Expand our client base, generate new business opportunities and build long-term client relationships.
+  seoDescription: Business Development Executive at Winapps in Karnal, Haryana. Generate leads, win IT services projects and build long-term client relationships.
+  about: Winapps Software Solutions Pvt. Ltd. is an IT company focused on delivering software development and technology solutions to clients. We are looking for a motivated Business Development Executive to help expand our client base, generate new business opportunities, and build long-term client relationships.
+  responsibilities:
+    - items:
+        - Identify and generate new business opportunities for IT services and software development projects.
+        - Generate leads through LinkedIn, Upwork, email marketing, cold calling, and other online platforms.
+        - Connect with domestic and international clients to understand their business requirements.
+        - Promote IT services, including web development, mobile app development, custom software, and AI-based solutions.
+        - Prepare proposals, quotations, presentations, and business pitches.
+        - Follow up with potential clients and convert leads into successful projects.
+        - Build and maintain strong, long-term client relationships.
+        - Coordinate with technical teams to understand project requirements and prepare suitable proposals.
+        - Maintain a database of leads, client communications, and sales activities.
+        - Achieve monthly lead generation, meeting, and revenue targets.
+  sections:
+    - title: Required skills & qualifications
+      items:
+        - Bachelor's degree in Business Administration, Marketing, IT, or a related field preferred.
+        - Excellent communication, negotiation, and presentation skills.
+        - Basic understanding of IT services and software development.
+        - Experience with lead generation, client acquisition, and sales.
+        - Knowledge of LinkedIn Sales Navigator, Upwork, CRM tools, and email marketing is an advantage.
+        - Ability to work independently and achieve business targets.
+        - Freshers with strong communication skills and a willingness to learn may also apply.
+    - title: Preferred experience
+      items:
+        - Freshers or candidates with 1–3 years of experience in business development or IT sales.
+        - Experience in selling software development services to international clients will be an advantage.
+  offer:
+    - Competitive salary with performance-based incentives.
+    - Career growth and learning opportunities.
+    - Supportive and professional work environment.
+    - Exposure to international clients and IT projects.
+    - Opportunity to develop sales, negotiation, and client management skills.
+  apply: Share your updated CV with the Winapps HR team.
+
+- id: business-analyst
+  title: Business Analyst
+  order: 2
+  location: Karnal, Haryana
+  jobType: Full-time, work from office
+  experience: 1–3 years (freshers with relevant skills may also apply)
+  summary: Understand client requirements, analyze business processes and work closely with development teams.
+  seoDescription: Business Analyst at Winapps in Karnal, Haryana. Gather requirements, write BRDs and user stories, and work with development teams on software solutions.
+  about: Winapps Software Solutions Pvt. Ltd. is an IT company providing software development and technology solutions. We are looking for a detail-oriented Business Analyst who can understand client requirements, analyze business processes, and work closely with development teams to deliver effective software solutions.
+  responsibilities:
+    - items:
+        - Gather, analyze, and document business and client requirements.
+        - Communicate with clients and stakeholders to understand their business needs.
+        - Prepare Business Requirement Documents (BRD), Functional Requirement Documents (FRD), and Software Requirement Specifications (SRS).
+        - Create user stories, use cases, process flows, and workflow diagrams.
+        - Coordinate with UI/UX designers, developers, QA testers, and project managers.
+        - Analyze existing business processes and recommend improvements.
+        - Support project planning, requirement validation, testing, and implementation.
+        - Participate in client meetings, project discussions, and sprint planning.
+        - Track project progress and ensure deliverables align with client expectations.
+        - Explore AI-based tools and solutions to improve business analysis and workflow efficiency.
+  sections:
+    - title: Required skills
+      items:
+        - Strong analytical, problem-solving, and communication skills.
+        - Understanding of SDLC, Agile, and Scrum methodologies.
+        - Knowledge of requirement gathering, documentation, and process mapping.
+        - Familiarity with Jira, Confluence, MS Excel, and Microsoft Office.
+        - Ability to prepare reports, presentations, user stories, and flowcharts.
+        - Basic understanding of web applications, mobile applications, APIs, and databases.
+        - Ability to communicate effectively with technical and non-technical stakeholders.
+    - title: Qualifications
+      items:
+        - Bachelor's degree in Computer Science, IT, Business Administration, or a related field.
+        - 1–3 years of experience in business analysis or a similar role preferred.
+        - Freshers with strong analytical and documentation skills may also apply.
+  offer:
+    - Competitive salary based on skills and experience.
+    - Professional development and career growth opportunities.
+    - Collaborative and supportive work environment.
+    - Exposure to real-world software development projects and AI-driven solutions.
+  apply: Share your updated CV with the Winapps HR team.
+
+- id: digital-marketing-executive
+  title: Digital Marketing Executive (SEO, ASO, Google Ads & Video Editing)
+  order: 3
+  location: Karnal, Haryana
+  jobType: Full-time, work from office
+  experience: 6 months – 2 years
+  summary: Improve online visibility, generate leads, manage advertising campaigns and create engaging video content.
+  seoDescription: Digital Marketing Executive at Winapps in Karnal, Haryana. SEO, App Store Optimization, Google and YouTube Ads, and video editing.
+  about: Winapps is looking for a creative and performance-driven Digital Marketing Executive with experience in SEO, digital marketing, App Store Optimization (ASO), Google Ads, YouTube Ads, and video editing. The ideal candidate should be capable of improving online visibility, generating leads, managing advertising campaigns, and creating engaging video content.
+  responsibilities:
+    - heading: Search Engine Optimization (SEO)
+      items:
+        - Perform keyword research and competitor analysis.
+        - Manage on-page and off-page SEO activities.
+        - Optimize website content, meta titles, descriptions, and landing pages.
+        - Monitor website traffic, rankings, and performance using Google Analytics and Google Search Console.
+    - heading: Digital marketing
+      items:
+        - Plan and execute digital marketing campaigns across online platforms.
+        - Generate leads and improve brand awareness.
+        - Manage social media content, posting schedules, and engagement.
+        - Analyze campaign performance and suggest improvements.
+    - heading: App Store Optimization (ASO)
+      items:
+        - Optimize app titles, descriptions, keywords, and metadata.
+        - Improve app visibility and organic downloads on Google Play and Apple App Store.
+        - Monitor competitor apps, rankings, and user reviews.
+    - heading: Google Ads & YouTube Ads
+      items:
+        - Create, manage, and optimize Google Ads campaigns.
+        - Run search, display, video, and remarketing campaigns as required.
+        - Set up and optimize YouTube advertising campaigns.
+        - Monitor campaign budgets, conversions, CTR, CPC, and ROI.
+        - Prepare performance reports and optimize campaigns to achieve marketing goals.
+    - heading: Video editing
+      items:
+        - Edit promotional videos, reels, YouTube videos, and short-form content.
+        - Add transitions, subtitles, background music, and visual effects.
+        - Create engaging video creatives for advertisements and social media.
+        - Use tools such as Adobe Premiere Pro, Adobe After Effects, Filmora, or CapCut.
+  sections:
+    - title: Required skills
+      items:
+        - Practical experience in SEO, digital marketing, and ASO.
+        - Knowledge of Google Ads and YouTube Ads campaign management.
+        - Basic understanding of Google Analytics 4 and Google Search Console.
+        - Video editing skills using any suitable editing software.
+        - Understanding of keyword research, audience targeting, and campaign optimization.
+        - Creative thinking, analytical skills, and good communication.
+        - Ability to manage multiple marketing activities and meet deadlines.
+    - title: Experience & qualifications
+      items:
+        - "Experience: 6 months to 2 years in digital marketing or a related field."
+        - Bachelor's degree or relevant certification in Digital Marketing, Marketing, IT, or a related field is preferred.
+        - Candidates with practical project experience and a portfolio of video edits or advertising campaigns are encouraged to apply.
+  offer:
+    - Competitive salary based on skills and experience.
+    - Opportunities to work on real-world digital marketing campaigns.
+    - Professional growth and skill development.
+    - Supportive team environment and opportunities to learn new marketing tools.
+  apply: Share your updated CV and portfolio, if available, with the Winapps HR team.
+
+- id: full-stack-developer-php
+  title: Full Stack Developer – PHP, Laravel, WordPress, React.js, Node.js & AI Integration
+  order: 4
+  location: Karnal, Haryana
+  jobType: Full-time, work from office
+  experience: 1–3 years
+  summary: Develop web applications, integrate AI-powered solutions and help build custom AI-based tools.
+  seoDescription: Full Stack Developer at Winapps in Karnal, Haryana. Build web applications with PHP, Laravel, WordPress, React.js and Node.js, and integrate AI services.
+  about: Winapps Software Solutions Pvt. Ltd. is looking for a skilled and motivated Full Stack Developer with experience in modern web technologies and an interest in Artificial Intelligence (AI). The ideal candidate will develop web applications, integrate AI-powered solutions, implement existing AI tools, and contribute to building custom AI-based tools to improve business efficiency.
+  responsibilities:
+    - items:
+        - Develop, maintain, and enhance web applications using PHP and Laravel.
+        - Build responsive user interfaces using React.js, HTML5, CSS3, and JavaScript.
+        - Develop and customize WordPress websites, themes, and plugins.
+        - Create backend services and RESTful APIs using PHP, Laravel, and Node.js.
+        - Design, develop, and optimize MySQL databases.
+        - Integrate third-party APIs, payment gateways, and external services.
+        - Develop and implement AI-powered tools and features for business automation and improved productivity.
+        - Integrate AI APIs and platforms such as OpenAI, Claude, Gemini, or other relevant AI services into web applications.
+        - Build AI-based solutions such as chatbots, AI assistants, automated content tools, and intelligent workflow systems.
+        - Implement existing AI tools and connect them with websites, applications, and internal business systems.
+        - Explore AI automation tools and identify opportunities to automate repetitive business processes.
+        - Work with AI-assisted development tools such as GitHub Copilot, Cursor, or similar platforms.
+        - Troubleshoot bugs and improve application performance, security, and scalability.
+        - Collaborate with UI/UX designers, business analysts, QA testers, and project managers.
+        - Write clean, reusable, maintainable, and well-documented code.
+        - Use Git/GitHub for version control and team collaboration.
+  sections:
+    - title: Required technical skills
+      items:
+        - "Backend: PHP, Laravel, Node.js"
+        - "Frontend: React.js, HTML5, CSS3, JavaScript"
+        - "CMS: WordPress theme and plugin customization"
+        - "Database: MySQL, database design, and query optimization"
+        - "API development: REST APIs and third-party integrations"
+        - "AI development & integration: AI APIs, LLM integration, chatbots, and AI-powered application features"
+        - "AI tools: Familiarity with OpenAI, Claude, Gemini, GitHub Copilot, Cursor, or similar tools"
+        - "Development tools: Git, GitHub, VS Code"
+        - "Additional advantage: AI workflow automation, prompt engineering, cloud deployment, and website security."
+    - title: Qualifications
+      items:
+        - Bachelor's degree or diploma in Computer Science, IT, or a related field preferred.
+        - 1–3 years of experience in full stack web development.
+        - Understanding of frontend, backend, and API integration concepts.
+        - Practical knowledge of AI tools or a strong interest in learning and implementing AI solutions.
+        - Strong analytical, debugging, and problem-solving skills.
+        - Ability to work independently and deliver projects within deadlines.
+        - Good communication and teamwork skills.
+  offer:
+    - Competitive salary based on skills and experience.
+    - Opportunities to work on web development and AI-powered projects.
+    - Exposure to modern AI technologies and automation solutions.
+    - Professional growth and continuous learning.
+    - A collaborative and supportive work environment.
+  apply: Share your updated CV and project portfolio, including any AI integration or AI-based projects, with the Winapps HR team.
+
+- id: full-stack-developer-dotnet
+  title: Full Stack Developer – .NET Core, Angular, Vue.js & AI Integration
+  order: 5
+  location: Karnal, Haryana
+  jobType: Full-time, work from office
+  experience: 1–3 years
+  summary: Develop scalable web applications, build modern user interfaces and implement AI-powered features.
+  seoDescription: Full Stack Developer at Winapps in Karnal, Haryana. Build web applications with .NET Core, Angular, Vue.js and MS SQL Server, and add AI-powered features.
+  about: Winapps Software Solutions Pvt. Ltd. is looking for a skilled and enthusiastic Full Stack Developer with experience in .NET Core, JavaScript, HTML, CSS, Angular, Vue.js, and MS SQL Server. The ideal candidate will be responsible for developing scalable web applications, building modern user interfaces, and implementing AI-powered features to improve business processes and application functionality.
+  responsibilities:
+    - items:
+        - Design, develop, test, and maintain full stack web applications using .NET Core.
+        - Build responsive and interactive user interfaces using HTML5, CSS3, JavaScript, Angular, and Vue.js.
+        - Develop and integrate RESTful APIs and backend services.
+        - Design, manage, and optimize databases using Microsoft SQL Server (MS SQL Server).
+        - Implement AI-powered features using AI APIs, large language models (LLMs), and suitable automation tools.
+        - Integrate third-party APIs and AI services into existing applications.
+        - Identify and resolve bugs, improve application performance, and maintain code quality.
+        - Collaborate with UI/UX designers, business analysts, QA engineers, and project managers.
+        - Follow secure coding practices and maintain application scalability and reliability.
+        - Participate in code reviews, testing, deployment, and ongoing application maintenance.
+        - Stay updated with modern web development technologies and AI implementation techniques.
+  sections:
+    - title: Required technical skills
+      items:
+        - "Backend: C#, .NET Core / ASP.NET Core"
+        - "Frontend: JavaScript, HTML5, CSS3"
+        - "Frameworks: Angular and/or Vue.js"
+        - "Database: Microsoft SQL Server (MS SQL Server), SQL queries, stored procedures, and database optimization"
+        - "API development: REST APIs and third-party integrations"
+        - "AI integration: AI APIs, LLM integration, prompt engineering, and AI-powered application features"
+        - "Tools: Git, GitHub, Visual Studio, and debugging tools"
+    - title: Qualifications
+      items:
+        - Bachelor's degree in Computer Science, IT, or a related field preferred.
+        - 1–3 years of experience in full stack development.
+        - Strong understanding of frontend and backend development.
+        - Knowledge of database design, API integration, and application architecture.
+        - Practical understanding of AI implementation or a willingness to learn AI integration.
+        - Good analytical, problem-solving, communication, and teamwork skills.
+  offer:
+    - Competitive salary based on skills and experience.
+    - Opportunities to work on modern web applications and AI-powered projects.
+    - Professional development and career growth.
+    - Collaborative and supportive work environment.
+    - Exposure to emerging technologies and innovative software solutions.
+  apply: Share your updated CV with the Winapps HR team.
+
+- id: web-graphic-ui-ux-designer
+  title: Web Designer / Graphic Designer / UI/UX Designer
+  order: 6
+  location: Karnal, Haryana
+  jobType: Full-time, work from office
+  experience: 6 months – 2 years
+  summary: Create attractive, user-friendly and responsive digital experiences across web, mobile and marketing.
+  seoDescription: Web, Graphic and UI/UX Designer at Winapps in Karnal, Haryana. Design websites, app interfaces, prototypes and marketing graphics using Figma and Adobe tools.
+  about: Winapps Software Solutions Pvt. Ltd. is looking for a creative and detail-oriented Web Designer / Graphic Designer / UI/UX Designer to join our team. The ideal candidate should have a strong understanding of visual design, user experience, website layouts, and graphic design, with the ability to create attractive, user-friendly, and responsive digital experiences.
+  responsibilities:
+    - items:
+        - Design modern, visually appealing, and responsive website layouts.
+        - Create user interfaces (UI) and user experiences (UX) for websites, web applications, and mobile applications.
+        - Develop wireframes, prototypes, user flows, and mockups.
+        - Create graphic designs for social media posts, banners, advertisements, brochures, and marketing materials.
+        - Design website landing pages and other digital assets according to project requirements.
+        - Work with developers, marketers, and project managers to deliver high-quality designs.
+        - Ensure consistency in typography, colors, layouts, and brand identity.
+        - Conduct basic user research and usability testing to improve design quality.
+        - Optimize designs for desktop, tablet, and mobile devices.
+        - Use AI-powered design tools where appropriate to improve creativity and productivity.
+        - Revise designs based on client feedback and project requirements.
+  sections:
+    - title: Required skills
+      items:
+        - Proficiency in Figma for UI/UX design, wireframing, and prototyping.
+        - Knowledge of Adobe Photoshop and Adobe Illustrator.
+        - Understanding of web design principles, color theory, typography, and visual hierarchy.
+        - Knowledge of responsive design and mobile-first design practices.
+        - Basic understanding of HTML5 and CSS3 will be an advantage.
+        - Ability to create website graphics, social media creatives, and marketing materials.
+        - Understanding of usability, accessibility, and user-centered design.
+        - Strong creative thinking, attention to detail, and communication skills.
+    - title: Qualifications
+      items:
+        - Degree or diploma in Graphic Design, Web Design, UI/UX Design, or a related field preferred.
+        - 6 months to 2 years of relevant experience.
+        - A portfolio showcasing website designs, graphic designs, or UI/UX projects is preferred.
+        - Freshers with strong design skills and a good portfolio may also apply.
+  offer:
+    - Competitive salary based on skills and experience.
+    - Opportunities to work on diverse web and mobile application projects.
+    - Professional development and career growth opportunities.
+    - A creative and collaborative work environment.
+    - Exposure to modern design tools and AI-assisted design workflows.
+  apply: Share your updated CV and design portfolio with the Winapps HR team.
+
+- id: mobile-app-developer
+  title: Mobile App Developer – Android, iOS, Flutter & React Native
+  order: 7
+  location: Karnal, Haryana
+  jobType: Full-time, work from office
+  experience: 1–3 years
+  summary: Develop, maintain and enhance high-quality mobile applications for Android and iOS.
+  seoDescription: Mobile App Developer at Winapps in Karnal, Haryana. Build Android and iOS apps with Flutter and React Native, integrate APIs and add AI-powered features.
+  about: Winapps Software Solutions Pvt. Ltd. is looking for a skilled and motivated Mobile App Developer to develop, maintain, and enhance high-quality mobile applications for Android and iOS. The ideal candidate should have experience with Flutter and/or React Native, API integration, and implementing AI-powered features in mobile applications.
+  responsibilities:
+    - items:
+        - Design, develop, test, and maintain mobile applications for Android and iOS platforms.
+        - Build cross-platform applications using Flutter and/or React Native.
+        - Develop native Android or iOS features where required.
+        - Integrate RESTful APIs, third-party services, payment gateways, and push notifications.
+        - Implement AI-powered features using AI APIs and large language models (LLMs).
+        - Integrate AI chatbots, intelligent search, recommendations, and automation features into mobile apps where required.
+        - Collaborate with UI/UX designers, backend developers, and project managers.
+        - Optimize application performance, responsiveness, security, and user experience.
+        - Identify and fix bugs, crashes, and compatibility issues.
+        - Manage application state, data handling, authentication, and API error handling.
+        - Test applications across different devices and operating system versions.
+        - Publish and maintain applications on the Google Play Store and Apple App Store.
+        - Follow coding standards, version control practices, and mobile development best practices.
+  sections:
+    - title: Required technical skills
+      items:
+        - "Mobile development: Flutter and/or React Native."
+        - "Platforms: Android and iOS."
+        - "Programming languages: Dart, JavaScript/TypeScript, or relevant native languages."
+        - "API integration: REST APIs, JSON, authentication, and third-party API integration."
+        - "AI integration: AI APIs, LLM integration, chatbot development, and AI-powered mobile features."
+        - "Tools: Git, GitHub, Android Studio, and VS Code."
+        - "Additional advantage: Firebase, push notifications, payment gateway integration, app deployment, and performance optimization."
+    - title: Qualifications
+      items:
+        - Bachelor's degree or diploma in Computer Science, IT, or a related field preferred.
+        - 1–3 years of experience in mobile application development.
+        - Practical experience building or maintaining Android and/or iOS applications.
+        - Understanding of mobile app architecture, debugging, and API integration.
+        - Knowledge of AI integration in mobile applications is an advantage.
+        - Strong problem-solving, communication, and teamwork skills.
+  offer:
+    - Competitive salary based on skills and experience.
+    - Opportunity to work on innovative Android and iOS applications.
+    - Hands-on experience with AI-powered mobile solutions.
+    - Professional development and career growth opportunities.
+    - A collaborative and supportive work environment.
+  apply: Share your updated CV and links to your mobile applications or project portfolio with the Winapps HR team.
+
+- id: python-full-stack-developer
+  title: Python Full Stack Developer – AI Implementation
+  order: 8
+  location: Karnal, Haryana
+  jobType: Full-time, work from office
+  experience: 1–3 years
+  summary: Develop scalable web applications, build backend services and integrate AI-powered features into business solutions.
+  seoDescription: Python Full Stack Developer at Winapps in Karnal, Haryana. Build web applications with Django, Flask or FastAPI and React.js, and implement AI features.
+  about: Winapps Software Solutions Pvt. Ltd. is looking for a skilled and innovative Python Full Stack Developer with experience in web application development and AI implementation. The ideal candidate should be capable of developing scalable web applications, building backend services, creating responsive user interfaces, and integrating AI-powered features into business solutions.
+  responsibilities:
+    - items:
+        - Design, develop, test, and maintain full stack web applications using Python.
+        - Develop backend applications and RESTful APIs using Django, Flask, or FastAPI.
+        - Build responsive and interactive user interfaces using HTML, CSS, JavaScript, and React.js.
+        - Design, manage, and optimize databases such as MySQL, PostgreSQL, or MongoDB.
+        - Implement AI-powered features using AI APIs, large language models (LLMs), and machine learning libraries.
+        - Integrate AI chatbots, intelligent search, document processing, and automated workflows into web applications.
+        - Work with AI frameworks and tools such as LangChain and relevant model APIs where appropriate.
+        - Integrate third-party APIs, authentication systems, and external services.
+        - Test, debug, and optimize applications for performance, security, and scalability.
+        - Collaborate with UI/UX designers, business analysts, and development teams.
+        - Maintain clean, reusable, and well-documented code using version control tools.
+        - Assist with application deployment, monitoring, and ongoing maintenance.
+  sections:
+    - title: Required technical skills
+      items:
+        - "Programming language: Python"
+        - "Backend frameworks: Django, Flask, or FastAPI"
+        - "Frontend: HTML5, CSS3, JavaScript, and React.js"
+        - "Database: MySQL, PostgreSQL, or MongoDB"
+        - "API development: REST APIs, JSON, and third-party integrations"
+        - "AI implementation: AI APIs, LLM integration, prompt engineering, and AI-powered application development"
+        - "AI tools & frameworks: Experience with LangChain, OpenAI-compatible APIs, or similar tools is an advantage"
+        - "Development tools: Git, GitHub, VS Code, and debugging tools"
+        - "Additional advantage: Docker, cloud deployment, machine learning fundamentals, and vector databases."
+    - title: Qualifications
+      items:
+        - Bachelor's degree or diploma in Computer Science, IT, or a related field preferred.
+        - 1–3 years of experience in Python or full stack development.
+        - Strong understanding of web application architecture and database management.
+        - Practical knowledge of API development and integration.
+        - Experience implementing AI features in web applications or a strong willingness to learn.
+        - Good analytical, problem-solving, communication, and teamwork skills.
+  offer:
+    - Competitive salary based on skills and experience.
+    - Opportunity to work on AI-powered software development projects.
+    - Exposure to modern web technologies and intelligent automation.
+    - Professional learning and career growth opportunities.
+    - Collaborative and supportive work environment.
+  apply: Share your updated CV and project portfolio with the Winapps HR team.
+
+- id: qa-automation-tester
+  title: QA Automation Tester
+  order: 9
+  location: Karnal, Haryana
+  jobType: Full-time, work from office
+  experience: 1–3 years
+  summary: Ensure reliable, high-quality software through test automation, bug reporting and quality assurance.
+  seoDescription: QA Automation Tester at Winapps in Karnal, Haryana. Automate tests with Selenium, Cypress or Playwright, test APIs and report defects.
+  about: Winapps Software Solutions Pvt. Ltd. is looking for a detail-oriented and analytical QA Automation Tester to join our software development team. The ideal candidate should have experience in software testing, test automation, bug reporting, and quality assurance to ensure reliable, high-quality software applications.
+  responsibilities:
+    - items:
+        - Design, develop, and maintain automated test scripts for web and mobile applications.
+        - Perform functional, regression, integration, smoke, and end-to-end testing.
+        - Create and execute test plans, test cases, and test scenarios based on project requirements.
+        - Automate test cases using tools such as Selenium, Cypress, or Playwright.
+        - Perform API testing using Postman or similar tools.
+        - Identify, document, track, and report software defects using bug-tracking tools.
+        - Validate application functionality, usability, performance, and compatibility across browsers and devices.
+        - Collaborate with developers, business analysts, and project managers to resolve issues.
+        - Participate in Agile ceremonies, sprint planning, and release testing.
+        - Maintain test documentation and prepare test execution reports.
+        - Integrate automated tests into CI/CD pipelines where required.
+        - Explore AI-powered testing tools to improve test coverage and testing efficiency.
+  sections:
+    - title: Required technical skills
+      items:
+        - "Automation tools: Selenium, Cypress, or Playwright."
+        - "Programming languages: Java, Python, or JavaScript."
+        - "API testing: Postman, REST API testing, and JSON validation."
+        - "Manual testing: Functional, regression, integration, and exploratory testing."
+        - "Bug tracking: Jira or similar defect-management tools."
+        - "Web technologies: Basic understanding of HTML, CSS, JavaScript, and web application architecture."
+        - "Database testing: Basic SQL queries and database validation."
+        - "Version control: Git and GitHub."
+        - "Additional advantage: CI/CD tools, performance testing with JMeter, mobile automation with Appium, and AI-assisted testing."
+    - title: Qualifications
+      items:
+        - Bachelor's degree or diploma in Computer Science, IT, or a related field preferred.
+        - 1–3 years of experience in QA testing or test automation.
+        - Strong understanding of the software testing life cycle (STLC) and software development life cycle (SDLC).
+        - Ability to write test cases, automate test scenarios, and analyze test results.
+        - Strong analytical, troubleshooting, and problem-solving skills.
+        - Good communication and teamwork skills.
+  offer:
+    - Competitive salary based on skills and experience.
+    - Opportunity to work on diverse software development projects.
+    - Professional learning and career growth opportunities.
+    - Collaborative and supportive work environment.
+    - Exposure to modern automation frameworks and AI-assisted testing tools.
+  apply: Share your updated CV with the Winapps HR team.

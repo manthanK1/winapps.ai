@@ -1,0 +1,171 @@
+---
+// Live working-hours clocks (V1 Clocks). Client cities show a 09:00–18:00
+// day; the Winapps row shows the shifted 11:00–20:00 IST day that creates the
+// overlap. The server HTML carries the cities, the bars and the note, with
+// "--:--" until the script fills in the times (same width: tabular digits).
+// Reads well on the dark trust panel and on a light page.
+import { CLOCKS } from "../data/copy";
+
+interface Props {
+  headingLevel?: "h3" | "h4";
+}
+const { headingLevel: H = "h3" } = Astro.props;
+const [homeStart, homeEnd] = CLOCKS.homeHours;
+const [clientStart, clientEnd] = CLOCKS.clientHours;
+const pct = (h: number) => `${((h / 24) * 100).toFixed(2)}%`;
+---
+<div
+  class="clocks"
+  data-clocks
+  data-start={homeStart}
+  data-end={homeEnd}
+  data-online={CLOCKS.online}
+  data-offline={CLOCKS.offline}
+>
+  <div class="clocks__head">
+    <H class="h4 clocks__title">{CLOCKS.title}</H>
+    <p class="clocks__status"><span class="clocks__dot" aria-hidden="true"></span><span data-clock-status>{CLOCKS.overlapBadge}</span></p>
+  </div>
+  <ul class="clocks__list">
+    {CLOCKS.zones.map((z) => {
+      const [start, end] = z.home ? [homeStart, homeEnd] : [clientStart, clientEnd];
+      return (
+        <li class:list={["clocks__row", { "clocks__row--home": z.home }]} data-tz={z.tz} data-home={z.home ? "" : undefined}>
+          <span class="clocks__city">{z.city}</span>
+          <span class="clocks__time" data-time>--:--</span>
+          <span class="clocks__bar" aria-hidden="true">
+            <span class="clocks__work" style={`--from:${pct(start)};--span:${pct(end - start)}`}></span>
+            <span class="clocks__now" data-now hidden></span>
+          </span>
+        </li>
+      );
+    })}
+  </ul>
+  <p class="clocks__note">
+    {CLOCKS.note.before}<strong>{CLOCKS.note.strong1}</strong>{CLOCKS.note.middle}<strong>{CLOCKS.note.strong2}</strong>{CLOCKS.note.after}
+  </p>
+</div>
+
+<style>
+  .clocks {
+    --clk-rule: var(--rule-2);
+    --clk-track: var(--rule);
+    --clk-bar: var(--teal);
+    --clk-home: var(--accent);
+    --clk-now: var(--ink);
+    --clk-text-2: var(--ink-2);
+    --clk-strong: var(--ink);
+    padding: clamp(24px, 2.4vw, 36px);
+    border: 1px solid var(--clk-rule);
+    background: var(--card);
+  }
+  :global(.on-dark) .clocks {
+    --clk-rule: var(--overlay-rule);
+    --clk-track: rgb(255 255 255 / 0.12);
+    --clk-bar: var(--teal-sheen);
+    --clk-now: #fff;
+    --clk-text-2: var(--on-dark-2);
+    --clk-strong: #fff;
+    background: transparent;
+  }
+  .clocks__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; }
+  .clocks__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 24px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--clk-text-2);
+  }
+  .clocks__dot { width: 8px; height: 8px; background: var(--clk-bar); }
+  .clocks[data-state="online"] .clocks__dot { background: var(--whatsapp); }
+  .clocks[data-state="offline"] .clocks__dot { background: var(--clk-home); }
+  .clocks__list {
+    margin: 24px 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--clk-rule);
+  }
+  .clocks__row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 8px 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--clk-rule);
+  }
+  .clocks__city { font-size: 14px; color: var(--clk-text-2); }
+  .clocks__row--home .clocks__city { font-weight: 600; color: inherit; }
+  .clocks__time {
+    min-width: 5ch;
+    text-align: right;
+    font-family: var(--font-display);
+    font-size: clamp(22px, 1.1vw + 14px, 28px);
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+  }
+  .clocks__bar { position: relative; grid-column: 1 / -1; height: 6px; background: var(--clk-track); }
+  .clocks__work { position: absolute; top: 0; bottom: 0; left: var(--from); width: var(--span); background: var(--clk-bar); }
+  .clocks__row--home .clocks__work { background: var(--clk-home); }
+  .clocks__now { position: absolute; top: -4px; width: 2px; height: 14px; margin-left: -1px; background: var(--clk-now); }
+  .clocks__note { margin-top: 20px; font-size: 14px; line-height: 1.55; color: var(--clk-text-2); }
+  .clocks__note strong { font-weight: 600; color: var(--clk-strong); white-space: nowrap; }
+</style>
+
+<script>
+  // Fill in the live times, the "now" markers and the online status. Runs
+  // every 30 s while the tab is visible; pauses when it is hidden.
+  for (const root of document.querySelectorAll<HTMLElement>("[data-clocks]")) {
+    const start = Number(root.dataset.start);
+    const end = Number(root.dataset.end);
+    const status = root.querySelector<HTMLElement>("[data-clock-status]");
+    const rows = [...root.querySelectorAll<HTMLElement>("[data-tz]")].map((row) => ({
+      home: row.hasAttribute("data-home"),
+      time: row.querySelector<HTMLElement>("[data-time]"),
+      now: row.querySelector<HTMLElement>("[data-now]"),
+      format: new Intl.DateTimeFormat("en-GB", {
+        timeZone: row.dataset.tz,
+        hour: "2-digit",
+        minute: "2-digit",
+        weekday: "short",
+        hourCycle: "h23",
+      }),
+    }));
+
+    const tick = () => {
+      const now = new Date();
+      let online = false;
+      for (const row of rows) {
+        const parts = row.format.formatToParts(now);
+        const get = (type: Intl.DateTimeFormatPartTypes) => parts.find((p) => p.type === type)?.value ?? "";
+        const hour = get("hour");
+        const minute = get("minute");
+        const hours = Number(hour) + Number(minute) / 60;
+        if (row.time) row.time.textContent = `${hour}:${minute}`;
+        if (row.now) {
+          row.now.style.left = `${(hours / 24) * 100}%`;
+          row.now.hidden = false;
+        }
+        if (row.home) online = !["Sat", "Sun"].includes(get("weekday")) && hours >= start && hours < end;
+      }
+      root.dataset.state = online ? "online" : "offline";
+      if (status) status.textContent = (online ? root.dataset.online : root.dataset.offline) ?? "";
+    };
+
+    let timer: number | undefined;
+    const run = () => {
+      if (timer !== undefined) return;
+      tick();
+      timer = window.setInterval(tick, 30_000);
+    };
+    const stop = () => {
+      window.clearInterval(timer);
+      timer = undefined;
+    };
+    document.addEventListener("visibilitychange", () => (document.hidden ? stop() : run()));
+    if (!document.hidden) run();
+  }
+</script>

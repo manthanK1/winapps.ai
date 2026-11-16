@@ -1,0 +1,80 @@
+---
+// Open roles, each linking to its own page with the application form.
+// Roles live in src/content/careers.yaml.
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageHero from "../../components/PageHero.astro";
+import Icon from "../../components/Icon.astro";
+import SectionHead from "../../components/SectionHead.astro";
+import { CAREERS_PAGE } from "../../data/copy";
+import { SITE } from "../../data/site";
+import { careerPath, getCareers } from "../../lib/content";
+import { href } from "../../lib/url";
+
+const roles = await getCareers();
+const crumbs = [{ name: "Careers", path: "/careers/" }];
+const { meta, hero, questions } = CAREERS_PAGE;
+const num = (i: number) => String(i + 1).padStart(2, "0");
+---
+<BaseLayout
+  title={meta.title}
+  description={meta.description}
+  breadcrumbs={crumbs}
+  pageType="CollectionPage"
+  markdownPath="/careers.md"
+>
+  <PageHero breadcrumbs={crumbs} eyebrow={hero.eyebrow} title={hero.title} accent={hero.accent} lead={hero.lead} />
+
+  <section class="section section--flush-top" aria-labelledby="roles-title">
+    <div class="container">
+      <SectionHead id="roles-title" eyebrow={CAREERS_PAGE.listEyebrow} title={CAREERS_PAGE.listTitle} />
+      <ul class="list-reset roles">
+        {roles.map((r, i) => (
+          <li class="card role">
+            <span class="card__num" aria-hidden="true">{num(i)}</span>
+            <h3 class="card__title role__title">
+              <a class="stretched" href={href(careerPath(r.id))}>{r.data.title}</a>
+            </h3>
+            <p class="card__text">{r.data.summary}</p>
+            <ul class="list-reset chips role__facts">
+              <li class="chip">{r.data.experience}</li>
+              <li class="chip">{r.data.location}</li>
+            </ul>
+            <p class="card__more role__more">{CAREERS_PAGE.viewRole} <Icon name="arrow" size={16} class="arrow" /></p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--flush-top" aria-labelledby="questions-title">
+    <div class="container">
+      <div class="panel panel--dark on-dark questions">
+        <div>
+          <h2 id="questions-title" class="questions__title">{questions.title}</h2>
+          <p class="lead">{questions.text}</p>
+        </div>
+        <a href={`mailto:${SITE.emailHr}`} class="btn btn--light"><Icon name="mail" size={18} /> {SITE.emailHr}</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .roles { display: grid; gap: 24px; }
+  @media (min-width: 768px) {
+    .roles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (min-width: 1100px) {
+    .roles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  .role { display: flex; flex-direction: column; }
+  .role__title { font-size: clamp(20px, 0.6vw + 14px, 24px); }
+  .role__facts { margin-top: 16px; }
+  .role__more { margin-top: auto; padding-top: 20px; }
+
+  .questions { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 28px 40px; }
+  .questions__title { margin-bottom: 16px; font-size: clamp(28px, 2.4vw + 12px, 44px); line-height: 1.05; letter-spacing: -0.025em; }
+  @media (max-width: 520px) {
+    .questions .btn { width: 100%; }
+  }
+</style>
